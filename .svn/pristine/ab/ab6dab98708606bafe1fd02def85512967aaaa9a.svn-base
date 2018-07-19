@@ -1,0 +1,188 @@
+<!doctype html>
+<html lang="ko">
+<head>
+<meta http-equiv="content-type" content="text/html; charset=utf-8">
+<meta http-equiv="X-UA-Compatible" content="IE=edge">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, minimum-scale=1.0, user-scalable=no">
+<meta name="subject" content="KBIZ">
+<meta name="author" content="KBIZ">
+<meta name="keywords" content="KBIZ">
+<meta name="description" content="KBIZ">
+<title>KBIZ</title>
+<script type="text/javascript" src="http://code.jquery.com/jquery-latest.min.js"></script>
+<script type="text/javascript" src="js/common.js"></script>
+<link rel="stylesheet" href="css/reset.css" type="text/css" media="screen" />
+<link rel="stylesheet" href="css/common.css" type="text/css" media="screen" />
+<script type="text/javascript">
+
+</script>
+<style>
+
+</style>
+</head>
+<body>
+
+<div class="template_wrap">
+<form id="frm" name="frm">
+<input type="hidden" name="ctl_cust_id" id="ctl_cust_id" value="" />
+    <div class="section">
+        <h3><span class="sec_tit">SMS 검색</span></h3>
+        <input type="hidden" name="a_s_page" id="a_s_page" value="1" /><!-- 한화면 첫페이지 -->
+        <input type="hidden" name="s_row" id="s_row" value="" /><!-- 한목록 첫 로우 -->
+        <input type="hidden" name="p_row" id="p_row" value="" />
+        <input type="hidden" name="all_page" id="all_page" value="" /> 
+        <input type="hidden" name="all_last_page" id="all_last_page" value="" /><!-- 총 페이지 수 -->
+        <table width="100%" border="0"  cellspacing="0" cellpadding="0" class="brd_sch">
+            <colgroup>
+                <col style="width:60px">
+                <col>
+                <col style="width:60px">
+                <col>
+                <col style="width:60px">
+                <col>
+                <col style="width:60px">
+                <col>
+                <col style="width:60px">
+            </colgroup>
+            <tr>
+                <th>선택</th>
+                <td><select id="cus_tp" name="cus_tp"><option value="">전체</option><option value=""></option></select></td>
+                <th>점포명</th>
+                <td><input type="text" name="store_name" id="store_name" value="" /></td>
+                <th>처리구분</th>
+                <td><select id="pro_tp" name="pro_tp"><option value="">전체</option><option value=""></option></select></td>
+                <th>이관자</th>
+                <td><input type="text" name="trans_name" id="trans_name" value="" /></td>
+                <td class="ar"><a href="#" class="btn small g_orange">조회</a><!--<img src="./images/btn_select01.gif" border="0" onClick="JavaScript:f_loadList('0')" style="cursor:pointer;" />--></td>
+            </tr>
+        </table>
+    </div>    
+    <div class="section">
+        <h3><span class="sec_tit">SMS</span></h3>
+        <!--게시판-->
+        <table width="100%" border="0"  cellspacing="0" cellpadding="0" class="brd_list_a hover_action">
+            <colgroup>
+                <col style="width:70px">
+                <col>
+                <col style="width:60px">
+                <col style="width:60px">
+                <col style="width:60px">
+            </colgroup>
+            <thead>
+            <tr>
+                <th>상담일시</th>
+                <th>내용</th>
+                <th>고객명</th>
+                <th>상담사</th>
+                <th>처리구분</th>
+            </tr>
+            </thead>
+            <tbody>
+            <tr>
+                <td>2017/11/02</td>
+                <td class="ellips al">고객이 만족할만한 이런이런 내용으로 처리하였습니다.</td>
+                <td>김대준</td>
+                <td>홍길동</td>
+                <td>완료</td>
+            </tr>
+            <tr>
+                <td>2017/11/02</td>
+                <td class="ellips al">고객이 만족할만한 이런이런 내용으로 처리하였습니다.</td>
+                <td>김대준</td>
+                <td>홍길동</td>
+                <td>완료</td>
+            </tr>
+            <tr>
+                <td>2017/11/02</td>
+                <td class="ellips al">고객이 만족할만한 이런이런 내용으로 처리하였습니다.</td>
+                <td>김대준</td>
+                <td>홍길동</td>
+                <td>완료</td>
+            </tr>
+            <tr>
+                <td>2017/11/02</td>
+                <td class="ellips al">고객이 만족할만한 이런이런 내용으로 처리하였습니다.</td>
+                <td>김대준</td>
+                <td>홍길동</td>
+                <td>완료</td>
+            </tr>
+            <tr>
+                <td>2017/11/02</td>
+                <td class="ellips al">고객이 만족할만한 이런이런 내용으로 처리하였습니다.</td>
+                <td>김대준</td>
+                <td>홍길동</td>
+                <td>완료</td>
+            </tr>
+            </tbody>
+            <tfoot>
+            <tr>
+                <td colspan="5" style="height:50px;">조회 결과가 없습니다.</td>
+            </tr>
+            </tfoot>
+        </table>
+        <!--/게시판-->
+		<div class="boardPagingWrap">
+			<a id="ctl00_ContentPlaceHolder1_btPrevEnd" href="javascript:__doPostBack('ctl00$ContentPlaceHolder1$btPrevEnd','')" class="first">first</a><!--
+			--><a id="ctl00_ContentPlaceHolder1_btPrev" href="javascript:__doPostBack('ctl00$ContentPlaceHolder1$btPrev','')" class="prev">prev</a><!--
+			--><a id="ctl00_ContentPlaceHolder1_lbtPage1" href="javascript:__doPostBack('ctl00$ContentPlaceHolder1$lbtPage1','')" class="on">1</a><!--
+			--><a id="ctl00_ContentPlaceHolder1_lbtPage2" href="javascript:__doPostBack('ctl00$ContentPlaceHolder1$lbtPage2','')">2</a><!--
+			--><a id="ctl00_ContentPlaceHolder1_lbtPage3" href="javascript:__doPostBack('ctl00$ContentPlaceHolder1$lbtPage3','')">3</a><!--
+			--><a id="ctl00_ContentPlaceHolder1_lbtPage4" href="javascript:__doPostBack('ctl00$ContentPlaceHolder1$lbtPage4','')">4</a><!--
+			--><a id="ctl00_ContentPlaceHolder1_lbtPage5" href="javascript:__doPostBack('ctl00$ContentPlaceHolder1$lbtPage5','')">5</a><!--
+			--><a id="ctl00_ContentPlaceHolder1_lbtPage5" href="javascript:__doPostBack('ctl00$ContentPlaceHolder1$lbtPage5','')">6</a><!--
+			--><a id="ctl00_ContentPlaceHolder1_lbtPage5" href="javascript:__doPostBack('ctl00$ContentPlaceHolder1$lbtPage5','')">7</a><!--
+			--><a id="ctl00_ContentPlaceHolder1_lbtPage5" href="javascript:__doPostBack('ctl00$ContentPlaceHolder1$lbtPage5','')">8</a><!--
+			--><a id="ctl00_ContentPlaceHolder1_lbtPage5" href="javascript:__doPostBack('ctl00$ContentPlaceHolder1$lbtPage5','')">9</a><!--
+			--><a id="ctl00_ContentPlaceHolder1_lbtPage5" href="javascript:__doPostBack('ctl00$ContentPlaceHolder1$lbtPage5','')">10</a><!--
+			--><a id="ctl00_ContentPlaceHolder1_btNext" href="javascript:__doPostBack('ctl00$ContentPlaceHolder1$btNext','')" class="next">next</a><!--
+			--><a id="ctl00_ContentPlaceHolder1_btNextEnd" href="javascript:__doPostBack('ctl00$ContentPlaceHolder1$btNextEnd','')" class="last">last</a>
+		</div>
+    </div>
+    <div class="section">
+        <h3><span class="sec_tit">SMS 전송 상세보기</span></h3>
+        <table width="100%" border="0" cellspacing="0" cellpadding="0" class="brd_sch">
+            <colgroup>
+                <col style="width:70px">
+                <col>
+                <col style="width:70px">
+                <col>
+                <col style="width:70px">
+                <col>
+            </colgroup>
+            <tr>
+                <th>전송일시</th>
+                <td class="pdl10">2017-07-15</td>
+                <th>고객명</th>
+                <td class="pdl10">홍길동</td>
+                <th>전화번호</th>
+                <td class="pdl10">010-2548-8956</td>
+            </tr>
+            <tr>
+                <th>내용</th>
+                <td colspan="5" class="pdl10"><div style="overflow-y:auto; height:200px; padding:0px">내용입니다.</div></td>
+            </tr>
+        </table>
+    </div>
+    <div class="btn_area clfix">
+        <div class="fl">
+            <button type="button" class="btn small g_darkgray">인쇄</button>
+            <button type="button" class="btn small g_lightgray">엑셀</button>
+            <button type="button" class="btn small g_blue">출력</button>
+            <button type="button" class="btn small g_orange">출력</button>
+            <button type="button" class="btn small g_red">출력</button>
+            <button type="button" class="btn small g_green">출력</button>
+        </div>
+        <div class="fr">
+            <a href="#" class="btn small g_darkgray">인쇄</a>
+            <a href="#" class="btn small g_lightgray">엑셀</a>
+            <a href="#" class="btn small g_blue">출력</a>
+            <a href="#" class="btn small g_orange">출력</a>
+            <a href="#" class="btn small g_red">출력</a>
+            <a href="#" class="btn small g_green">출력</a>
+        </div>
+    </div>
+</form>
+</div>
+
+</body>
+</html>

@@ -1,0 +1,51 @@
+package or.kr.kbiz.test;
+
+import java.text.SimpleDateFormat;
+import java.util.Calendar;
+import java.util.Date;
+
+import or.kr.kbiz.serv.spring.mvc.BaseDomain;
+import or.kr.kbiz.serv.util.SecureUtil;
+
+public class TestMain {
+
+	private static BaseDomain b;
+
+	public static void main(String[] args) {
+		// TODO Auto-generated method stub
+//		TemplateDomain a = new TemplateDomain();
+//		a.setPageIdx(5);
+//		setBaseDomain(a);
+//		System.out.println(b.getPageIdx());
+
+
+//		System.out.println(simpledate("yyyy-MM-dd HH:mm:ss"));
+//		System.out.println(simpledate("yyyyMMddHHmmss"));
+
+//		System.out.println(Math.ceil(1 / (double) 10));
+//		System.out.println(Math.ceil(1 / (double) 10) * 10 * 10 + 1);
+		System.out.println(SecureUtil.encrypt("narucnc1@"));
+//		System.out.println("A00000".substring(1, 6));
+
+	}
+
+	public static void setBaseDomain(Object domainClazz) {
+		System.out.println(domainClazz.getClass().getSuperclass().getSimpleName());
+		if (domainClazz.getClass().getSuperclass().getSimpleName().equals("BaseDomain")) {
+			b = (BaseDomain) domainClazz;
+		} else {
+			System.out.println("Do not have superclass 'BaseDomain'");
+		}
+	}
+
+	public static String simpledate(String format) {
+		Date d = (Date) Calendar.getInstance().getTime();
+		SimpleDateFormat sdf = new SimpleDateFormat(format);
+		return sdf.format(d);
+	}
+
+	public enum FirstOption {
+		ALL, SEL
+	}
+
+}

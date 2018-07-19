@@ -1,0 +1,276 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper
+  PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+  "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="renewCustomerBatch">
+
+    <!-- 차세대 통합계약 테이블 배치 대상 데이터 저장 -->
+    <update id="mergeIfCaUntycntr" parameterType="RenewIfCaUntycntrDomain">
+        MERGE INTO IF_CA_UNTYCNTR_M A
+            USING (
+                SELECT
+                    #{untyCntrNo} AS UNTY_CNTR_NO
+                    , #{ddctBizDscd} AS DDCT_BIZ_DSCD
+                    , #{cntrNo} AS CNTR_NO
+                    , #{prdCd} AS PRD_CD
+                    , #{nregBzpnYn} AS NREG_BZPN_YN
+                    , #{cntrBgnDt} AS CNTR_BGN_DT
+                    , #{cntrEndDt} AS CNTR_END_DT
+                    , #{abndYn} AS ABND_YN
+                    , #{postTrsplDscd} AS POST_TRSPL_DSCD
+                    , #{smsYn} AS SMS_YN
+                    , #{dlgtUntyCsno} AS DLGT_UNTY_CSNO
+                    , #{bzplUntyCsno} AS BZPL_UNTY_CSNO
+                    , #{bzenChrpnNm} AS BZEN_CHRPN_NM
+                    , TO_DATE(#{fnlUdtDtm}, 'YYYYMMDDHH24MISS') AS FNL_UDT_DTM
+                  FROM DUAL
+            ) B
+            ON (A.UNTY_CNTR_NO = B.UNTY_CNTR_NO)
+            WHEN MATCHED THEN
+                UPDATE SET
+                    A.DDCT_BIZ_DSCD = B.DDCT_BIZ_DSCD
+                    , A.CNTR_NO = B.CNTR_NO
+                    , A.PRD_CD = B.PRD_CD
+                    , A.NREG_BZPN_YN = B.NREG_BZPN_YN
+                    , A.CNTR_BGN_DT = B.CNTR_BGN_DT
+                    , A.CNTR_END_DT = B.CNTR_END_DT
+                    , A.ABND_YN = B.ABND_YN
+                    , A.POST_TRSPL_DSCD = B.POST_TRSPL_DSCD
+                    , A.SMS_YN = B.SMS_YN
+                    , A.DLGT_UNTY_CSNO = B.DLGT_UNTY_CSNO
+                    , A.BZPL_UNTY_CSNO = B.BZPL_UNTY_CSNO
+                    , A.BZEN_CHRPN_NM = B.BZEN_CHRPN_NM
+                    , A.FNL_UDT_DTM = B.FNL_UDT_DTM
+            WHEN NOT MATCHED THEN
+                INSERT
+                (
+                    A.UNTY_CNTR_NO
+                    , A.DDCT_BIZ_DSCD
+                    , A.CNTR_NO
+                    , A.PRD_CD
+                    , A.NREG_BZPN_YN
+                    , A.CNTR_BGN_DT
+                    , A.CNTR_END_DT
+                    , A.ABND_YN
+                    , A.POST_TRSPL_DSCD
+                    , A.SMS_YN
+                    , A.DLGT_UNTY_CSNO
+                    , A.BZPL_UNTY_CSNO
+                    , A.BZEN_CHRPN_NM
+                    , A.FNL_UDT_DTM
+                ) VALUES (
+                    B.UNTY_CNTR_NO
+                    , B.DDCT_BIZ_DSCD
+                    , B.CNTR_NO
+                    , B.PRD_CD
+                    , B.NREG_BZPN_YN
+                    , B.CNTR_BGN_DT
+                    , B.CNTR_END_DT
+                    , B.ABND_YN
+                    , B.POST_TRSPL_DSCD
+                    , B.SMS_YN
+                    , B.DLGT_UNTY_CSNO
+                    , B.BZPL_UNTY_CSNO
+                    , B.BZEN_CHRPN_NM
+                    , B.FNL_UDT_DTM
+                )
+    </update>
+
+    <!-- 차세대 통합고객 테이블 배치 대상 데이터 저장 -->
+    <update id="mergeIfCmUntycs" parameterType="RenewIfCmUntycsDomain">
+        MERGE INTO IF_CM_UNTYCS_M A
+            USING (
+                SELECT
+                    #{untyCsno} AS UNTY_CSNO
+                    , #{csSrchNo} AS CS_SRCH_NO
+                    , #{csDscd} AS CS_DSCD
+                    , #{csKrnNm} AS CS_KRN_NM
+                    , #{csSrchKwrdNm} AS CS_SRCH_KWRD_NM
+                    , #{rlCsKrnNm} AS RL_CS_KRN_NM
+                    , TO_DATE(#{fnlUdtDtm}, 'YYYYMMDDHH24MISS') AS FNL_UDT_DTM
+                    , #{csRnno} AS CS_RNNO
+                  FROM DUAL
+            ) B
+            ON (A.UNTY_CSNO = B.UNTY_CSNO)
+            WHEN MATCHED THEN
+                UPDATE SET
+                    A.CS_SRCH_NO = B.CS_SRCH_NO
+                    , A.CS_DSCD = B.CS_DSCD
+                    , A.CS_KRN_NM = B.CS_KRN_NM
+                    , A.CS_SRCH_KWRD_NM = B.CS_SRCH_KWRD_NM
+                    , A.RL_CS_KRN_NM = B.RL_CS_KRN_NM
+                    , A.FNL_UDT_DTM = B.FNL_UDT_DTM
+                    , A.CS_RNNO = B.CS_RNNO
+            WHEN NOT MATCHED THEN
+                INSERT
+                (
+                    A.UNTY_CSNO
+                    , A.CS_SRCH_NO
+                    , A.CS_DSCD
+                    , A.CS_KRN_NM
+                    , A.CS_SRCH_KWRD_NM
+                    , A.RL_CS_KRN_NM
+                    , A.FNL_UDT_DTM
+                    , A.CS_RNNO
+                ) VALUES (
+                    B.UNTY_CSNO
+                    , B.CS_SRCH_NO
+                    , B.CS_DSCD
+                    , B.CS_KRN_NM
+                    , B.CS_SRCH_KWRD_NM
+                    , B.RL_CS_KRN_NM
+                    , B.FNL_UDT_DTM
+                    , B.CS_RNNO
+                )
+    </update>
+
+    <!-- 차세대 고객이메일 테이블 배치 대상 데이터 저장 -->
+    <update id="mergeIfCmEmail" parameterType="RenewIfCmEmailDomain">
+        MERGE INTO IF_CM_EMAIL_M A
+            USING (
+                SELECT
+                    #{untyCsno} AS UNTY_CSNO
+                    , #{emailSeqno} AS EMAIL_SEQNO
+                    , #{untyCntrNo} AS UNTY_CNTR_NO
+                    , #{emailRlDscd} AS EMAIL_RL_DSCD
+                    , #{email} AS EMAIL
+                    , #{errYn} AS ERR_YN
+                    , #{usagYn} AS USAG_YN
+                    , TO_DATE(#{fnlUdtDtm}, 'YYYYMMDDHH24MISS') AS FNL_UDT_DTM
+                  FROM DUAL
+            ) B
+            ON (A.UNTY_CSNO = B.UNTY_CSNO AND A.EMAIL_SEQNO = B.EMAIL_SEQNO)
+            WHEN MATCHED THEN
+                UPDATE SET
+                    A.UNTY_CNTR_NO = B.UNTY_CNTR_NO
+                    , A.EMAIL_RL_DSCD = B.EMAIL_RL_DSCD
+                    , A.EMAIL = B.EMAIL
+                    , A.ERR_YN = B.ERR_YN
+                    , A.USAG_YN = B.USAG_YN
+                    , A.FNL_UDT_DTM = B.FNL_UDT_DTM
+            WHEN NOT MATCHED THEN
+                INSERT
+                (
+                    A.UNTY_CSNO
+                    , A.EMAIL_SEQNO
+                    , A.UNTY_CNTR_NO
+                    , A.EMAIL_RL_DSCD
+                    , A.EMAIL
+                    , A.ERR_YN
+                    , A.USAG_YN
+                    , A.FNL_UDT_DTM
+                ) VALUES (
+                    B.UNTY_CSNO
+                    , B.EMAIL_SEQNO
+                    , B.UNTY_CNTR_NO
+                    , B.EMAIL_RL_DSCD
+                    , B.EMAIL
+                    , B.ERR_YN
+                    , B.USAG_YN
+                    , B.FNL_UDT_DTM
+                )
+    </update>
+
+    <!-- 차세대 고객전화번호 테이블 배치 대상 데이터 저장 -->
+    <update id="mergeIfCmCnpl" parameterType="RenewIfCmCnplDomain">
+        MERGE INTO IF_CM_CNPL_M A
+            USING (
+                SELECT
+                    #{untyCsno} AS UNTY_CSNO
+                    , #{cnplSeqno} AS CNPL_SEQNO
+                    , #{untyCntrNo} AS UNTY_CNTR_NO
+                    , #{csCnplDscd} AS CS_CNPL_DSCD
+                    , #{tlno} AS TLNO
+                    , #{errYn} AS ERR_YN
+                    , #{usagYn} AS USAG_YN
+                    , TO_DATE(#{fnlUdtDtm}, 'YYYYMMDDHH24MISS') AS FNL_UDT_DTM
+                  FROM DUAL
+            ) B
+            ON (A.UNTY_CSNO = B.UNTY_CSNO AND A.CNPL_SEQNO = B.CNPL_SEQNO)
+            WHEN MATCHED THEN
+                UPDATE SET
+                    A.UNTY_CNTR_NO = B.UNTY_CNTR_NO
+                    , A.CS_CNPL_DSCD = B.CS_CNPL_DSCD
+                    , A.TLNO = B.TLNO
+                    , A.ERR_YN = B.ERR_YN
+                    , A.USAG_YN = B.USAG_YN
+                    , A.FNL_UDT_DTM = B.FNL_UDT_DTM
+            WHEN NOT MATCHED THEN
+                INSERT
+                (
+                    A.UNTY_CSNO
+                    , A.CNPL_SEQNO
+                    , A.UNTY_CNTR_NO
+                    , A.CS_CNPL_DSCD
+                    , A.TLNO
+                    , A.ERR_YN
+                    , A.USAG_YN
+                    , A.FNL_UDT_DTM
+                ) VALUES (
+                    B.UNTY_CSNO
+                    , B.CNPL_SEQNO
+                    , B.UNTY_CNTR_NO
+                    , B.CS_CNPL_DSCD
+                    , B.TLNO
+                    , B.ERR_YN
+                    , B.USAG_YN
+                    , B.FNL_UDT_DTM
+                )
+    </update>
+
+    <!-- 차세대 고객주소 테이블 배치 대상 데이터 저장 -->
+    <update id="mergeIfCmAdr" parameterType="RenewIfCmAdrDomain">
+        MERGE INTO IF_CM_ADR_M A
+            USING (
+                SELECT
+                    #{untyCsno} AS UNTY_CSNO
+                    , #{adrSeqno} AS ADR_SEQNO
+                    , #{untyCntrNo} AS UNTY_CNTR_NO
+                    , #{csAdrPostTrsplDscd} AS CS_ADR_POST_TRSPL_DSCD
+                    , #{zip} AS ZIP
+                    , #{badr} AS BADR
+                    , #{dadr} AS DADR
+                    , #{errYn} AS ERR_YN
+                    , #{usagYn} AS USAG_YN
+                    , TO_DATE(#{fnlUdtDtm}, 'YYYYMMDDHH24MISS') AS FNL_UDT_DTM
+                  FROM DUAL
+            ) B
+            ON (A.UNTY_CSNO = B.UNTY_CSNO AND A.ADR_SEQNO = B.ADR_SEQNO)
+            WHEN MATCHED THEN
+                UPDATE SET
+                    A.UNTY_CNTR_NO = B.UNTY_CNTR_NO
+                    , A.CS_ADR_POST_TRSPL_DSCD = B.CS_ADR_POST_TRSPL_DSCD
+                    , A.ZIP = B.ZIP
+                    , A.BADR = B.BADR
+                    , A.DADR = B.DADR
+                    , A.ERR_YN = B.ERR_YN
+                    , A.USAG_YN = B.USAG_YN
+                    , A.FNL_UDT_DTM = B.FNL_UDT_DTM
+            WHEN NOT MATCHED THEN
+                INSERT
+                (
+                    A.UNTY_CSNO
+                    , A.ADR_SEQNO
+                    , A.UNTY_CNTR_NO
+                    , A.CS_ADR_POST_TRSPL_DSCD
+                    , A.ZIP
+                    , A.BADR
+                    , A.DADR
+                    , A.ERR_YN
+                    , A.USAG_YN
+                    , A.FNL_UDT_DTM
+                ) VALUES (
+                    B.UNTY_CSNO
+                    , B.ADR_SEQNO
+                    , B.UNTY_CNTR_NO
+                    , B.CS_ADR_POST_TRSPL_DSCD
+                    , B.ZIP
+                    , B.BADR
+                    , B.DADR
+                    , B.ERR_YN
+                    , B.USAG_YN
+                    , B.FNL_UDT_DTM
+                )
+    </update>
+
+</mapper>

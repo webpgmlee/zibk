@@ -1,0 +1,93 @@
+package or.kr.kbiz.bo.admin.controller;
+
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.stereotype.Controller;
+import org.springframework.ui.Model;
+import org.springframework.web.bind.annotation.ModelAttribute;
+import org.springframework.web.bind.annotation.RequestMapping;
+
+import or.kr.kbiz.bo.admin.domain.UserDomain;
+import or.kr.kbiz.bo.admin.service.UserService;
+import or.kr.kbiz.serv.util.SecureUtil;
+/**
+ * <pre>UserController</pre>
+ *
+ * @author bsy
+ * @since 2017.11.20
+ * @version 1.0
+ */
+@Controller
+@RequestMapping(value="/admin")
+public class UserController extends SecureUtil {
+
+	private static final Logger logger = LoggerFactory.getLogger(UserController.class);
+
+	private static String PREFIX = "admin";
+	/**
+	 * 사용자 서비스
+	 */
+	@Autowired
+	private UserService userService;
+	/**
+	 * <pre>사용자 화면 호출</pre>
+	 *
+	 * @param userInit 템플릿 도메인
+	 * @param model Model 객체
+	 * @return String 요청화면 url
+	 */
+	@RequestMapping(value="/user")
+	public String userInit(@ModelAttribute UserDomain userDomain, Model model) {
+		model.addAttribute("resultList", userService.selectUserList(userDomain));
+		return PREFIX + "/user";
+	}
+
+	/**
+	 * <pre>사용자 목록 조회</pre>
+	 *
+	 * @param userList 템플릿 도메인
+	 * @param model Model 객체
+	 * @return String 요청화면 url
+	 */
+	@RequestMapping(value="/userList", produces="text/html")
+	public String userList(@ModelAttribute UserDomain userDomain, Model model) {
+		model.addAttribute("pageDomain", userDomain);
+		model.addAttribute("resultList", userService.selectUserList(userDomain));
+		return PREFIX + "/view/userList";
+	}
+
+	/**
+	 * <pre>사용자  상세 조회</pre>
+	 *
+	 * @param userDetail 템플릿 도메인
+	 * @param model Model 객체
+	 */
+	@RequestMapping(value="/userDetail")
+	public void userDetail(@ModelAttribute UserDomain userDomain, Model model) {
+		model.addAttribute("result", userService.selectUserDetail(userDomain));
+	}
+
+	/**
+	 * <pre>사용자 비밀번호 초기화</pre>
+	 *
+	 * @param userPwdInit 템플릿 도메인
+	 * @param model Model 객체
+	 */
+	@RequestMapping(value="/userPwdInit")
+	public void userPwdInit(@ModelAttribute UserDomain userDomain, Model model) {
+		userDomain.setNewPswd(encrypt(userDomain.getHidUserId()+"1234!"));
+		userService.userPwdInit(userDomain);
+	}
+
+	/**
+	 * <pre>사용자 등급변경 </pre>
+	 *
+	 * @param gradeUpdUser 템플릿 도메인
+	 * @param model Model 객체
+	 */
+	@RequestMapping(value="/gradeUpdUser")
+	public void gradeUpdUser(@ModelAttribute UserDomain userDomain, Model model) {
+		userService.gradeUpdUser(userDomain);
+	}
+}

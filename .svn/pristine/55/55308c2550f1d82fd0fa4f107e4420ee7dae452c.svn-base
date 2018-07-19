@@ -1,0 +1,447 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper
+  PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+  "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="renewUserBatch">
+
+    <!-- [AP 조직] 존재여부 조회 -->
+    <select id="selectExistOrngYn" parameterType="java.lang.String" resultType="java.lang.String">
+        SELECT DECODE(COUNT(*), 0, 'N', 'Y')
+          FROM IF_CO_ORNG_MA A
+         WHERE A.DEPT_CD = #{value}
+    </select>
+
+    <!-- [AP 조직] 신규 입력 -->
+    <insert id="insertIfCoOrngMa" parameterType="RenewOrngDomain">
+        INSERT INTO IF_CO_ORNG_MA
+            (
+                DEPT_CD
+                , DEPT_NM
+                , LEVL
+                , UPPR_DEPT
+                , OPEN_DD
+                , ABOL_DD
+                , ABOL_YN
+                , DEPT_TYPE_DSCD
+                , DEPT_TELNO
+                , DEPT_FAXNO
+                , DEPT_IMG_FAXNO
+                , DEPT_ZIP
+                , DEPT_ADR
+                , DEPT_DETLADR
+                , ORG_TYPE
+                , ODCD_CD
+                , FORMBOX_INFO
+                , RESERVED1
+                , RESERVED2
+                , RESERVED3
+                , COMPANY_ID
+                , HOMEPAGE
+                , EMAIL
+                , OUTGOING_NM
+                , ADDR_SYMBOL
+                , REG_ID
+                , REG_DATE
+                , MOD_ID
+                , MOD_DATE
+            )
+           VALUES (
+                #{deptCd}
+              , #{deptNm}
+              , #{levl}
+              , #{upperDeptCd}
+              , TO_CHAR(SYSDATE,'YYYYMMDD')
+              , '29991231'
+              , 'N'
+              , #{deptTypeDscd}
+              , #{deptTelno}
+              , #{deptFaxno}
+              , #{deptImgFaxno}
+              , #{deptZip}
+              , #{deptAdr}
+              , #{deptDetladr}
+              , #{orgType}
+              , #{odcdCd}
+              , #{formboxInfo}
+              , #{reserved1}
+              , #{reserved2}
+              , #{reserved3}
+              , #{companyId}
+              , #{homepage}
+              , #{email}
+              , #{outgoingNm}
+              , #{addrSymbol}
+              , 'BATCH.intrfcUserAndOrg'
+              , SYSDATE
+              , 'BATCH.intrfcUserAndOrg'
+              , SYSDATE
+        )
+    </insert>
+
+    <!-- [AP 조직이력] 신규 입력 -->
+    <insert id="insertIfCoOrngHi" parameterType="RenewOrngDomain">
+        INSERT INTO IF_CO_ORNG_HI
+            (
+                DEPT_CD
+                , SNO
+                , APPL_DT
+                , END_DT
+                , DEPT_NM
+                , LEVL
+                , LAST_YN
+                , ABOL_YN
+                , DEPT_CD_1
+                , DEPT_CD_2
+                , DEPT_CD_3
+                , DEPT_CD_4
+                , DEPT_TYPE_DSCD
+                , DEPT_TELNO
+                , DEPT_FAXNO
+                , DEPT_IMG_FAXNO
+                , DEPT_ZIP
+                , DEPT_ADR
+                , DEPT_DETLADR
+                , ORG_TYPE
+                , ODCD_CD
+                , FORMBOX_INFO
+                , RESERVED1
+                , RESERVED2
+                , RESERVED3
+                , COMPANY_ID
+                , HOMEPAGE
+                , EMAIL
+                , OUTGOING_NM
+                , ADDR_SYMBOL
+                , REG_ID
+                , REG_DATE
+            ) VALUES (
+                #{deptCd}          /* 부서코드 */
+                , 1                  /* 일련번호 */
+                , TO_CHAR(SYSDATE,'YYYYMMDD')      /* 적용시작일자 */
+                , '29991231'         /* 적용종료일자 */
+                , #{deptNm}          /* 부서명 */
+                , #{levl}             /* 부서레벨 */
+                , 'Y'                /* 최종여부, Y:최종 */
+                , 'N'                /* 폐지여부, Y:폐지, N:미폐지 */
+                , #{upperDeptCd}    /* 상위부서 DEPT_CD_1 */
+                , ''                 /* DEPT_CD_2 */
+                , ''                 /* DEPT_CD_3 */
+                , ''                 /* DEPT_CD_4 */
+                , #{deptTypeDscd}   /* 부서유형구분 코드 (0:중소기업중앙회, 1:위탁조합) */
+                , #{deptTelno}       /* 부서전화번호 */
+                , #{deptFaxno}       /* 부서팩스번호 */
+                , #{deptImgFaxno}   /* 부서 이미지 팩스번호 */
+                , #{deptZip}         /* 부서우편번호 */
+                , #{deptAdr}         /* 부서주소 */
+                , #{deptDetladr}     /* 부서상세주소 */
+                , #{orgType}         /* 두레_타입1 */
+                , #{odcdCd}          /* 두레_코드 */
+                , #{formboxInfo}     /* 두레_안내 */
+                , #{reserved1}        /* 부서 정보(D:연합회, E:전국조합, F:지방조합, G:사업조합) */
+                , #{reserved2}        /* 두레2 */
+                , #{reserved3}        /* 두레3 */
+                , #{companyId}       /* 두레_회사ID */
+                , #{homepage}         /* 부서 홈페이지 */
+                , #{email}            /* 부서 이메일주소 */
+                , #{outgoingNm}      /* 두레5 */
+                , #{addrSymbol}      /* 부서 대표 주소명 */
+                , 'BATCH.intrfcUserAndOrg'       /* 등록자ID */
+                , SYSDATE      /* 등록일시 */
+            )
+    </insert>
+
+    <!-- [AP 조직] 수정 -->
+    <update id="updateIfCoOrngMa" parameterType="RenewOrngDomain">
+        UPDATE IF_CO_ORNG_MA
+           SET
+               DEPT_NM        = #{deptNm}         /* 부서명 */
+             , UPPR_DEPT      = #{upperDeptCd}   /* 상위부서 */
+             , DEPT_TELNO     = #{deptTelno}      /* 부서전화번호 */
+             , DEPT_FAXNO     = #{deptFaxno}      /* 부서팩스번호 */
+             , DEPT_ZIP       = #{deptZip}        /* 부서우편번호 */
+             , DEPT_ADR       = #{deptAdr}        /* 부서주소 */
+             , DEPT_DETLADR   = #{deptDetladr}    /* 부서상세주소 */
+             , ORG_TYPE       = #{orgType}        /* 두레_타입1 */
+             , ODCD_CD        = #{odcdCd}         /* 두레_코드 */
+             , FORMBOX_INFO   = #{formboxInfo}    /* 두레_안내 */
+             , RESERVED1      = #{reserved1}       /* 부서 정보(D:연합회, E:전국조합, F:지방조합, G:사업조합) */
+             , RESERVED2      = #{reserved2}       /* 두레2 */
+             , RESERVED3      = #{reserved3}       /* 두레3 */
+             , COMPANY_ID     = #{companyId}      /* 두레_회사ID */
+             , HOMEPAGE       = #{homepage}        /* 부서 홈페이지 */
+             , EMAIL          = #{email}           /* 부서 이메일주소 */
+             , OUTGOING_NM    = #{outgoingNm}     /* 두레4 */
+             , ADDR_SYMBOL    = #{addrSymbol}     /* 부서 대표 주소명 */
+             , MOD_ID = 'BATCH.intrfcUserAndOrg'
+             , MOD_DATE     = SYSDATE
+         WHERE DEPT_CD = #{deptCd}
+    </update>
+
+    <!-- [AP 조직] 수정 -->
+    <update id="updateIfCoOrngHi" parameterType="RenewOrngDomain">
+        UPDATE IF_CO_ORNG_HI
+            SET
+                DEPT_NM        = #{deptNm}          /* 부서명 */
+                , DEPT_CD_1      = #{upperDeptCd}    /* 상위부서 */
+                , DEPT_TELNO     = #{deptTelno}       /* 부서전화번호 */
+                , DEPT_FAXNO     = #{deptFaxno}       /* 부서팩스번호 */
+                , DEPT_ZIP       = #{deptZip}         /* 부서우편번호 */
+                , DEPT_ADR       = #{deptAdr}         /* 부서주소 */
+                , DEPT_DETLADR   = #{deptDetladr}     /* 부서상세주소 */
+                , ORG_TYPE       = #{orgType}         /* 두레_타입1 */
+                , ODCD_CD        = #{odcdCd}          /* 두레_코드 */
+                , FORMBOX_INFO   = #{formboxInfo}     /* 두레_안내 */
+                , RESERVED1      = #{reserved1}        /* 부서 정보(D:연합회, E:전국조합, F:지방조합, G:사업조합) */
+                , RESERVED2      = #{reserved2}        /* 두레2 */
+                , RESERVED3      = #{reserved3}        /* 두레3 */
+                , COMPANY_ID     = #{companyId}       /* 두레_회사ID */
+                , HOMEPAGE       = #{homepage}         /* 부서 홈페이지 */
+                , EMAIL          = #{email}            /* 부서 이메일주소 */
+                , OUTGOING_NM    = #{outgoingNm}      /* 두레4 */
+                , ADDR_SYMBOL    = #{addrSymbol}      /* 부서 대표 주소명 */
+                , LEVL           = #{levl}             /* 레벨 */
+         WHERE DEPT_CD = #{deptCd}
+           AND LAST_YN = 'Y'
+    </update>
+
+    <!-- [AP 사용자] 사용자 존재 여부 및 기본 정보 조회 -->
+    <select id="selectExistIfCoUserMaInfo" parameterType="java.lang.String" resultType="RenewUserDomain">
+        SELECT
+                A.USER_ID
+                , A.USER_TYPE_DSCD
+                , C.DEPT_TYPE_DSCD
+                , B.RTRM_YN
+                , B.RSPOFC
+                , B.OFCPS
+                , B.DEPT_CD
+                , B.USER_SNO
+                , B.APPL_DT
+          FROM
+            IF_CO_USER_MA A
+            , IF_CO_USER_HI B
+            , IF_CO_ORNG_MA C
+         WHERE C.DEPT_CD = B.DEPT_CD
+           AND B.USER_ID = A.USER_ID
+           AND B.LAST_YN = 'Y'
+           AND A.USER_ID  = #{value}
+    </select>
+
+    <!-- [AP 사용자] 신규사용자일 경우 조직테이블에서 조직정보 조회 -->
+    <select id="selectDeptTypeDscd" parameterType="java.lang.String" resultType="java.lang.String">
+        SELECT
+                A.DEPT_TYPE_DSCD
+          FROM IF_CO_ORNG_MA A
+         WHERE A.DEPT_CD = #{value}
+    </select>
+
+    <!-- [AP 사용자] 신규 사용자 정보 저장 -->
+    <insert id="insertIfCoUserMa" parameterType="RenewUserDomain">
+        INSERT INTO IF_CO_USER_MA
+        (
+            USER_ID
+            , USER_NM
+            , EMPNO
+            , HOME_TEL_NO
+            , OFRM_TEL_NO
+            , OFRM_TEL_NO2
+            , MOBL_NO
+            , MOBL_NO2
+            , FAX_NO
+            , EMAILADR_1
+            , EMAILADR_2
+            , OFRM_ZIP
+            , OFRM_ADR
+            , OFRM_DETLADR
+            , HOME_ZIP
+            , HOME_ADR
+            , HOME_DETLADR
+            , USER_UID
+            , SYS_PSWD
+            , USER_TYPE_DSCD
+            , USER_RID
+            , IS_DELETED
+            , REG_ID
+            , REG_DATE
+            , MOD_ID
+            , MOD_DATE
+        ) VALUES (
+            #{userId}     /* 사용자id */
+            , #{userNm}   /* 사용자명 */
+            , #{empno}     /* 사원번호 */
+            , #{homeTelNo}     /* 자택전화번호 */
+            , #{ofrmTelNo}     /* 사무실전화번호 */
+            , #{ofrmTelNo2}   /* 사무실전화번호2 */
+            , #{moblNo}   /* 모바일번호 */
+            , #{moblNo2}     /* 모바일번호2 */
+            , #{faxNo}     /* 팩스번호 */
+            , #{emailadr1}     /* 이메일주소1 */
+            , #{emailadr2}     /* 이메일주소2 */
+            , #{ofrmZip}     /* 사무실우편번호 */
+            , #{ofrmAdr}     /* 사무실주소 */
+            , #{ofrmDetladr}     /* 사무실상세주소 */
+            , #{homeZip}     /* 자택우편번호 */
+            , #{homeAdr}     /* 자택주소 */
+            , #{homeDetladr}     /* 자택상세주소 */
+            , #{userUid}     /* 두레사용자id */
+            , #{sysPswd}     /* 두레비밀번호 */
+            , #{userTypeDscd}       /* 사용자유형구분코드 */
+            , #{userRid}     /* 두레 Rid */
+            , #{isDeleted}     /* 두레 Delete */
+            , 'BATCH.intrfcUserAndOrg'
+            , SYSDATE
+            , 'BATCH.intrfcUserAndOrg'
+            , SYSDATE
+        )
+    </insert>
+
+    <!-- [AP 사용자] 기존 사용자 정보 수정 -->
+    <update id="updateIfCoUserMa" parameterType="RenewUserDomain">
+        UPDATE IF_CO_USER_MA
+            SET
+                USER_NM        = #{userNm}        /* 사용자명 */
+                , EMPNO         = #{empno}         /* 사원번호 */
+                , HOME_TEL_NO   = #{homeTelNo}   /* 자택전화번호 */
+                , OFRM_TEL_NO   = #{ofrmTelNo}   /* 사무실전화번호 */
+                , OFRM_TEL_NO2  = #{ofrmTelNo2}  /* 사무실전화번호2 */
+                , MOBL_NO        = #{moblNo}        /* 모바일번호 */
+                , MOBL_NO2       = #{moblNo2}       /* 모바일번호2 */
+                , FAX_NO        = #{faxNo}        /* 팩스번호 */
+                , EMAILADR_1    = #{emailadr1}    /* 이메일주소1 */
+                , OFRM_ZIP      = #{ofrmZip}      /* 사무실우편번호 */
+                , OFRM_ADR      = #{ofrmAdr}      /* 사무실주소 */
+                , OFRM_DETLADR  = #{ofrmDetladr}  /* 사무실상세주소 */
+                , HOME_ZIP      = #{homeZip}      /* 자택우편번호 */
+                , HOME_ADR      = #{homeAdr}      /* 자택주소 */
+                , HOME_DETLADR  = #{homeDetladr}  /* 자택상세주소 */
+                , USER_UID       = #{userUid}       /* 두레사용자ID */
+                , SYS_PSWD       = #{sysPswd}       /* 두레비밀번호 */
+                , USER_RID      = #{userRid}      /* 데이터 존재시 사용안함 */
+                , IS_DELETED    = #{isDeleted}     /* '0' 인거만 가져와야 한다 함. */
+                , MOD_ID = 'BATCH.intrfcUserAndOrg'
+                , MOD_DATE = SYSDATE
+         WHERE USER_ID = #{userId}
+    </update>
+
+    <!-- [AP 사용자] 사용자 비밀번호 초기화 등록 -->
+    <insert id="insertUserPswd" parameterType="RenewUserDomain">
+        INSERT INTO TH_USER_PSWD
+        (
+            USER_ID
+            , PSWD_CHNG_DATE
+            , PSWD
+            , CURR_PSWD_YN
+            , LOGN_ATMP_CONT
+            , INIT_PSWD_YN
+            , REG_ID
+            , REG_DATE
+        ) VALUES (
+            #{userId}
+            , SYSDATE
+            , #{pswd}
+            , 'Y'
+            , 0
+            , 'Y'
+            , 'BATCH.intrfcUserAndOrg'
+            , SYSDATE
+        )
+    </insert>
+
+    <!-- [AP 사용자] 변경된 사용자 이력 정보 저장 -->
+    <insert id="insertIfCoUserHi" parameterType="RenewUserDomain">
+        INSERT INTO IF_CO_USER_HI
+        (
+            USER_ID
+            , USER_SNO
+            , APPL_DT
+            , END_DT
+            , GRP_CD
+            , GRP_NM
+            , COM_CD
+            , COM_NM
+            , DEPT_CD
+            , DEPT_NM
+            , PART_CD
+            , PART_NM
+            , ORG_DSP_NM
+            , RSPOFC
+            , RSPOFC_NM
+            , OFCPS
+            , OFCPS_NM
+            , RTRM_DT
+            , RTRM_YN
+            , LAST_YN
+            , CALL_AP_GRADE
+            , REG_ID
+            , REG_DATE
+        ) VALUES (
+            #{userId}       /* 사용자ID */
+            , #{userSno} + 1  /* 사용자일련번호 */
+            , #{applDt}     /* 적용일자 */
+            , '29991231'     /* 종료일자 */
+            , #{grpCd}       /* 그룹코드 */
+            , #{grpNm}       /* 그룹명 */
+            , #{comCd}       /* 회사코드 */
+            , #{comNm}       /* 회사명 */
+            , #{deptCd}      /* 부서코드 */
+            , #{deptNm}      /* 부서명 */
+            , #{partCd}      /* 파트코드 */
+            , #{partNm}      /* 파트명 */
+            , #{orgDspNm}   /* 부서화면명 */
+            , #{rspofc}       /* 직책 */
+            , #{rspofcNm}       /* 직책명 */
+            , #{ofcps}        /* 직위 */
+            , #{ofcpsNm}        /* 직위명 */
+            , ''             /* 퇴직일 */
+            , 'N'            /* 퇴직여부 */
+            , 'Y'            /* 최종여부 */
+            , #{callApGrade}  /* 콜센터 사용자등급[TH_CODE.LCODE: 002] */
+            , 'BATCH.intrfcUserAndOrg'   /* 입력자ID */
+            , SYSDATE  /* 입력일자 */
+        )
+    </insert>
+
+    <!-- [AP 사용자] 변경된 사용자 이력 정보 수정 -->
+    <update id="updateIfCoUserHi" parameterType="RenewUserDomain">
+        UPDATE IF_CO_USER_HI
+           SET
+                GRP_CD      = #{grpCd}      /* 그룹코드 */
+                , GRP_NM      = #{grpNm}      /* 그룹명 */
+                , COM_CD      = #{comCd}      /* 회사코드 */
+                , COM_NM      = #{comNm}      /* 회사명 */
+                , DEPT_CD     = #{deptCd}     /* 부서코드 */
+                , DEPT_NM     = #{deptNm}     /* 부서명 */
+                , PART_CD     = #{partCd}     /* 파트코드 */
+                , PART_NM     = #{partNm}     /* 파트명 */
+                , ORG_DSP_NM  = #{orgDspNm}  /* 부서화면명 */
+                , RSPOFC      = #{rspofc}      /* 직책 */
+                , RSPOFC_NM      = #{rspofcNm}      /* 직책 */
+                , OFCPS       = #{ofcps}       /* 직위 */
+                , OFCPS_NM       = #{ofcpsNm}       /* 직위 */
+                , CALL_AP_GRADE = #{callApGrade}  /* 콜센터 사용자등급[TH_CODE.LCODE: 002] */
+         WHERE USER_ID = #{userId}
+           AND USER_ID <![CDATA[<>]]> 'kyt3951' /*  공제사업본부장 겸직으로 수정처리 대상 제외(20160905) */
+           AND LAST_YN = 'Y'
+    </update>
+
+    <!-- [AP 사용자] 퇴사 후 재입사 시 삭제여부 수정 -->
+    <update id="updateIfCoUserMaIsDeleted" parameterType="RenewUserDomain">
+        UPDATE IF_CO_USER_MA
+           SET
+                USER_RID      = #{userRid}      /* 데이터 존재시 사용안함 */
+                , IS_DELETED    = #{isDeleted}    /* '0' 인거만 가져와야 한다 함. */
+                , MOD_ID = 'BATCH.intrfcUserAndOrg'    /* 수정자ID */
+                , MOD_DATE    = SYSDATE   /* 수정일시 */
+         WHERE USER_ID = #{userId}
+    </update>
+
+    <!-- [AP 사용자] 기존 최종 데이터 변경 -->
+    <update id="updateIfCoUserHiLastYn" parameterType="RenewUserDomain">
+        UPDATE IF_CO_USER_HI
+            SET
+                LAST_YN = 'N'
+                , END_DT  = #{endDt}
+         WHERE USER_ID  = #{userId}
+           AND LAST_YN = 'Y'    /* 최종여부 */
+    </update>
+
+</mapper>

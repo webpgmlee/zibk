@@ -1,0 +1,290 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper
+  PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+  "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="script">
+
+    <!-- [스크립트] 목록 조회 -->
+    <select id="select" resultType="ScriptDomain" parameterType="ScriptDomain">
+           SELECT CHNL_CODE
+                      , CHNL_CODE_NAME
+                      , LCODE
+                      , LCODE_NAME
+                      , MCODE
+                      , MCODE_NAME
+                      , SCODE
+                      , SCODE_NAME
+                      , RNUM
+            FROM (
+                SELECT
+                    CHNL_CODE
+                  , CHNL_CODE_NAME
+                  , LCODE
+                  , LCODE_NAME
+                  , MCODE
+                  , MCODE_NAME
+                  , SCODE
+                  , SCODE_NAME
+                 , ROWNUM AS RNUM
+                    FROM (
+                           SELECT TCC.CHNL_CODE
+                                    , (SELECT CODE_NAME FROM TH_CONSULT_CODE WHERE CHNL_CODE = TCC.CHNL_CODE AND LCODE='00' AND MCODE='00' AND SCODE='00') AS CHNL_CODE_NAME
+                                    , TCC.LCODE
+                                    , (SELECT CODE_NAME FROM TH_CONSULT_CODE WHERE CHNL_CODE = TCC.CHNL_CODE AND LCODE=TCC.LCODE  AND LCODE <![CDATA[<>]]> '00' AND MCODE='00' AND SCODE='00') AS LCODE_NAME
+                                    , TCC.MCODE
+                                    , (SELECT CODE_NAME FROM TH_CONSULT_CODE WHERE CHNL_CODE = TCC.CHNL_CODE AND LCODE=TCC.LCODE AND MCODE=TCC.MCODE AND MCODE <![CDATA[<>]]> '00' AND SCODE='00') AS MCODE_NAME
+                                    , TCC.SCODE
+                                    , (SELECT CODE_NAME FROM TH_CONSULT_CODE WHERE CHNL_CODE = TCC.CHNL_CODE AND LCODE=TCC.LCODE AND MCODE=TCC.MCODE AND SCODE=TCC.SCODE AND SCODE <![CDATA[<>]]> '00') AS SCODE_NAME
+                            FROM TH_CONSULT_CODE TCC
+                          WHERE TCC.LCODE <![CDATA[<>]]> '00' AND TCC.MCODE <![CDATA[<>]]> '00' AND SCODE <![CDATA[<>]]> '00'
+                             <if test="selChnlCode != null and selChnlCode != ''">
+                              AND TCC.CHNL_CODE = #{selChnlCode}
+                              </if>
+                              <if test="selLcode != null and selLcode != '' and selLcode != '00'" >
+                              AND TCC.LCODE = #{selLcode}
+                              </if>
+                              <if test="selMcode != null and selMcode != ''and selMcode != '00'">
+                              AND TCC.MCODE  = #{selMcode}
+                              </if>
+                              <if test="selKeyword  != null and selKeyword != ''">
+                              AND (  (SELECT CODE_NAME FROM TH_CONSULT_CODE WHERE CHNL_CODE = TCC.CHNL_CODE AND LCODE='00' AND MCODE='00' AND SCODE='00') LIKE '%'|| #{selKeyword} ||'%' OR
+                                        (SELECT CODE_NAME FROM TH_CONSULT_CODE WHERE CHNL_CODE = TCC.CHNL_CODE AND LCODE=TCC.LCODE  AND LCODE <![CDATA[<>]]> '00' AND MCODE='00' AND SCODE='00') LIKE '%' || #{selKeyword} || '%' OR
+                                        (SELECT CODE_NAME FROM TH_CONSULT_CODE WHERE CHNL_CODE = TCC.CHNL_CODE AND LCODE=TCC.LCODE AND MCODE=TCC.MCODE AND MCODE <![CDATA[<>]]> '00' AND SCODE='00') LIKE '%' || #{selKeyword} || '%' OR
+                                        (SELECT CODE_NAME FROM TH_CONSULT_CODE WHERE CHNL_CODE = TCC.CHNL_CODE AND LCODE=TCC.LCODE AND MCODE=TCC.MCODE AND SCODE=TCC.SCODE AND SCODE <![CDATA[<>]]> '00') LIKE '%' || #{selKeyword} || '%' OR
+                                        TCC.SCRIPT LIKE '%' || #{selKeyword} || '%' )
+                              </if>
+                          ORDER BY TCC.CHNL_CODE , TCC.LCODE, TCC.MCODE , TCC.SCODE
+                           )
+                 )
+         WHERE RNUM BETWEEN #{fromRowPerPage} AND #{toRowPerPage}
+    </select>
+
+    <!--[스크립트] 페이징  -->
+    <select id="selectScriptTotalCount" resultType="int">
+        SELECT
+            COUNT(*) AS TOTALCNT
+          FROM TH_CONSULT_CODE TCC
+          WHERE TCC.LCODE <![CDATA[<>]]> '00' AND TCC.MCODE <![CDATA[<>]]> '00' AND SCODE <![CDATA[<>]]> '00'
+          <if test="selChnlCode != null and selChnlCode != ''">
+           AND TCC.CHNL_CODE = #{selChnlCode}
+           </if>
+           <if test="selLcode != null and selLcode != '' and selLcode != '00'" >
+           AND TCC.LCODE = #{selLcode}
+           </if>
+           <if test="selMcode != null and selMcode != ''and selMcode != '00'">
+           AND TCC.MCODE  = #{selMcode}
+           </if>
+            <if test="selKeyword  != null and selKeyword != ''">
+            AND (  (SELECT CODE_NAME FROM TH_CONSULT_CODE WHERE CHNL_CODE = TCC.CHNL_CODE AND LCODE='00' AND MCODE='00' AND SCODE='00') LIKE '%'|| #{selKeyword} ||'%' OR
+                      (SELECT CODE_NAME FROM TH_CONSULT_CODE WHERE CHNL_CODE = TCC.CHNL_CODE AND LCODE=TCC.LCODE  AND LCODE <![CDATA[<>]]> '00' AND MCODE='00' AND SCODE='00') LIKE '%' || #{selKeyword} || '%' OR
+                      (SELECT CODE_NAME FROM TH_CONSULT_CODE WHERE CHNL_CODE = TCC.CHNL_CODE AND LCODE=TCC.LCODE AND MCODE=TCC.MCODE AND MCODE <![CDATA[<>]]> '00' AND SCODE='00') LIKE '%' || #{selKeyword} || '%' OR
+                      (SELECT CODE_NAME FROM TH_CONSULT_CODE WHERE CHNL_CODE = TCC.CHNL_CODE AND LCODE=TCC.LCODE AND MCODE=TCC.MCODE AND SCODE=TCC.SCODE AND SCODE <![CDATA[<>]]> '00') LIKE '%' || #{selKeyword} || '%' OR
+                      TCC.SCRIPT LIKE '%' || #{selKeyword} || '%' )
+            </if>
+    </select>
+
+    <!-- [스크립트] 목록 조회2 -->
+    <select id="select2" resultType="ScriptDomain" parameterType="ScriptDomain">
+           SELECT SCRP_NO
+                     , SCRP_TITLE
+                     , SCRP_CONT
+                     , SCRP_FILE
+	                 , CHNL_CODE
+	                 , LCODE
+	                 , MCODE
+	                 , SCODE
+                     , RNUM
+            FROM (
+                SELECT
+                    SCRP_NO
+                  , SCRP_TITLE
+                  , SCRP_CONT
+                  , SCRP_FILE
+                  , CHNL_CODE
+                  , LCODE
+                  , MCODE
+                  , SCODE
+                 , ROWNUM AS RNUM
+                    FROM (
+                           SELECT  SCRP_NO
+                                     , SCRP_TITLE
+                                     , SCRP_CONT
+                                     , SCRP_FILE
+					                 , CHNL_CODE
+					                 , LCODE
+					                 , MCODE
+					                 , SCODE
+					       FROM TH_SCRIPT
+					      WHERE CHNL_CODE = #{hidChnlCode}
+					          AND LCODE = #{hidLcode}
+					          AND MCODE = #{hidMcode}
+					          AND SCODE = #{hidScode}
+                          ORDER BY SCRP_NO DESC
+                           )
+                 )
+         WHERE RNUM BETWEEN #{fromRowPerPage} AND #{toRowPerPage}
+    </select>
+
+    <!--[스크립트] 페이징2  -->
+    <select id="selectScriptTotalCount2" resultType="int">
+        SELECT
+            COUNT(*) AS TOTALCNT
+          FROM TH_SCRIPT
+           WHERE CHNL_CODE = #{hidChnlCode}
+		       AND LCODE = #{hidLcode}
+		       AND MCODE = #{hidMcode}
+		       AND SCODE = #{hidScode}
+    </select>
+
+    <!-- [스크립트] 상세목록 조회 -->
+   <select id="selectDetail" resultType="ScriptDomain" parameterType="ScriptDomain">
+   SELECT CHNL_CODE,
+              CHNL_CODE_NAME||'('||CHNL_CODE||')' AS CHNL_CODE_NAME,
+              LCODE,
+              LCODE_NAME||'('||LCODE||')' AS LCODE_NAME,
+              MCODE,
+              MCODE_NAME||'('||MCODE||')' AS MCODE_NAME,
+              SCODE,
+              SCODE_NAME||'('||SCODE||')' AS SCODE_NAME,
+              SCRP_TITLE,
+              SCRP_CONT,
+              SCRP_FILE,
+              SCRP_NO
+      FROM (
+		 SELECT CHNL_CODE,
+				    (SELECT CODE_NAME FROM TH_CONSULT_CODE WHERE CHNL_CODE = TCC.CHNL_CODE AND LCODE='00' AND MCODE='00' AND SCODE='00') AS CHNL_CODE_NAME ,
+					LCODE ,
+					(SELECT CODE_NAME FROM TH_CONSULT_CODE WHERE CHNL_CODE = TCC.CHNL_CODE AND LCODE=TCC.LCODE AND LCODE <![CDATA[<>]]> '00' AND MCODE='00' AND SCODE='00') AS LCODE_NAME ,
+					MCODE ,
+					(SELECT CODE_NAME FROM TH_CONSULT_CODE WHERE CHNL_CODE = TCC.CHNL_CODE AND LCODE=TCC.LCODE AND MCODE=TCC.MCODE AND MCODE <![CDATA[<>]]> '00' AND SCODE='00') AS MCODE_NAME ,
+					SCODE,
+					 (SELECT CODE_NAME FROM TH_CONSULT_CODE WHERE CHNL_CODE = TCC.CHNL_CODE AND LCODE=TCC.LCODE AND MCODE=TCC.MCODE AND SCODE=TCC.SCODE AND SCODE <![CDATA[<>]]> '00') AS SCODE_NAME  ,
+					SCRP_TITLE,
+					SCRP_CONT,
+					SCRP_FILE,
+					SCRP_NO
+	           FROM TH_SCRIPT TCC
+	        WHERE 1=1
+	             AND SCRP_NO = #{scrpNo}
+	   )
+    </select>
+
+    <select id="currScriptSeq" resultType="integer">
+        SELECT MAX(SCRP_NO) FROM TH_SCRIPT
+    </select>
+
+    <!-- [스크립트]저장 -->
+    <insert id="insertScript" parameterType="ScriptDomain">
+        INSERT INTO TH_SCRIPT
+        (
+            CHNL_CODE,
+            LCODE,
+            MCODE,
+            SCODE,
+            SCRP_NO,
+            SCRP_TITLE,
+            SCRP_CONT,
+            SCRP_FILE,
+            REG_ID,
+            REG_DATE,
+            MOD_ID,
+            MOD_DATE
+        )
+        VALUES
+        (
+            #{chnlCode}
+            ,#{lcode}
+            ,#{mcode}
+            ,#{scode}
+            , (SELECT NVL(MAX(SCRP_NO+1),0) FROM TH_SCRIPT)
+            ,#{scrpTitle}
+            ,#{scrpCont}
+            ,#{scrpFile}
+            ,#{loginUserId}
+            ,sysdate
+            ,#{loginUserId}
+            ,sysdate
+        )
+    </insert>
+
+    <!-- [스크립트] 수정 -->
+    <update id="updateScript" parameterType="ScriptDomain">
+        UPDATE TH_SCRIPT
+             SET SCRP_TITLE = #{scrpTitle},
+                    SCRP_CONT = #{scrpCont},
+                    MOD_ID = #{loginUserId},
+                    MOD_DATE = sysdate
+          WHERE SCRP_NO = #{scrpNo}
+
+    </update>
+
+    <!-- [스크립트] 파일수정 -->
+    <update id="updateFile" parameterType="ScriptDomain">
+        UPDATE TH_SCRIPT
+             SET SCRP_FILE = #{scrpFile}
+        WHERE SCRP_NO = #{scrpNo}
+    </update>
+
+<!--[상담]인입채널 조회  -->
+    <select id="selectChCodeList" resultType="ChannelCodeDomain">
+        SELECT CHNL_CODE,CODE_NAME FROM TH_CONSULT_CODE
+            WHERE LCODE = '00'
+                AND MCODE = '00'
+                AND SCODE = '00'
+                AND USE_YN ='Y'
+  ORDER BY CHNL_CODE ASC
+    </select>
+
+   <!--  [스크립트] 대분류 조회 -->
+    <select id="selectLcode" resultType="ChannelCodeDomain" parameterType="ChannelCodeDomain">
+           SELECT LCODE
+                    , CODE_NAME
+            FROM TH_CONSULT_CODE
+          WHERE 1=1
+             <if test="chnlCode != null and chnlCode != ''">
+              AND CHNL_CODE =  #{chnlCode}
+              AND LCODE<![CDATA[<]]><![CDATA[>]]>'00'
+              AND MCODE='00'
+              AND SCODE='00'
+              </if>
+ ORDER BY SORT_IDX ASC
+    </select>
+
+   <!--  [스크립트] 중분류 조회 -->
+    <select id="selectMcode" resultType="ChannelCodeDomain" parameterType="ChannelCodeDomain">
+           SELECT MCODE
+                    , CODE_NAME
+            FROM TH_CONSULT_CODE
+          WHERE 1=1
+             <if test="chnlCode != null and chnlCode != ''">
+              AND CHNL_CODE =  #{chnlCode}
+              AND LCODE = #{lcode}
+              AND MCODE<![CDATA[<]]><![CDATA[>]]>'00'
+              AND SCODE='00'
+              </if>
+ ORDER BY SORT_IDX ASC
+
+    </select>
+
+    <!-- [상담] 소분류 조회 -->
+    <select id="selectScode" resultType="ChannelCodeDomain" parameterType="ChannelCodeDomain">
+           SELECT SCODE
+                    , CODE_NAME
+            FROM TH_CONSULT_CODE
+          WHERE 1=1
+             <if test="chnlCode != null and chnlCode != ''">
+              AND CHNL_CODE =  #{chnlCode}
+              AND LCODE = #{lcode}
+              AND MCODE= #{mcode}
+              AND SCODE<![CDATA[<>]]>'00'
+              AND USE_YN ='Y'
+              </if>
+ ORDER BY SCODE ASC
+
+    </select>
+    <!-- 스크립트 삭제 -->
+    <delete id="deleteScript" parameterType="int">
+    DELETE FROM TH_SCRIPT
+   WHERE SCRP_NO = #{scrpNo}
+    </delete>
+</mapper>

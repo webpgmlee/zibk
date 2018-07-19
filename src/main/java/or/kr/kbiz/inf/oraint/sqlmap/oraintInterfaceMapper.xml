@@ -1,0 +1,94 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper
+  PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+  "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="oraintInterface">
+
+    <!-- [ORAINT 사용자] 목록 조회 -->
+    <select id="selectOraintUser" resultType="RenewUserDomain">
+        SELECT
+            A.USER_ID                                   AS USER_ID       /* 사용자ID */
+            , A.USER_NAME                                 AS USER_NM       /* 사용자명 */
+            , A.EMPLOYEE_ID                               AS EMPNO        /* 사원번호 */
+            , A.GROUP_ID                                  AS GRP_CD       /* 상위그룹ID */
+            , A.GROUP_NAME                                AS GRP_NM       /* 상위부서명 */
+            , A.COMP_ID                                   AS COM_CD       /* 회사ID */
+            , A.COMP_NAME                                 AS COM_NM       /* 회사명 */
+            , A.DEPT_ID                                   AS DEPT_CD      /* 부서ID  H00000/회원사 (51,583) */
+            , A.DEPT_NAME                                 AS DEPT_NM      /* 부서명 */
+            , A.PART_ID                                   AS PART_CD      /* 파트ID */
+            , A.PART_NAME                                 AS PART_NM      /* 파트명 */
+            , A.ORG_DISPLAY_NAME                          AS ORG_DSP_NM   /* 부서화면명 */
+            , A.POSITION_CODE                             AS RSPOFC       /* 직책 */
+            , (SELECT POSITION_NAME FROM ORGDBADM.TCN_POSITIONINFORMATION
+                WHERE POSITION_ID = A.POSITION_CODE) AS RSPOFC_NM   /* 직책명 */
+            , A.GRADE_CODE                                AS OFCPS        /* 직위 */
+            , (SELECT GRADE_NAME FROM ORGDBADM.TCN_GRADEINFORMATION
+                WHERE GRADE_ID = A.GRADE_CODE) AS OFCPS_NM    /* 직위명 */
+            , B.HOME_TEL                                  AS HOME_TEL_NO  /* 자택전화번호 */
+            , B.OFFICE_TEL                                AS OFRM_TEL_NO  /* 사무실전화번호1 */
+            , B.OFFICE_TEL2                               AS OFRM_TEL_NO2 /* 사무실전화번호2 */
+            , B.MOBILE                                    AS MOBL_NO       /* 휴대폰1 */
+            , B.MOBILE2                                   AS MOBL_NO2      /* 휴대폰2 */
+            , B.OFFICE_FAX                                AS FAX_NO       /* 팩스번호 */
+            , A.SYSMAIL                                   AS EMAILADR_1   /* 이메일주소1 */
+            , B.EMAIL                                     AS EMAILADR_2   /* 이메일주소2 */
+            , REPLACE(B.OFFICE_ZIPCODE,'-','')            AS OFRM_ZIP     /* 사무실우편번호 */
+            , B.OFFICE_ADDR                               AS OFRM_ADR     /* 사무실주소 */
+            , B.OFFICE_DETAIL_ADDR                        AS OFRM_DETLADR /* 사무실상세주소 */
+            , REPLACE(B.HOME_ZIPCODE,'-','')              AS HOME_ZIP     /* 자택우편번호 */
+            , B.HOME_ADDR                                 AS HOME_ADR     /* 자택주소 */
+            , B.HOME_DETAIL_ADDR                          AS HOME_DETLADR /* 자택상세주소 */
+            , A.USER_UID                                  AS USER_UID      /* 두레ID */
+            , C.SYSTEM_PASSWORD                           AS SYS_PSWD      /* 사용자비밀번호 */
+            , A.USER_RID                                  AS USER_RID     /* 2012.04.5 추가 */
+            , A.IS_DELETED                                AS IS_DELETED   /* 2012.04.5 추가 */
+          FROM
+            ORGDBADM.TCN_USERINFORMATION_BASIC    A
+            , ORGDBADM.TCN_USERINFORMATION_ADDR     B
+            , ORGDBADM.TCN_USERINFORMATION_PASSWORD C
+            , (SELECT *
+                  FROM ORGDBADM.TCN_ORGANIZATIONINFORMATION A
+                WHERE A.ORG_PARENT_ID <![CDATA[<>]]> '008888' AND A.ORG_CODE <![CDATA[<>]]> '008888'
+                   AND (A.ORG_CODE <![CDATA[<]]>= '009999' OR A.ORG_CODE = 'B00604'
+                          OR A.ORG_CODE = 'A00000' OR A.ORG_CODE = 'B00000'))  T    /* '008888': 삭제부서, '009999': 중앙회하위부서들, 'B00604': 콜센터, 'A00000': 중소기업, 'B00000': 중소기업중앙회 */
+         WHERE A.USER_UID = B.USER_ID(+)
+           AND A.USER_UID = C.USER_ID(+)
+           AND A.DEPT_ID  = T.ORG_CODE
+           AND A.USER_RID IS NULL
+    </select>
+
+    <!-- [ORAINT 조직] 목록 조회 -->
+    <select id="selectOraintOrng" resultType="RenewOrngDomain">
+        SELECT
+            A.ORG_CODE                                        AS DEPT_CD        /* 부서코드 */
+            , A.ORG_NAME                                        AS DEPT_NM        /* 부서명 */
+            , (SELECT B.ORG_NAME
+                FROM ORGDBADM.TCN_ORGANIZATIONINFORMATION B
+               WHERE B.ORG_CODE = A.ORG_PARENT_ID)             AS UPPER_DEPT_NM  /* 상위부서명 */
+            , A.ORG_PARENT_ID                                   AS UPPER_DEPT_CD  /* 상위부서 */
+            , '1'                                                       AS DEPT_TYPE_DSCD /* 부서유형구분코드 */
+            , A.TELEPHONE                                       AS DEPT_TELNO     /* 부서전화번호 */
+            , A.FAX                                             AS DEPT_FAXNO     /* 부서팩스번호 */
+            , A.UFAX                                            AS DEPT_IMG_FAXNO /* 부서 이미지팩스 번호 */
+            , REPLACE(A.ZIP_CODE,'-','')                        AS DEPT_ZIP       /* 부서우편번호 */
+            , A.ADDRESS                                         AS DEPT_ADR       /* 부서주소 */
+            , A.ADDRESS_DETAIL                                  AS DEPT_DETLADR   /* 부서상세주소 */
+            , A.ORG_TYPE                                        AS ORG_TYPE       /* 두레_타입1 */
+            , A.ODCD_CODE                                       AS ODCD_CD        /* 두레_코드 */
+            , A.FORMBOX_INFO                                    AS FORMBOX_INFO   /* 두레_안내 */
+            , A.RESERVED1                                       AS RESERVED1      /* 부서 정보(D:연합회, E:전국조합, F:지방조합, G:사업조합) */
+            , A.RESERVED2                                       AS RESERVED2      /* 두레2 */
+            , A.RESERVED3                                       AS RESERVED3      /* 두레3 */
+            , A.COMPANY_ID                                      AS COMPANY_ID     /* 두레_회사ID */
+            , A.HOMEPAGE                                        AS HOMEPAGE       /* 부서 홈페이지 */
+            , A.EMAIL                                           AS EMAIL          /* 부서 이메일주소 */
+            , A.OUTGOING_NAME                                   AS OUTGOING_NM    /* 두레5 */
+            , A.ADDR_SYMBOL                                     AS ADDR_SYMBOL    /* 부서 대표 주소명 */
+          FROM ORGDBADM.TCN_ORGANIZATIONINFORMATION A
+        WHERE A.ORG_PARENT_ID <![CDATA[<>]]> '008888' AND A.ORG_CODE <![CDATA[<>]]> '008888'
+           AND (A.ORG_CODE <![CDATA[<]]>= '009999' OR A.ORG_CODE = 'B00604'
+                  OR A.ORG_CODE = 'A00000' OR A.ORG_CODE = 'B00000')
+    </select>
+
+</mapper>

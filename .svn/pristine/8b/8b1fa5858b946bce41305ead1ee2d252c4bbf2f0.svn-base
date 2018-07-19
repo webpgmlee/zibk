@@ -1,0 +1,85 @@
+<!doctype html>
+<html lang="ko">
+<head>
+<meta http-equiv="content-type" content="text/html; charset=utf-8">
+<meta http-equiv="X-UA-Compatible" content="IE=edge">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, minimum-scale=1.0, user-scalable=no">
+<meta name="subject" content="KBIZ">
+<meta name="author" content="KBIZ">
+<meta name="keywords" content="KBIZ">
+<meta name="description" content="KBIZ">
+<title>KBIZ</title>
+<script type="text/javascript" src="http://code.jquery.com/jquery-latest.min.js"></script>
+<script type="text/javascript" src="js/common.js"></script>
+<link rel="stylesheet" href="css/reset.css" type="text/css" media="screen" />
+<link rel="stylesheet" href="css/common.css" type="text/css" media="screen" />
+<script type="text/javascript">
+
+</script>
+<style>
+
+</style>
+</head>
+<body>
+<!--비밀번호변경 모달창//-->
+<div class="popup-wrap">
+    <div class="popup-layer">
+		<div class="popup-header"><h1>비밀번호변경</h1><button type="button" class="closeBtn" onClick="javascript:window.close();"><img src="img/btn_layer_close.gif"></button></div>
+        <div class="popup-container">
+            <div class="popup-conts">
+                <!--content //-->
+				<div class="boardListWrap mgb" style="width:100%;">
+					<table border="0" cellspacing="0" cellpadding="0" class="brd_sch">
+						<colgroup>
+							<col style="width:80px">
+							<col style="width:">
+                            <col style="width:80px">
+							<col style="width:">
+                            <col style="width:80px">
+							<col style="width:180px">
+						</colgroup>
+						<tr>
+						  <th>제목</th>
+						  <td colspan="3" class="pdl10">공지사항알립니다.</td>
+						  <th>공지구분</th>
+							<td class="pdl10"><img src="images/main_soft/notice_icon01.gif"></td>
+						</tr>
+						<tr>
+						  <th>작성자</th>
+						  <td class="pdl10">박진혁</td>
+						  <th>작성일</th>
+						  <td class="pdl10">2017-12-15</td>
+							<th>게시일자</th>
+							<td class="pdl10">2017-05-25 ~2017-12-12</td>
+						</tr>
+						<tr>
+						  <th>첨부화일</th>
+						  <td colspan="3" class="pdl10">&nbsp;</td>
+						  <th>조회수</th>
+							<td class="pdl10">5</td>
+						</tr>
+						<tr>
+						  <td colspan="6"><textarea name="textarea" id="textarea" style="height:200px"></textarea></td>
+					    </tr>
+						<tr>
+						  <th>이전글</th>
+						  <td colspan="5" class="pdl10">이전글이 없습니다.</td>
+					  </tr>
+						<tr>
+						  <th>다음글</th>
+						  <td colspan="5" class="pdl10"><img src="images/main_soft/notice_icon02.gif"> 다음글은 이것입니다.</td>
+					  </tr>
+					</table>
+				</div>
+                <div class="btn_area pdb20 clfix"><p class="fl"><a href="#stop" class="btn small g_blue">목록</a></p> <p class="fr"><a href="#stop" class="btn small g_blue">수정</a> <a href="#stop" class="btn small g_blue">삭제</a> <a href="#stop" class="btn small g_blue">닫기</a></p></div>
+                <!--// content-->
+            </div>
+        </div>
+		<div class="popup-footer">
+			<a href="#stop" class="btn small g_lightgray clostBtn" onClick="javascript:window.close();"><span class="buttonStyleText">닫기</span></a>
+		</div>
+    </div>
+</div>
+<!--//이름검색 모달창-->
+</body>
+</html>

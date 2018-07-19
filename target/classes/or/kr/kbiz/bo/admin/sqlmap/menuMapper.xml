@@ -1,0 +1,156 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper
+  PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+  "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="menu">
+
+    <!-- [공통코드] 목록 조회 -->
+	<select id="select" resultType="AdminMenuDomain" parameterType="AdminMenuDomain">
+	       SELECT frstMenuCode
+                      , secdMenuCode
+                      , menuName
+                      , menuViewName
+                      , useYn
+                      , sortIdx                    
+                      , RNUM
+            FROM (
+                SELECT
+                    FRST_MENU_CODE frstMenuCode
+                  , SECD_MENU_CODE secdMenuCode
+                  , MENU_NAME menuName
+                  , MENU_VIEW_NAME menuViewName
+                  , USE_YN useYn
+                  , MENU_SORT_IDX sortIdx
+                  , ROWNUM AS RNUM
+                    FROM (
+                       SELECT TM.FRST_MENU_CODE,
+                              TM.SECD_MENU_CODE,
+                              TM.MENU_NAME,
+                              TM.MENU_VIEW_NAME,
+                              TM.USE_YN,
+                              TM.MENU_SORT_IDX
+                        FROM TH_MNGT_MENU TM
+                      WHERE 1=1
+                        <if test="selMcode != null and selMcode != '' and selMcode != '000'">
+                          AND TM.FRST_MENU_CODE  = #{selMcode}
+                          </if>
+                          <if test="selUseYn != null and selUseYn != ''">
+                          AND TM.USE_YN  = #{selUseYn}
+                          </if>
+                      
+                     ORDER BY TM.FRST_MENU_CODE, TM.SECD_MENU_CODE, TM.MENU_SORT_IDX
+                           )
+                 )
+         WHERE RNUM BETWEEN #{fromRowPerPage} AND #{toRowPerPage}
+	</select>
+
+    <!--[공통코드] 페이징  -->
+    <select id="selectCodeTotalCount" resultType="int">
+        SELECT
+            COUNT(*) AS TOTALCNT
+          FROM TH_MNGT_MENU TM
+          WHERE 1=1       
+           <if test="selMcode != null and selMcode != ''and selMcode != '000'">
+               AND TM.FRST_MENU_CODE  = #{selMcode}
+           </if>
+           <if test="selUseYn != null and selUseYn != ''">
+           AND TM.USE_YN  = #{selUseYn}
+           </if>
+    </select>
+
+    <!-- [메뉴] Top 메뉴 조회 -->
+    <select id="selectFMenu" resultType="AdminMenuDomain" parameterType="AdminMenuDomain">
+         SELECT 
+             FRST_MENU_CODE frstMenuCode
+            , SECD_MENU_CODE secdMenuCode
+            , MENU_NAME menuName
+            , MENU_VIEW_NAME menuViewName
+            , USE_YN useYn
+            , MENU_SORT_IDX sortIdx            
+        FROM 
+            TH_MNGT_MENU
+        WHERE 1=1            
+             AND
+                SECD_MENU_CODE = '00' 
+    </select>
+
+    <!-- [공통코드] 상세목록 조회 -->
+     <select id="selectDetail" resultType="AdminMenuDomain" parameterType="AdminMenuDomain">
+     
+        SELECT 
+             FRST_MENU_CODE frstMenuCode
+            , SECD_MENU_CODE secdMenuCode
+            , MENU_NAME menuName
+            , MENU_VIEW_NAME menuViewName
+            , USE_YN useYn
+            , MENU_SORT_IDX sortIdx            
+        FROM 
+            TH_MNGT_MENU
+        WHERE 1=1
+            AND FRST_MENU_CODE = #{frstMenuCode}
+            AND SECD_MENU_CODE = #{secdMenuCode}
+    </select>
+
+    <!-- [메뉴코드] 중복 조회 -->
+    <select id="selectCheck" resultType="AdminMenuDomain" parameterType="AdminMenuDomain">
+        SELECT COUNT(*) AS OVERLAP_CNT
+            FROM TH_MNGT_MENU
+          WHERE 1=1
+               AND FRST_MENU_CODE = #{frstMenuCode}
+               AND SECD_MENU_CODE = #{secdMenuCode}
+    </select>
+
+   <!--  [메뉴코드] 저장 -->
+    <insert id="insertMenu" parameterType="AdminMenuDomain">
+           INSERT INTO TH_MNGT_MENU(
+                FRST_MENU_CODE
+                , SECD_MENU_CODE
+                , MENU_NAME
+                , MENU_VIEW_NAME
+                , MENU_SORT_IDX
+                , USE_YN
+                , REG_DATE
+                , MOD_DATE
+                , REG_ID
+                , MOD_ID				
+           )VALUES(
+                #{frstMenuCode}
+                ,#{secdMenuCode}
+                ,#{menuName}
+                ,#{menuViewName}
+                ,#{sortIdx}
+                ,#{useYn}
+                ,sysdate
+                ,sysdate
+                , 'SYSTEM'
+                , 'SYSTEM'
+           )
+    </insert>
+
+    <!-- [메뉴코드] 수정 -->
+    <update id="updateMenu" parameterType="AdminMenuDomain">
+        UPDATE TH_MNGT_MENU
+             SET USE_YN = #{useYn},
+                    MENU_SORT_IDX = #{sortIdx},
+                    MENU_NAME = #{menuName},
+                    MENU_VIEW_NAME = #{menuViewName},
+                    MOD_DATE = sysdate                    
+          WHERE
+                    FRST_MENU_CODE = #{frstMenuCode}
+                    AND 
+                    SECD_MENU_CODE = #{secdMenuCode}
+                    
+    </update>
+    
+    <!-- [메뉴코드] 삭제 -->
+    <delete id="deleteMenu" parameterType="AdminMenuDomain">
+        DELETE 
+        FROM 
+            TH_MNGT_MENU
+        WHERE
+			FRST_MENU_CODE = #{frstMenuCode}
+			AND 
+			SECD_MENU_CODE = #{secdMenuCode}
+                    
+    </delete>
+</mapper>

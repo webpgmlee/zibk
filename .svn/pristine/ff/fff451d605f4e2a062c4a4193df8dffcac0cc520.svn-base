@@ -1,0 +1,670 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper
+  PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+  "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="inbound">
+
+	<!-- 고객코드 조회 -->
+	<select id="selectCustCode" resultType="CodeDomain">
+		SELECT MCODE, CODE_NAME FROM TH_CODE WHERE LCODE = '006' AND MCODE != '00'
+	</select>
+
+	<!-- 특이성향 여부조회 -->
+	<select id="selectSpclAppvYn" resultType="java.lang.String" parameterType="java.lang.String">
+		SELECT SPCL_APPV_YN FROM TH_SPECIAL_CUST WHERE UNTY_CSNO = #{untyCsno}
+	</select>
+
+	<!-- 고객조회 검색조건 -->
+	<select id="selectCsSearch" resultType="CustomerDomain" parameterType="CustomerDomain">
+		SELECT
+			    CS_KRN_NM,
+			    CS_DSCD,
+                (SELECT CODE_NAME FROM TH_CODE
+                WHERE LCODE='006' AND MCODE = CS_DSCD) AS CODE_NAME,
+                #{tlno} AS TLNO,
+                UNTY_CSNO,
+                CS_SRCH_NO
+			FROM IF_CM_UNTYCS_M
+                WHERE UNTY_CSNO =
+                (SELECT DISTINCT(UNTY_CSNO) FROM IF_CM_CNPL_M WHERE TLNO=#{tlno})
+                <if test=" csDscd != null and csDscd !='' ">
+                AND CS_DSCD like '%' || #{csDscd} || '%'
+                </if>
+	</select>
+
+	<!-- 고객조회(전화번호) 고객/계약 수 조회용 -->
+	<select id="selectCustomerCount" resultType="CustomerDomain" parameterType="CustomerDomain">
+			SELECT
+			    A.DLGT_UNTY_CSNO,
+			    A.BZPL_UNTY_CSNO,
+			    B.CS_KRN_NM,
+			    B.CS_DSCD,
+			    A.CNTR_NO,
+			    A.UNTY_CNTR_NO,
+			    A.ABND_YN,
+			    A.SMS_YN,
+			    B.RL_CS_KRN_NM,
+			    (SELECT BADR || ' ' || DADR FROM IF_CM_ADR_M
+			    	WHERE A.UNTY_CNTR_NO = UNTY_CNTR_NO AND CS_ADR_POST_TRSPL_DSCD = '1') AS ADDR,
+                #{tlno} AS TLNO,
+                B.UNTY_CSNO,
+                B.CS_SRCH_NO,
+                C.SPCL_APPV_YN
+			FROM IF_CA_UNTYCNTR_M A FULL OUTER JOIN IF_CM_UNTYCS_M B
+		    	ON  A.DLGT_UNTY_CSNO = B.UNTY_CSNO
+		        OR A.BZPL_UNTY_CSNO = B.UNTY_CSNO
+		        LEFT OUTER JOIN TH_SPECIAL_CUST C
+		        ON B.UNTY_CSNO = C.UNTY_CSNO
+         		WHERE B.UNTY_CSNO IN(SELECT DISTINCT(UNTY_CSNO) FROM IF_CM_CNPL_M WHERE TLNO = #{tlno} AND NVL(UNTY_CNTR_NO,'N') != 'N')
+	</select>
+
+	<!-- 고객조회(전화번호) -->
+	<select id="selectCustomer" resultType="CustomerDomain" parameterType="CustomerDomain">
+            SELECT
+			    DISTINCT A.UNTY_CSNO,
+                A.CS_KRN_NM,
+			    A.CS_DSCD,
+                (SELECT CODE_NAME FROM TH_CODE
+                WHERE LCODE='006' AND MCODE = CS_DSCD) AS CODE_NAME,
+                #{tlno} AS TLNO,
+                A.CS_SRCH_NO
+			FROM IF_CM_UNTYCS_M A, IF_CM_CNPL_M B
+                WHERE A.UNTY_CSNO = B.UNTY_CSNO
+                AND B.TLNO=#{tlno}
+                AND NVL(B.UNTY_CNTR_NO,'N') != 'N'
+	</select>
+
+	<!-- 고객조회(고객번호) -->
+	<select id="selectCustomer2" resultType="CustomerDomain" parameterType="CustomerDomain">
+			SELECT
+			    A.CS_KRN_NM,
+			    A.CS_DSCD,
+                (SELECT CODE_NAME FROM TH_CODE
+                WHERE LCODE='006' AND MCODE = A.CS_DSCD) AS CODE_NAME,
+                B.TLNO,
+                A.UNTY_CSNO,
+                A.CS_SRCH_NO,
+                C.SPCL_APPV_YN
+			FROM IF_CM_UNTYCS_M A JOIN IF_CM_CNPL_M B
+		        ON A.UNTY_CSNO = B.UNTY_CSNO AND A.UNTY_CSNO = #{untyCsno}
+		        AND B.TLNO = #{tlno}
+		        AND NVL(B.UNTY_CNTR_NO,'N') != 'N'
+		        LEFT OUTER JOIN TH_SPECIAL_CUST C
+		        ON A.UNTY_CSNO = C.UNTY_CSNO
+	</select>
+
+	<!-- 계약조회(고객번호) -->
+	<select id="selectContract" resultType="UntyCntrDomain" parameterType="CustomerDomain">
+		SELECT
+			UNTY_CNTR_NO,
+			CNTR_NO,
+			DDCT_BIZ_DSCD,
+			CNTR_BGN_DT,
+			ABND_YN,
+			DLGT_UNTY_CSNO,
+			BZPL_UNTY_CSNO,
+			#{untyCsno} AS UNTY_CSNO
+		FROM IF_CA_UNTYCNTR_M
+			WHERE DLGT_UNTY_CSNO = #{untyCsno}
+			OR BZPL_UNTY_CSNO = #{untyCsno}
+	</select>
+
+	<!-- 고객/계약조회(계약번호) -->
+	<select id="selectCntrDetail" resultType="CustomerDomain" parameterType="CustomerDomain">
+		SELECT
+		    B.CNLT_SEQ,
+            B.CNLT_DETAIL_NO,
+		    A.DLGT_UNTY_CSNO,
+		    A.BZPL_UNTY_CSNO,
+		    (SELECT CS_KRN_NM FROM IF_CM_UNTYCS_M
+		    	WHERE UNTY_CSNO = #{untyCsno}) AS CS_KRN_NM,
+		    (SELECT RL_CS_KRN_NM FROM IF_CM_UNTYCS_M
+		    WHERE UNTY_CSNO = #{untyCsno}) AS RL_CS_KRN_NM,
+		    (SELECT CS_DSCD FROM IF_CM_UNTYCS_M
+		    	WHERE UNTY_CSNO = #{untyCsno}) AS CS_DSCD,
+		    A.CNTR_NO,
+		    A.UNTY_CNTR_NO,
+		    A.ABND_YN,
+		    A.SMS_YN,
+		    (SELECT BADR || ' ' || DADR FROM IF_CM_ADR_M
+		    	WHERE UNTY_CNTR_NO = A.UNTY_CNTR_NO AND CS_ADR_POST_TRSPL_DSCD = '3') AS ADDR,
+		    #{tlno} AS TLNO,
+		    #{untyCsno} AS UNTY_CSNO,
+		    (SELECT SPCL_APPV_YN FROM TH_SPECIAL_CUST
+		    WHERE UNTY_CSNO = A.DLGT_UNTY_CSNO OR UNTY_CSNO = A.BZPL_UNTY_CSNO) AS SPCL_APPV_YN
+	    FROM IF_CA_UNTYCNTR_M A FULL OUTER JOIN TH_CONSULT_DETAIL B
+            ON A.UNTY_CNTR_NO = B.CNTR_NO
+	    	WHERE A.UNTY_CNTR_NO = #{untyCntrNo}
+	</select>
+
+	<!-- 상담이력조회(마스터) -->
+	<select id="selectConsult" resultType="ConsultDomain">
+		SELECT * FROM TH_CONSULT
+	</select>
+
+	<!-- 상담이력 리스트조회 -->
+	<select id="selectConsultDetailList" resultType="ConsultDetailDomain">
+		SELECT
+		    A.*,
+		    B.CUST_NM,
+		    C.CODE_NAME,
+		    (SELECT USER_NM FROM IF_CO_USER_MA WHERE USER_ID=A.USER_ID) AS USER_NM
+		FROM TH_CONSULT_DETAIL A JOIN TH_CONSULT B
+		   		ON A.CNLT_SEQ = B.CNLT_SEQ
+		    JOIN TH_CODE C
+		    	ON A.CNLT_PROC_CD = C.MCODE
+		    WHERE C.LCODE='001'
+		    ORDER BY A.CNLT_DATE DESC
+	</select>
+
+	<!-- 상담이력 선택조회 -->
+	<select id="selectConsultInfoDetail" resultType="ConsultDetailDomain">
+		SELECT
+			(SELECT CODE_NAME FROM TH_CONSULT_CODE
+				WHERE CHNL_CODE = A.CHNL_CODE AND LCODE='00') AS CODE_NAME,
+			(SELECT CODE_NAME FROM TH_CONSULT_CODE
+				WHERE CHNL_CODE = A.CHNL_CODE AND LCODE=A.LCODE AND MCODE='00' AND SCODE='00') AS LCODE,
+			(SELECT CODE_NAME FROM TH_CONSULT_CODE
+				WHERE CHNL_CODE = A.CHNL_CODE AND LCODE=A.LCODE AND MCODE=A.MCODE AND SCODE='00') AS MCODE,
+			(SELECT CODE_NAME FROM TH_CONSULT_CODE
+				WHERE CHNL_CODE = A.CHNL_CODE AND LCODE=A.LCODE AND MCODE=A.MCODE AND SCODE=A.SCODE) AS SCODE,
+			(SELECT CUST_NM FROM TH_CONSULT
+				WHERE CNLT_SEQ=A.CNLT_SEQ) AS CUST_NM,
+			A.CNTR_NO,
+			A.UNTY_CNTR_NO,
+			A.RECV_NOTE,
+			A.PROC_NOTE,
+			A.TELL_NUM,
+			A.REC_URL,
+			A.CNLT_SEQ,
+			A.CNLT_DETAIL_NO
+		FROM TH_CONSULT_DETAIL A
+			WHERE A.CNLT_SEQ = #{cnltSeq} AND A.CNLT_DETAIL_NO = #{cnltDetailNo}
+			ORDER BY A.CNLT_DATE DESC
+	</select>
+
+	<!-- 상담이력 검색 -->
+	<select id="selectConsultSearch" resultType="ConsultDetailDomain" parameterType="ConsultDetailDomain">
+	SELECT * FROM(
+		SELECT C.*, ROWNUM AS RNUM
+			FROM
+			(SELECT A.*,
+				(SELECT USER_NM FROM IF_CO_USER_MA WHERE USER_ID=A.USER_ID) AS USER_NM,
+				B.CUST_NM,
+				(SELECT CODE_NAME FROM TH_CODE WHERE LCODE='001' AND MCODE = A.CNLT_PROC_CD) AS CODE_NAME
+			FROM TH_CONSULT_DETAIL A JOIN TH_CONSULT B
+			ON A.CNLT_SEQ=B.CNLT_SEQ
+			WHERE
+			1=1
+			<if test=" startDate != null and startDate !='' ">
+			AND A.CNLT_DATE >= TO_DATE(#{startDate},'YYYY-MM-DD')
+			</if>
+			<if test=" endDate != null and endDate !='' ">
+			AND A.CNLT_DATE <![CDATA[<]]> TO_DATE(#{endDate},'YYYY-MM-DD')+1
+			</if>
+			<if test=" userNm != null and userNm !='' ">
+			AND A.USER_ID IN (SELECT USER_ID FROM IF_CO_USER_MA WHERE USER_NM = #{userNm})
+			</if>
+			<if test=" custNm != null and custNm !='' ">
+			AND B.CUST_NM LIKE '%' || #{custNm} || '%'
+			</if>
+			<if test=" cnltProcCd != null and cnltProcCd !='' ">
+			AND A.CNLT_PROC_CD = #{cnltProcCd}
+			</if>
+			ORDER BY A.CNLT_DATE DESC
+			) C
+			WHERE C.REG_ID = #{loginUserId} OR (SELECT CALL_AP_GRADE FROM IF_CO_USER_HI WHERE USER_ID = #{loginUserId}) IN ('01','02')
+		)
+		WHERE RNUM BETWEEN #{fromRowPerPage} AND #{toRowPerPage}
+	</select>
+
+	<!-- 상담이력 총개수 -->
+	<select id="consultTotalCount" resultType="Integer" parameterType="ConsultDetailDomain">
+	SELECT COUNT(*) FROM(
+		SELECT C.*
+			FROM
+			(SELECT
+				A.*
+			FROM TH_CONSULT_DETAIL A JOIN TH_CONSULT B
+			ON A.CNLT_SEQ=B.CNLT_SEQ
+			WHERE
+			1=1
+			<if test=" startDate != null and startDate !='' ">
+			AND A.CNLT_DATE >= TO_DATE(#{startDate},'YYYY-MM-DD')
+			</if>
+			<if test=" endDate != null and endDate !='' ">
+			AND A.CNLT_DATE <![CDATA[<]]> TO_DATE(#{endDate},'YYYY-MM-DD')+1
+			</if>
+			<if test=" userNm != null and userNm !='' ">
+			AND A.USER_ID IN (SELECT USER_ID FROM IF_CO_USER_MA WHERE USER_NM = #{userNm})
+			</if>
+			<if test=" custNm != null and custNm !='' ">
+			AND B.CUST_NM LIKE '%' || #{custNm} || '%'
+			</if>
+			<if test=" cnltProcCd != null and cnltProcCd !='' ">
+			AND A.CNLT_PROC_CD = #{cnltProcCd}
+			</if>
+			ORDER BY A.CNLT_DATE DESC
+			) C
+			WHERE C.REG_ID = #{loginUserId} OR (SELECT CALL_AP_GRADE FROM IF_CO_USER_HI WHERE USER_ID = #{loginUserId}) IN ('01','02')
+		)
+	</select>
+
+	<!-- 상담내용 저장1 -->
+	<insert id="insertConsult" parameterType="ConsultDetailDomain">
+		INSERT INTO TH_CONSULT
+		VALUES
+		(
+			(TO_CHAR(sysdate,'YYYYMMDD') || SEQ_TH_CONSULT.NEXTVAL), #{cnltProcCd},
+			#{custNo}, #{custNm}, #{regId},
+			sysdate, #{modId}, sysdate
+		)
+	</insert>
+
+	<!-- 상담 CNLT_SEQ -->
+	<select id="curSeq" resultType="String">
+		SELECT TO_CHAR(MAX(TO_NUMBER(SUBSTR(CNLT_SEQ,9,14)))) FROM TH_CONSULT
+	</select>
+
+	<!-- 상담 상세 개수 -->
+	<select id="curDetailNo" resultType="Integer" parameterType="ConsultDetailDomain">
+		SELECT COUNT(CNLT_DETAIL_NO) FROM TH_CONSULT_DETAIL WHERE CNLT_SEQ=#{cnltSeq}
+	</select>
+
+	<!-- 상담내용 저장2 -->
+	<insert id="insertConsultDetail" parameterType="ConsultDetailDomain">
+			INSERT INTO TH_CONSULT_DETAIL
+			(
+				CNLT_SEQ, CNLT_DETAIL_NO, CNLT_PROC_CD,
+				CNLT_DATE, UNTY_CNTR_NO, CNTR_NO,
+				CALL_START_DATE, CALL_END_DATE,
+				TELL_NUM, CALL_YN, IO_TYPE,
+				REC_URL, REC_KEY, RECV_NOTE,
+				PROC_NOTE, USER_ID, CHNL_CODE,
+				SCODE, MCODE, LCODE,
+				TRAN_ID, RSRV_DATE, RSRV_TELL_NUM,
+				CALLBACK_SEQ, REG_ID, REG_DATE,
+				MOD_ID, MOD_DATE
+			)
+			VALUES
+			(
+				#{cnltSeq}, #{cnltDetailNo}, #{cnltProcCd},
+				TO_DATE(#{cnltDate},'YYYY-MM-DD HH24:MI:SS'), #{untyCntrNo, jdbcType=VARCHAR}, #{cntrNo, jdbcType=VARCHAR},
+				TO_DATE(#{callStartDate},'YYYY-MM-DD HH24:MI:SS'), TO_DATE(#{callEndDate},'YYYY-MM-DD HH24:MI:SS'),
+				#{tellNum}, #{callYn}, '',
+				#{recUrl}, '', #{recvNote},
+				#{procNote}, #{userId}, #{chnlCode},
+				#{scode}, #{mcode}, #{lcode},
+				#{tranId, jdbcType=VARCHAR}, TO_DATE(#{rsrvDate, jdbcType=VARCHAR},'YYYY-MM-DD HH24:MI:SS'),
+				#{rsrvTellNum, jdbcType=VARCHAR}, #{callbackSeq, jdbcType=VARCHAR},
+				#{regId}, sysdate,
+				#{modId}, sysdate
+			)
+	</insert>
+
+	<!-- 특이성향 저장 -->
+	<insert id="insertSpecial" parameterType="ConsultDetailDomain">
+		INSERT INTO TH_SPECIAL_CUST
+		(
+			CNLT_SEQ, CNLT_DETAIL_NO, UNTY_CSNO,
+			SPCL_CONT,SPCL_APPV_YN,
+			REG_ID, REG_DATE, MOD_ID, MOD_DATE
+		)
+		VALUES
+		(
+			#{cnltSeq},#{cnltDetailNo},#{custNo},
+			#{spclCont},'N',
+			#{regId},sysdate,#{modId},sysdate
+		)
+	</insert>
+
+	<!-- 예약저장 -->
+	<insert id="insertRsrv" parameterType="ConsultDetailDomain">
+		INSERT INTO TH_RESERVE
+		(
+			CNLT_SEQ, CNLT_DETAIL_NO, REG_ID,
+			REG_DATE, MOD_ID, MOD_DATE
+		)
+		VALUES
+		(
+			#{cnltSeq}, #{cnltDetailNo}, #{regId},
+			sysdate, #{modId}, sysdate
+		)
+	</insert>
+
+	<!-- 이관저장 -->
+	<insert id="insertTran" parameterType="ConsultDetailDomain">
+		INSERT INTO TH_TRANSFER
+		(
+			CNLT_SEQ, CNLT_DETAIL_NO, REG_ID,
+			REG_DATE, MOD_ID, MOD_DATE
+		)
+		VALUES
+		(
+			#{cnltSeq}, #{cnltDetailNo}, #{regId},
+			sysdate, #{modId}, sysdate
+		)
+	</insert>
+
+	<!-- 콜백 리스트 -->
+	<select id="selectCallbackList" resultType="CallbackDomain">
+		SELECT
+			A.*,
+			(SELECT CODE_NAME FROM TH_CONSULT_CODE
+			WHERE A.CHNL_CODE=CHNL_CODE AND LCODE='00') AS CODE_NAME
+		FROM
+			TH_CALLBACK A
+		WHERE PROC_YN = 'N'
+			ORDER BY A.REG_DATE DESC
+	</select>
+
+	<!-- 콜백 총개수 -->
+	<select id="callbackTotalCount" parameterType="CallbackDomain" resultType="Integer">
+		SELECT
+			COUNT(*)
+		FROM
+			TH_CALLBACK A
+		WHERE PROC_YN = 'N'
+	</select>
+
+	<!-- 콜백 선점 -->
+	<update id="callBackProc" parameterType="CallbackDomain">
+		UPDATE TH_CALLBACK SET PROC_YN = 'Y'
+			WHERE CALLBACK_SEQ = #{callbackSeq}
+	</update>
+
+	<!-- 예약전화 리스트 -->
+	<select id="selectRsrvList" resultType="ConsultDetailDomain">
+		 SELECT * FROM
+			(SELECT E.*, ROWNUM AS RNUM
+				FROM
+				(SELECT
+					A.CNLT_DATE, A.RSRV_DATE, A.RSRV_TELL_NUM,
+					B.CNLT_SEQ, B.CNLT_DETAIL_NO,
+					D.USER_NM, C.CUST_NM
+				FROM
+					TH_CONSULT_DETAIL A JOIN TH_RESERVE B
+						ON A.CNLT_SEQ = B.CNLT_SEQ
+                        AND A.CNLT_DETAIL_NO = B.CNLT_DETAIL_NO
+                        AND A.RSRV_DATE BETWEEN TO_DATE(TO_CHAR(SYSDATE,'YYYY-MM-DD'), 'YYYY-MM-DD') AND TO_DATE(TO_CHAR(SYSDATE+1,'YYYY-MM-DD'), 'YYYY-MM-DD')
+                        AND A.CALL_YN = 'N'
+		        	JOIN TH_CONSULT C
+		        		ON A.CNLT_SEQ = C.CNLT_SEQ
+		        	JOIN IF_CO_USER_MA D
+		        		ON D.USER_ID = B.REG_ID
+		        	WHERE
+			        	B.REG_ID = #{loginUserId}
+			        	OR (SELECT CALL_AP_GRADE FROM IF_CO_USER_HI WHERE USER_ID = #{loginUserId}) IN ('01','02')
+			        ORDER BY A.RSRV_DATE DESC) E
+	   	 ) WHERE RNUM BETWEEN #{fromRowPerPage} AND #{toRowPerPage}
+	</select>
+
+	<!-- 예약전화 총개수 -->
+	<select id="reserveTotalCount" parameterType="ConsultDetailDomain" resultType="Integer">
+		SELECT COUNT(*) FROM
+		(
+		SELECT
+			A.CNLT_DATE, A.RSRV_DATE, A.RSRV_TELL_NUM,
+			B.CNLT_SEQ, B.CNLT_DETAIL_NO,
+			D.USER_NM, C.CUST_NM
+		FROM
+			TH_CONSULT_DETAIL A JOIN TH_RESERVE B
+				ON A.CNLT_SEQ = B.CNLT_SEQ
+                AND A.CNLT_DETAIL_NO = B.CNLT_DETAIL_NO
+                AND A.RSRV_DATE BETWEEN TO_DATE(TO_CHAR(SYSDATE,'YYYY-MM-DD'), 'YYYY-MM-DD') AND TO_DATE(TO_CHAR(SYSDATE+1,'YYYY-MM-DD'), 'YYYY-MM-DD')
+	       	JOIN TH_CONSULT C
+	       		ON A.CNLT_SEQ = C.CNLT_SEQ
+	       	JOIN IF_CO_USER_MA D
+	       		ON D.USER_ID = B.REG_ID
+	       	WHERE
+	        	B.REG_ID = #{loginUserId}
+	        	OR (SELECT CALL_AP_GRADE FROM IF_CO_USER_HI WHERE USER_ID = #{loginUserId}) IN ('01','02')
+        	)
+	</select>
+
+	<select id="changeCallYn" parameterType="ConsultDetailDomain">
+		UPDATE TH_CONSULT_DETAIL SET CALL_YN = 'Y' WHERE CNLT_SEQ = #{cnltSeq} AND CNLT_DETAIL_NO = #{cnltDetailNo}
+	</select>
+
+	<!-- 예약전화 상세조회(상담정보) -->
+	<select id="selectConsultRsrvDetail" resultType="ConsultDetailDomain">
+	SELECT
+			A.*,
+			B.CNLT_SEQ, B.CNLT_DETAIL_NO,
+			D.USER_NM, C.CUST_NM
+		FROM
+			TH_CONSULT_DETAIL A JOIN TH_RESERVE B
+				ON A.CNLT_SEQ = B.CNLT_SEQ
+			AND A.CNLT_DETAIL_NO = B.CNLT_DETAIL_NO
+	        JOIN TH_CONSULT C
+	        	ON A.CNLT_SEQ = C.CNLT_SEQ
+	        JOIN IF_CO_USER_MA D
+	       		ON D.USER_ID = A.USER_ID
+	        	WHERE B.CNLT_SEQ=#{cnltSeq}
+				AND B.CNLT_DETAIL_NO=#{cnltDetailNo}
+	</select>
+
+	<!-- 예약전화 상세조회(고객정보) -->
+	<select id="selectConsultRsrvDetail2" resultType="java.lang.String">
+		SELECT
+			UNTY_CNTR_NO
+		FROM TH_CONSULT_DETAIL
+	    	WHERE CNLT_SEQ=#{cnltSeq}
+	    	AND CNLT_DETAIL_NO = #{cnltDetailNo}
+	</select>
+
+	<!-- 이관내역 리스트 -->
+	<select id="selectTransList" resultType="ConsultDetailDomain">
+		SELECT * FROM
+			(SELECT E.*, ROWNUM AS RNUM FROM
+				(SELECT
+					A.CNLT_DATE, A.TRAN_ID, A.TELL_NUM,
+					(SELECT USER_NM FROM IF_CO_USER_MA WHERE USER_ID=B.REG_ID) AS REG_NM,
+					B.CNLT_SEQ, B.CNLT_DETAIL_NO,
+					NVL((SELECT USER_NM FROM IF_CO_USER_MA WHERE USER_ID=A.TRAN_ID),'VOC') AS TRAN_NM,
+					(SELECT CUST_NM FROM TH_CONSULT WHERE A.CNLT_SEQ = CNLT_SEQ) AS CUST_NM,
+					(SELECT CODE_NAME FROM TH_CODE WHERE LCODE='001' AND MCODE = A.CNLT_PROC_CD) AS CODE_NAME
+				FROM
+					TH_CONSULT_DETAIL A JOIN TH_TRANSFER B
+						ON A.CNLT_SEQ = B.CNLT_SEQ
+					AND A.CNLT_DETAIL_NO = B.CNLT_DETAIL_NO
+                    AND B.REG_DATE BETWEEN TO_DATE(TO_CHAR(SYSDATE,'YYYY-MM-DD'), 'YYYY-MM-DD') AND TO_DATE(TO_CHAR(SYSDATE+1,'YYYY-MM-DD'), 'YYYY-MM-DD')
+		        	    WHERE
+                        A.TRAN_ID = #{loginUserId}
+		        		OR B.REG_ID = #{loginUserId}
+		        		OR (SELECT CALL_AP_GRADE FROM IF_CO_USER_HI WHERE USER_ID = #{loginUserId}) IN ('01','02')
+		        		ORDER BY A.REG_DATE DESC) E
+		      )
+		      WHERE RNUM BETWEEN #{fromRowPerPage} AND #{toRowPerPage}
+	</select>
+
+	<!-- 이관내역 총개수 -->
+	<select id="transferTotalCount" parameterType="ConsultDetailDomain" resultType="Integer">
+			SELECT COUNT(*) FROM
+				(SELECT E.*, ROWNUM AS RNUM FROM
+				(SELECT
+					A.CNLT_DATE, A.TRAN_ID, A.TELL_NUM,
+					(SELECT USER_NM FROM IF_CO_USER_MA WHERE USER_ID=B.REG_ID) AS REG_NM,
+					B.CNLT_SEQ, B.CNLT_DETAIL_NO,
+					NVL((SELECT USER_NM FROM IF_CO_USER_MA WHERE USER_ID=A.TRAN_ID),'VOC') AS TRAN_NM,
+					(SELECT CUST_NM FROM TH_CONSULT WHERE A.CNLT_SEQ = CNLT_SEQ) AS CUST_NM,
+					(SELECT CODE_NAME FROM TH_CODE WHERE LCODE='001' AND MCODE = A.CNLT_PROC_CD) AS CODE_NAME
+				FROM
+					TH_CONSULT_DETAIL A JOIN TH_TRANSFER B
+						ON A.CNLT_SEQ = B.CNLT_SEQ
+					AND A.CNLT_DETAIL_NO = B.CNLT_DETAIL_NO
+                    AND B.REG_DATE BETWEEN TO_DATE(TO_CHAR(SYSDATE,'YYYY-MM-DD'), 'YYYY-MM-DD') AND TO_DATE(TO_CHAR(SYSDATE+1,'YYYY-MM-DD'), 'YYYY-MM-DD')
+		        	    WHERE
+                        A.TRAN_ID = #{loginUserId}
+		        		OR B.REG_ID = #{loginUserId}
+		        		OR (SELECT CALL_AP_GRADE FROM IF_CO_USER_HI WHERE USER_ID = #{loginUserId}) IN ('01','02')
+		        		ORDER BY A.REG_DATE DESC) E
+		      	)
+	</select>
+
+	<!-- 스크립트 리스트 -->
+	<select id="selectScript" resultType="CodeDomain">
+		SELECT * FROM(
+			SELECT B.*, ROWNUM AS RNUM FROM
+	            (SELECT
+		            A.CHNL_CODE,
+		            A.LCODE,
+		            (SELECT CODE_NAME FROM TH_CONSULT_CODE
+		            WHERE CHNL_CODE = #{chnlCode} AND LCODE=A.LCODE
+		            AND MCODE='00' AND SCODE='00') AS LCODE_NAME,
+		            A.MCODE,
+		            (SELECT CODE_NAME FROM TH_CONSULT_CODE
+		            WHERE CHNL_CODE = #{chnlCode} AND LCODE=A.LCODE
+		            AND MCODE=A.MCODE AND SCODE='00') AS MCODE_NAME,
+		            A.SCODE,
+		             (SELECT CODE_NAME FROM TH_CONSULT_CODE
+		            WHERE CHNL_CODE = #{chnlCode} AND LCODE=A.LCODE
+		            AND MCODE=A.MCODE AND SCODE=A.SCODE) AS SCODE_NAME,
+		            A.MOD_DATE,
+		            (SELECT USER_NM FROM IF_CO_USER_MA WHERE USER_ID = A.REG_ID) AS REG_NM,
+		            A.SCRIPT,
+		            A.UPLOAD_FILE
+		            FROM TH_CONSULT_CODE A
+		            WHERE A.USE_YN = 'Y'
+		            AND A.CHNL_CODE = #{chnlCode} AND A.LCODE != '00'
+		            AND A.MCODE != '00' AND A.SCODE != '00'
+		            AND NVL(A.SCRIPT,'N') != 'N'
+		            ORDER BY A.CHNL_CODE, A.LCODE, A.MCODE, A.SCODE ASC ) B
+	        		WHERE 1=1
+	        	<if test="keyword != null and keyword != '' ">
+					AND B.LCODE_NAME like '%' || #{keyword} || '%' OR
+				    B.MCODE_NAME like '%' || #{keyword} || '%' OR
+					B.SCODE_NAME like '%' || #{keyword} || '%'
+				</if>
+				<if test="lcode != null and lcode != '' ">
+					AND LCODE = #{lcode}
+	        	</if>
+	        	<if test="mcode != null and mcode != '' ">
+					AND MCODE = #{mcode}
+				</if>
+			) WHERE RNUM BETWEEN #{fromRowPerPage} AND #{toRowPerPage}
+	</select>
+
+	<!-- 스크립트 총개수 -->
+	<select id="scriptTotalCount" parameterType="CodeDomain" resultType="Integer">
+		SELECT COUNT(*) FROM
+	            (SELECT
+		            A.CHNL_CODE,
+		            A.LCODE,
+		            (SELECT CODE_NAME FROM TH_CONSULT_CODE
+		            WHERE CHNL_CODE = #{chnlCode} AND LCODE=A.LCODE
+		            AND MCODE='00' AND SCODE='00') AS LCODE_NAME,
+		            A.MCODE,
+		            (SELECT CODE_NAME FROM TH_CONSULT_CODE
+		            WHERE CHNL_CODE = #{chnlCode} AND LCODE=A.LCODE
+		            AND MCODE=A.MCODE AND SCODE='00') AS MCODE_NAME,
+		            A.SCODE,
+		             (SELECT CODE_NAME FROM TH_CONSULT_CODE
+		            WHERE CHNL_CODE = #{chnlCode} AND LCODE=A.LCODE
+		            AND MCODE=A.MCODE AND SCODE=A.SCODE) AS SCODE_NAME
+		            FROM TH_CONSULT_CODE A
+		            WHERE A.USE_YN = 'Y'
+		            AND A.CHNL_CODE = #{chnlCode} AND A.LCODE != '00'
+		            AND A.MCODE != '00' AND A.SCODE != '00'
+		            AND NVL(A.SCRIPT,'N') != 'N' ) B
+	        		WHERE 1=1
+				<if test="keyword != null and keyword != '' ">
+					AND B.LCODE_NAME like '%' || #{keyword} || '%' OR
+				    B.MCODE_NAME like '%' || #{keyword} || '%' OR
+					B.SCODE_NAME like '%' || #{keyword} || '%'
+				</if>
+				<if test="lcode != null and lcode != '' ">
+					AND LCODE = #{lcode}
+	        	</if>
+	        	<if test="mcode != null and mcode != '' ">
+					AND MCODE = #{mcode}
+				</if>
+	</select>
+
+	<!-- 코드조회 -->
+	<select id="selectCode" resultType="CodeDomain">
+		SELECT * FROM TH_CODE WHERE USE_YN = 'Y' ORDER BY MCODE ASC
+	</select>
+
+	<!-- 상담코드조회 -->
+	<select id="selectChCode" resultType="CodeDomain">
+		SELECT * FROM TH_CONSULT_CODE
+			WHERE USE_YN = 'Y' AND LCODE = '00' AND MCODE = '00' AND SCODE = '00' ORDER BY CHNL_CODE ASC
+	</select>
+
+	<!-- 상담코드조회 -->
+	<select id="selectLcode" resultType="CodeDomain">
+		SELECT * FROM TH_CONSULT_CODE
+			WHERE USE_YN = 'Y' AND CHNL_CODE = #{chnlCode} AND LCODE != '00' AND MCODE = '00' AND SCODE = '00'
+			ORDER BY LCODE ASC
+	</select>
+
+	<!-- 중분류코드조회 -->
+	<select id="selectMcode" resultType="CodeDomain">
+		SELECT * FROM TH_CONSULT_CODE
+			WHERE USE_YN = 'Y' AND CHNL_CODE = #{chnlCode} AND LCODE = #{lcode} AND MCODE != '00' AND SCODE = '00'
+	</select>
+
+	<!-- 소분류코드조회 -->
+	<select id="selectScode" resultType="CodeDomain">
+		SELECT * FROM TH_CONSULT_CODE
+			WHERE USE_YN = 'Y' AND CHNL_CODE = #{chnlCode} AND LCODE = #{lcode} AND MCODE = #{mcode} AND SCODE != '00'
+	</select>
+
+	<!-- 상담원정보조회 -->
+	<select id="selectUserList" resultType="UserDomain">
+		SELECT A.USER_ID, A.USER_NM, A.CALL_TEL_NUM
+			FROM IF_CO_USER_MA A JOIN IF_CO_USER_HI B
+			ON A.USER_ID = B.USER_ID
+			WHERE B.DEPT_CD = 'B00604'
+	</select>
+
+	<!-- SMS전송내역 저장 -->
+	<insert id="insertSms" parameterType="java.util.Map">
+		INSERT INTO TH_SEND_SMS
+		VALUES
+		(
+			SEQ_TH_SEND_SMS.NEXTVAL, #{tellNum}, #{content}, sysdate, #{userId}
+		)
+	</insert>
+
+	<!-- 특이성향 고객 조회 -->
+	<select id="selectSpecial" parameterType="java.lang.String" resultType="InboundSpecialDomain">
+		SELECT
+			B.CNLT_SEQ,
+			B.CNLT_DETAIL_NO,
+			C.*,
+			A.CUST_NM,
+			(SELECT USER_NM FROM IF_CO_USER_MA WHERE USER_ID = C.REG_ID) AS USER_NM
+		FROM TH_CONSULT A JOIN TH_CONSULT_DETAIL B
+			ON A.CNLT_SEQ = B.CNLT_SEQ
+			JOIN TH_SPECIAL_CUST C
+			ON C.UNTY_CSNO = A.CUST_NO
+			AND C.CNLT_SEQ = B.CNLT_SEQ
+	        AND C.CNLT_DETAIL_NO = B.CNLT_DETAIL_NO
+			WHERE C.UNTY_CSNO = #{untyCsno}
+	</select>
+
+	<!-- 조직도 조회 -->
+	<select id="selectOrganization" resultType="OrganizationDomain">
+		SELECT LEVEL, DEPT_CD, DEPT_NM, UPPR_DEPT FROM IF_CO_ORNG_MA
+		START WITH DEPT_CD = 'B00000'
+		CONNECT BY PRIOR DEPT_CD = UPPR_DEPT
+	</select>
+
+	<!-- 조직도 조회 -->
+	<select id="organizationSearch" resultType="OrganizationDomain" parameterType="OrganizationDomain">
+		SELECT A.USER_ID, A.USER_NM, EMAILADR_1 AS EMAIL_ADR, OFRM_TEL_NO
+			FROM IF_CO_USER_MA A ,IF_CO_USER_HI B
+			WHERE A.USER_ID = B.USER_ID AND B.DEPT_CD = #{deptCd}
+	</select>
+
+	<!-- 조직도 조회 -->
+	<select id="selectAdminList" resultType="OrganizationDomain">
+		SELECT A.USER_ID, A.USER_NM, A.CALL_TEL_NUM FROM
+		IF_CO_USER_MA A JOIN IF_CO_USER_HI B
+		ON A.USER_ID = B.USER_ID
+		WHERE B.CALL_AP_GRADE = '02'
+	</select>
+
+</mapper>

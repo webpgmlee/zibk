@@ -1,0 +1,200 @@
+<!doctype html>
+<html lang="ko">
+<head>
+<meta http-equiv="content-type" content="text/html; charset=utf-8">
+<meta http-equiv="X-UA-Compatible" content="IE=edge">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, minimum-scale=1.0, user-scalable=no">
+<meta name="subject" content="KBIZ">
+<meta name="author" content="KBIZ">
+<meta name="keywords" content="KBIZ">
+<meta name="description" content="KBIZ">
+<title>KBIZ</title>
+<script type="text/javascript" src="http://code.jquery.com/jquery-latest.min.js"></script>
+<script type="text/javascript" src="js/common.js"></script>
+<link rel="stylesheet" href="css/reset.css" type="text/css" media="screen" />
+<link rel="stylesheet" href="css/common.css" type="text/css" media="screen" />
+<script type="text/javascript">
+
+</script>
+<style>
+
+</style>
+</head>
+<body>
+<!-- cc_Main start -->
+<form id="cnsl_input_frm" name="cnsl_input_frm">
+<input type="hidden" id="cnsl_detail" name="cnsl_detail" value="" /><!-- 상담 상세분류 -->
+<input type="hidden" id="cust_tp" name="cust_tp" value="1" /><!-- 고객분류 -->
+<input type="hidden" id="cust_id" name="cust_id" value="" /><!-- 고객ID -->
+<input type="hidden" id="store_code" name="store_code" value="" /><!-- 점포코드 -->
+
+
+<input type="hidden" id="tempid" name="tempid" value="" /><!-- TEMP 상담이력ID -->
+<input type="hidden" id="cust_info" name="cust_info" value="" /><!-- 개인정보 -->
+<input type="hidden" id="hid_claim_yn" name="hid_claim_yn" value="" /><!-- 클레임 여부 -->
+<input type="hidden" id="hid_happycall_yn" name="hid_happycall_yn" value="" /><!-- 해피콜지정 -->
+<input type="hidden" id="hid_reserve_id" name="hid_reserve_id" value="" /><!-- 예약자 ID-->
+<input type="hidden" id="hid_reserve_name" name="hid_reserve_name" value="" /><!-- 예약자 명-->
+
+<input type="hidden" id="hid_trans_title" name="hid_trans_title" value="" /><!-- 이관제목-->
+<input type="hidden" id="hid_trans_note" name="hid_trans_note" value="" /><!-- 이관내용(메일)-->
+<input type="hidden" id="hid_trans_note2" name="hid_trans_note2" value="" /><!-- 이관내용(SMS)-->
+
+<input type="hidden" id="hid_goods_code" name="hid_goods_code" value="" /><!-- 상품코드-->
+
+<input type="hidden" id="hid_lcode_code" name="hid_lcode_code" value="" /><!-- 상담분류(대)-->
+<input type="hidden" id="hid_mcode_code" name="hid_mcode_code" value="" /><!-- 상담분류(중)-->
+<input type="hidden" id="hid_scode_code" name="hid_scode_code" value="" /><!-- 상담분류(소)-->
+<input type="hidden" id="parent_frm" name="parent_frm" value="" /><!-- 부모form -->
+<input type="hidden" id="hid_homepg_yn" name="hid_homepg_yn" value="" /><!-- 홈페이지등록 여부 -->
+
+<input type="hidden" id="file_name" name="file_name" value="" /><!-- 파일명 -->
+<input type="hidden" id="hid_input_yn" name="hid_input_yn" value="" /><!-- 수/발신 -->
+
+<input type="hidden" id="sc_name" name="sc_name" value="" /><!-- sc명 -->
+<input type="hidden" id="sc_id" name="sc_id" value="" /><!-- sc사번 -->
+<input type="hidden" id="store_depart" name="store_depart" value="" /><!-- 영업부 -->
+<input type="hidden" id="store_depart_nm" name="store_depart_nm" value="" /><!-- 영업부명 -->
+<input type="hidden" id="store_team" name="store_team" value="" /><!-- 영업팀 -->
+<input type="hidden" id="store_team_nm" name="store_team_nm" value="" /><!-- 영업팀명 -->
+<input type="hidden" id="md_id" name="md_id" value="" /><!-- MD사번 -->
+<input type="hidden" id="charge_team_id" name="charge_team_id" value="" /><!-- MD담당팀 -->
+<input type="hidden" id="charge_team" name="charge_team" value="" /><!-- MD담담팀명 -->
+
+<input type="hidden" id="mail_yn" name="mail_yn" value="" /><!-- MAIL 전송여부 -->
+<input type="hidden" id="sms_yn" name="sms_yn" value="" /><!-- SMS 전송여부 -->
+
+<input type="hidden" id="file_cnsl_id" name="file_cnsl_id" value="" /><!-- 파일에 적을 때 넘겨 줄 이력 일련번호 -->
+
+<input type="hidden" id="call_start_date" name="call_start_date" value="" /><!-- 통화시작 시간 -->
+<input type="hidden" id="call_end_date" name="call_end_date" value="" /><!-- 통화끝 시간 -->
+
+<input type="hidden" id="hid_cust_gender" name="hid_cust_gender" value="" /><!-- 통화자 성별 -->
+
+<input type="hidden" name="cus_special_level" id="cus_special_level" value="" /><!-- 고객성향 -->
+<input type="hidden" name="cus_special_nm" id="cus_special_nm" value="" /><!-- 고객성향내용 -->
+<input type="hidden" name="hid_orderseq" id="hid_orderseq" value="" /><!-- 점주발주 일련번호 -->
+
+<table width="100%" border="0"  cellspacing="0" cellpadding="0" class="brd_sch">
+	<colgroup>
+		<col style="width:8%">
+		<col style="width:18%">
+		<col style="width:8%">
+		<col style="width:18%">
+		<col style="width:8%">
+		<col style="width:18%">
+		<col style="width:8%">
+		<col>
+	</colgroup>
+	<tr>
+		<th>점포명</th>
+		<td><input type="text" name="store_name" id="store_name" onClick="JavaScript:f_store_search();"> </td>
+		<th>통화자</th>
+		<td><select name="call_tp" id="call_tp"><option value="">선택</option><option value=""></option></select></td>
+		<th>전화번호</th>
+		<td><input type="text" name="cid_num" id="cid_num" ></td>
+		<th>통화자명</th>
+		<td><input type="text" name="cust_name" id="cust_name"></td>
+	</tr>
+	<tr>
+		<th>대분류</th>
+		<td><div id="fdiv_lcode" class="pdl10">대분류표시</div></td>
+		<th>중분류</th>
+		<td><div id="fdiv_mcode" class="pdl10">중분류표시</div></td>
+		<th>소분류</th>
+		<td><div id="fdiv_scode" class="pdl10">소분류표시</div></td>
+		<th colspan="2" onClick="JavaScript:f_detailcnsl();" style="cursor:pointer;" >:: 상세분류 조회 ::</th>
+	</tr>
+	<tr>
+		<th>상품명</th>
+		<td><input type="text" name="goods_name" id="goods_name" style="width:80%"> <img src="./img/search_icon.gif" onClick="JavaScript:f_goods_search();" style="cursor:pointer;" /></td>
+		<th>거래처명</th>
+		<td><input type="text" name="account_name" id="account_name"></td>
+		<th>MD명</th>
+		<td><input type="text" name="md_name" id="md_name"></td>
+		<th>통화자성별</th>
+		<td><label><input type="radio" name="cust_gender" value="M" id="cust_gender" class="radio_syl"> 남</label>&nbsp;&nbsp;&nbsp;<label><input type="radio" name="cust_gender" value="F" id="cust_gender" class="radio_syl" > 여</label></td>
+	</tr>
+	<tr>
+		<th><input type="checkbox" class="checkbox_blue" name="special_question" id="special_question" value="Y" align="absmiddle" onClick="JavaScript:f_qnote_dis();" />접수내용<br>및 특이사항 </th>
+		<td colspan="3" ><textarea  class="sebox_textarea" name="detail_note" id="detail_note" style="width:100%;height:80px;"  disabled>상세분류를 선택해주세요.</textarea><textarea  class="sebox_textarea" name="sp_question_note" id="sp_question_note" style="width:100%;height:80px;" disabled="disabled">특이사항선택 후 입력해주세요.</textarea></td>
+		<th>답변사항</th>
+		<td colspan="3"><textarea class="sebox_textarea" name="answer_note" id="" style="width:100%; height:80px;"> </textarea><textarea class="sebox_textarea" name="answer_note" id="answer_note" style="width:100%;height:80px;" ></textarea></td>
+	</tr>
+	<tr>
+		<th>개인정보</th>
+		<td><label><input type="radio" name="pri_info" value="Y" id="pri_info" class="radio_syl" checked> YES</label>&nbsp;&nbsp;&nbsp;<label><input type="radio" name="pri_info" value="N" id="pri_info" class="radio_syl" > NO</label></td>
+		<th>홈페이지</th>
+		<td><label><input type="radio" name="homepg_yn" value="Y" id="homepg_yn" class="radio_syl" > YES</label>&nbsp;&nbsp;&nbsp;<label><input type="radio" name="homepg_yn" value="N" id="homepg_yn" class="radio_syl" checked> NO</label></td>    
+		<th>이관자</th>
+		<td><input type="hidden" name="transfer_names" value="" /><input type="text" name="vi_transfer_names"   readOnly style="width:80%"> <img src="./img/trans_text.gif" align="absalign" style="cursor:pointer;" onClick="JavaScript:f_transfer_sel();" /> </td>
+		<td colspan="2"><select name="selAccNm" id="selAccNm"><option value="">선택</option></select></td>
+	</tr>
+<!--</table>
+<table width="100%" border="0"  cellspacing="0" cellpadding="0" class="brd_sch">
+	<colgroup>
+		<col style="width:7%">
+		<col style="width:18%">
+		<col style="width:7%">
+		<col style="width:18%">
+		<col style="width:7%">
+		<col style="width:18%">
+		<col style="width:7%">
+		<col>
+	</colgroup>-->
+	<tr>
+		<th>클레임일시</th>
+		<td><input type="text" name="dd_from" value="" onkeyup="javascript:autoYYYYMMDD(this);" onkeypress="isNumber2(this)" style="ime-mode:Disabled;width:50%;" onClick="javascript:show_calendar('document.cnsl_input_frm.dd_from',document.cnsl_input_frm.dd_from.value);"><input type="text" name="dd_time" value="" onkeyup="javascript:autoHHMM2(this);" onkeypress="isNumber(this);" style="ime-mode:Disabled;width:50%" ></td>
+		<th>근무자</th>
+		<td><select name="clm_work_name" id="clm_work_name"><option value="">선택</option></select></td>
+		<th>성별</th>
+		<td><select name="clm_gender"><option value="">선택</option><option value=""></option></select></td>
+		<th>연령대</th>
+		<td><select name="claim_cus_age" id="claim_cus_age"><option value="">선택</option></select></td>
+	</tr>
+<!--</table>
+<table width="100%" border="0"  cellspacing="0" cellpadding="0" class="brd_sch">
+	<colgroup>
+		<col style="width:7%">
+		<col style="width:18%">
+		<col style="width:7%">
+		<col style="width:18%">
+		<col style="width:7%">
+		<col style="width:18%">
+		<col>
+	</colgroup>	-->		
+	<tr>
+		<th>심각도</th>
+		<td><select name="risk_level" id="risk_level" onChange="JavaScript:f_risk_chage();" ><option value="">선택</option><option value=""></option></select></td>
+		<th>처리구분</th>
+		<td><select name="pro_tp" id="pro_tp" onmouseout="JavaScript:sel_flag=true" onmouseover="JavaScript:sel_flag=false;" onClick="JavaScript:if(sel_flag)f_protp_chg();"><option value="">선택</option><option value=""></option></select></td>
+		<th>예약자</th>
+		<td><span id="reserve_user">홍길동</span></td>
+		<td colspan="2" class="ar"><a href="#stop" class="btn small g_orange">저장</a></td>
+	</tr>
+<!--</table>
+<table width="100%" border="0"  cellspacing="0" cellpadding="0" class="brd_sch">-->
+	<tr>
+		<td colspan="8"><textarea name="log_str" style="width:100%;height:100%;"></textarea></td>
+	</tr> 
+</table>
+
+<div style="display:none;position:absolute; top:20px; left:250px; width:300px; height:200px">
+	<table width="100%" border="0"  cellspacing="0" cellpadding="0" class="brd_sch">
+		<tr>
+			<td colspan = "2"><strong>※특이성향 고객입니다.</strong></td>
+		</tr>
+		<tr>
+			<td colspan = "2"  class = ""><textarea name="note2" style="height:100px;" readonly onKeyDown="javascript:if(event.keyCode == 8) return false;"></textarea></td>
+		</tr>
+		<tr>
+			<td id = "second" align = "right">&nbsp;</td>
+			<td align = "right"><a onclick = "f_Show_Special();" style="cursor:pointer"><font color = blue><b><u>close</u></b></font></a></td>
+		</tr>
+	</table>
+</div>
+<div id="risk_level01" style = "background-color:#FFFFCC;position:absolute;top:270px; left:50px;width:550px; height:200px;border:solid 1 #FF6600; display:none">asdfasd</div>
+</form>
+<!-- cc_Main end -->
+</body>
+</html>

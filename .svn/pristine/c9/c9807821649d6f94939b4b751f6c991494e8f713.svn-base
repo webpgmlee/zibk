@@ -1,0 +1,31 @@
+package or.kr.kbiz.bo.admin.service;
+
+import java.util.List;
+
+import or.kr.kbiz.bo.admin.domain.UserStatDomain;
+/**
+ * <pre>UserStatService</pre>
+ *
+ * @author bsy
+ * @since 2017.11.20
+ * @version 1.0
+ */
+public interface UserStatService {
+
+	/**
+	 * 목록 조회 템플릿
+	 *
+	 * @param param
+	 * @return List<UserStatDomain>
+	 */
+	abstract List<UserStatDomain> selectUserStatList(UserStatDomain param);
+
+	/**
+	 * 엑셀 다운
+	 *
+	 * @param param
+	 * @return List<UserStatDomain>
+	 */
+	abstract List<UserStatDomain> selectUserStatExcelList(UserStatDomain userStatDomain);
+
+}

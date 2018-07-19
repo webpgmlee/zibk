@@ -1,0 +1,82 @@
+<!doctype html>
+<html lang="ko">
+<head>
+<meta http-equiv="content-type" content="text/html; charset=utf-8">
+<meta http-equiv="X-UA-Compatible" content="IE=edge">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, minimum-scale=1.0, user-scalable=no">
+<meta name="subject" content="KBIZ">
+<meta name="author" content="KBIZ">
+<meta name="keywords" content="KBIZ">
+<meta name="description" content="KBIZ">
+<title>KBIZ</title>
+<script type="text/javascript" src="http://code.jquery.com/jquery-latest.min.js"></script>
+<script type="text/javascript" src="js/common.js"></script>
+<link rel="stylesheet" href="css/reset.css" type="text/css" media="screen" />
+<link rel="stylesheet" href="css/common.css" type="text/css" media="screen" />
+<script type="text/javascript">
+
+</script>
+<style>
+
+</style>
+</head>
+<body>
+<div class="wrap2">
+	<div class="login_wrap">
+		<div class="gbcover"></div>
+		<div class="inner_box">
+			<dl>
+				<dt><img src="img/login_logo2.png"></dt>
+				<dd><input name="" type="text" placeholder="아이디를 입력하세요"></dd>
+				<dd><input name="" type="password" placeholder="비밀번호를 입력하세요"></dd>
+				<dd><input name="" type="button" title="로그인" class="btn xlarge orange brdronone" value="로그인" style="width:100%; text-align:center; cursor:pointer"></dd>
+				<dd class="clfix pdt10"><label class="fl"><input name="" type="checkbox" value="" style="vertical-align:middle"> 아이디 기억하기</label><a href="#pwchange" class="fr btn-example">비밀번호변경</a></dd>	
+				<dd class="pdb00 pdt30"><p>이곳은 중소기업중앙회 노란공제우산 콜센터입니다.<br>대표전화 : 1588-1255</p></dd>			
+			</dl>
+		</div>
+	</div>
+</div>
+<!--비밀번호변경 모달창//-->
+<div class="dim-layer">
+    <div class="dimBg"></div>
+    <div id="pwchange" class="pop-layer">
+		<div class="pop-header"><h1>비밀번호변경</h1><button type="button" class="closeBtn"><img src="img/btn_layer_close.gif"></button></div>
+        <div class="pop-container">
+            <div class="pop-conts">
+                <!--content //-->
+				<div class="boardListWrap" style="width:360px;">
+					<table border="0" cellspacing="0" cellpadding="0" class="brd_sch">
+						<colgroup>
+							<col style="width:100px">
+							<col style="width:">
+						</colgroup>
+						<tr>
+							<th>아이디</th>
+							<td><input name="" type="text"></td>
+						</tr>
+						<tr>
+							<th>현제 비밀번호</th>
+							<td><input name="" type="password"></td>
+						</tr>
+						<tr>
+							<th>신규 비밀번호</th>
+							<td><input name="" type="password"></td>
+						</tr>
+						<tr>
+							<th>비밀번호 확인</th>
+							<td><input name="" type="password"></td>
+						</tr>
+					</table>
+				</div>
+                <div class="btn_area" style="text-align:center"><a href="#stop" class="btn small g_blue"><span class="buttonStyleText">변경</span></a> <a href="#stop" class="btn small g_blue"><span class="buttonStyleText">취소</span></a></div>
+                <!--// content-->
+            </div>
+        </div>
+		<!--<div class="pop-footer">
+			<a href="#stop" class="btn_type1"><span class="buttonStyleText">확인</span></a><a href="#stop" class="btn_type1"><span class="buttonStyleText">삭제</span></a><a href="#stop" class="btn_type1 closeBtn"><span class="buttonStyleText">닫기</span></a>
+		</div>-->
+    </div>
+</div>
+<!--//이름검색 모달창-->
+</body>
+</html>

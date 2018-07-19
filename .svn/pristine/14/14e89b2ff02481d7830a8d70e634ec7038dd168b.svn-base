@@ -1,0 +1,428 @@
+<%--
+ * file name    : consultInfo.jsp
+ * description  : 상담이력, CallBack, 예약전화, 이관내역
+ * author       : H.K.Lee
+ * initial date : 2017.11.01
+ * history
+  수정일자      수정자 수정내용
+  --%>
+<%@ page language="java" contentType="text/html; charset=UTF-8" pageEncoding="UTF-8"%>
+<%@ taglib prefix="c" uri="/WEB-INF/tld/c.tld" %>
+<%@ taglib prefix="fmt" uri="/WEB-INF/tld/fmt.tld" %>
+<%@ taglib prefix="fn" uri="/WEB-INF/tld/fn.tld" %>
+<%@ taglib prefix="kbiz" uri="/WEB-INF/tld/kbiz.tld" %>
+<jsp:include page="/WEB-INF/jsp/comm_top.jsp"/>
+<!doctype html>
+<html lang="ko">
+<head>
+<meta http-equiv="content-type" content="text/html; charset=utf-8">
+<meta http-equiv="X-UA-Compatible" content="IE=edge">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, minimum-scale=1.0, user-scalable=no">
+<meta name="subject" content="KBIZ">
+<meta name="author" content="KBIZ">
+<meta name="keywords" content="KBIZ">
+<meta name="description" content="KBIZ">
+<title>상담이력 </title>
+<script type="text/javascript">
+$(function(){
+	fn_searchConsult2();
+	fn_searchConsult();
+	// 상담이력 검색 달력
+	KBIZDT.setDatepicker("startDate2");
+	KBIZDT.setDatepicker("endDate2");
+    KBIZDT.datepicker();
+
+    var now = new Date();
+    var year= now.getFullYear();
+    var mon = now.getMonth()+1;
+    var day = now.getDate();
+
+    $("#startDate2").val(KBIZDT.addFormattedDate(year+''+mon+''+day,'d',(1-day)));
+    $("#endDate2").val(KBIZDT.addFormattedDate(year+''+mon+''+day,'m',0));
+
+	// 탭 이동 스크립트
+	$(".tab_content").hide();
+    $(".tab_content:first").show();
+
+    $("ul.tabs li").click(function () {
+       $("ul.tabs li").removeClass("active");
+       $(this).addClass("active");
+       $(".tab_content").hide();
+       var activeTab = $(this).attr("rel");
+       $("#" + activeTab).fadeIn(0);
+    });
+
+   // 상담이력 조회버튼클릭
+	$("#consultInfoSearch").click(function(){
+		fn_searchConsult();
+	});
+
+	$("#consultInfoSearch2").click(function(){
+		fn_searchConsult2();
+	});
+});
+
+/* View처리 */
+function fn_searchConsult(){
+	$(".tabs li").removeClass("active");
+	$(".tabs li").eq(0).addClass("active");
+	$(".tab_content").hide();
+	var activeTab = $(".tabs li").eq(0).attr("rel");
+	$("#" + activeTab).fadeIn(0);
+	KBIZIO.requestViewAjax("consultSearchForm", "consultInfoView", "");
+};
+function fn_searchConsultKey(){
+	if(event.keyCode == "13"){
+		$("#pageIdx1").val(1);
+		KBIZIO.requestViewAjax("consultSearchForm", "consultInfoView", "");
+	}
+};
+function fn_searchConsult2(){
+	$(".tabs li").removeClass("active");
+	$(".tabs li").eq(1).addClass("active");
+	$(".tab_content").hide();
+	var activeTab = $(".tabs li").eq(1).attr("rel");
+	$("#" + activeTab).fadeIn(1);
+	KBIZIO.requestViewAjax("consultSearchForm2", "consultInfoView2", "");
+};
+function fn_searchConsult2Key(){
+	if(event.keyCode == "13"){
+		$("#pageIdx2").val(1);
+		KBIZIO.requestViewAjax("consultSearchForm2", "consultInfoView2", "");
+	}
+};
+function fn_callbackList(){
+	KBIZIO.requestViewAjax("callbackListForm","callbackView", "");
+};
+function fn_reserveList(){
+	KBIZIO.requestViewAjax("reserveListForm","reserveView", "");
+};
+function fn_transferList(){
+	KBIZIO.requestViewAjax("transferListForm","transferView", "");
+};
+/* View처리 */
+
+// 상담이력 상세 팝업
+function fn_con_detail(cnltSeq,cnltDetailNo){
+	KBIZUI.highlightTrByEvent(window.event);
+	window.open('/inbound/consult/consultInfoDetail.do?cnltDetailNo='+cnltDetailNo+'&cnltSeq='+cnltSeq+"&tranId=",cnltSeq+'-'+cnltDetailNo,'width=800,height=500,resizable=no,scrollbars=no,toolbar=no');
+};
+
+function fn_tran_detail(cnltSeq,cnltDetailNo,cnltProcCd,tellNum){
+	KBIZUI.highlightTrByEvent(window.event);
+	if(cnltProcCd == "03"){
+		var con = confirm("이관 상담정보를 조회하고 전화를 거시겠습니까?");
+		if(con){
+			if($("#ctiYn", parent.parent.topFrame.document).val() != "Y" || $("#ctiLoginYn", parent.parent.topFrame.document).val() != "Y"){
+				alert("CTI로그인을 해주세요.");
+				return false;
+			}else{
+				if(parent.parent.topFrame.SCall.CtiAgentStateEx() != "B"){
+					KBIZIO.requestParamAjax("/inbound/consult/consultTranDetail.json", fn_rsrv_detailBack, {params: {cnltSeq: cnltSeq, cnltDetailNo: cnltDetailNo}});
+					KBIZIO.requestParamAjax("/inbound/consult/consultTranDetail2.json", fn_rsrv_detailBack2, {params: {cnltSeq: cnltSeq, cnltDetailNo: cnltDetailNo}});
+					$("#tellNum",parent.parent.topFrame.document).val(tellNum); // 전화번호 세팅
+					$("#cnltSeq",parent.conFrame.document).val(cnltSeq);
+					$("#cnltDetailNo",parent.conFrame.document).val(cnltDetailNo);
+					$("#recUrl",parent.parent.topFrame.document).val("");
+					parent.parent.topFrame.manualCall();
+				}else{
+					alert("지금은 통화중입니다.");
+				}
+			}
+		}else{
+			window.open('/inbound/consult/consultInfoDetail.do?cnltDetailNo='+cnltDetailNo+'&cnltSeq='+cnltSeq+"&tranId=",cnltSeq+'-'+cnltDetailNo,'width=800,height=500,resizable=no,scrollbars=no,toolbar=no');
+		}
+	}else if(cnltProcCd == "04"){
+		window.open('/inbound/consult/consultInfoDetail.do?cnltDetailNo='+cnltDetailNo+'&cnltSeq='+cnltSeq+"&tranId=tranId",cnltSeq+'-'+cnltDetailNo,'width=800,height=500,resizable=no,scrollbars=no,toolbar=no');
+	}
+};
+
+ /* 예약전화 상세 조회 and Outbound */
+function fn_rsrv_detail(cnltSeq, cnltDetailNo, tellNum) {
+	KBIZUI.highlightTrByEvent(window.event);
+	var con = confirm("예약 상담정보를 조회하고 전화를 거시겠습니까?");
+	if(con){
+		if($("#ctiYn", parent.parent.topFrame.document).val() != "Y" || $("#ctiLoginYn", parent.parent.topFrame.document).val() != "Y"){
+			alert("CTI로그인을 해주세요.");
+			return false;
+		}else{
+			if(parent.parent.topFrame.SCall.CtiAgentStateEx() != "B"){
+				KBIZIO.requestParamAjax("/inbound/consult/consultRsrvDetail.json", fn_rsrv_detailBack, {params: {cnltSeq: cnltSeq, cnltDetailNo: cnltDetailNo}});
+				KBIZIO.requestParamAjax("/inbound/consult/consultRsrvDetail2.json", fn_rsrv_detailBack2, {params: {cnltSeq: cnltSeq, cnltDetailNo: cnltDetailNo}});
+				KBIZIO.requestParamAjax("/inbound/consult/changeCallYn.json", "", {params: {cnltSeq: cnltSeq, cnltDetailNo: cnltDetailNo}});
+				$("#tellNum",parent.parent.topFrame.document).val(tellNum); // 전화번호 세팅
+				$("#cnltSeq",parent.conFrame.document).val(cnltSeq);
+				$("#cnltDetailNo",parent.conFrame.document).val(cnltDetailNo);
+				$("#recUrl",parent.parent.topFrame.document).val("");
+				parent.parent.topFrame.manualCall();
+			}else{
+				alert("지금은 통화중입니다.");
+			}
+		}
+	}else{
+		window.open('/inbound/consult/consultInfoDetail.do?cnltDetailNo='+cnltDetailNo+'&cnltSeq='+cnltSeq+"&tranId=",cnltSeq+'-'+cnltDetailNo,'width=800,height=500,resizable=no,scrollbars=no,toolbar=no');
+	}
+ };
+
+/* 예약전화 상세 조회 콜백세팅 */
+function fn_rsrv_detailBack(ret) {
+	var r = ret.rsrvd;
+	$("#chnlCode", parent.conFrame.document).val(r.chnlCode);
+	parent.conFrame.fn_selLcode();
+	$("#lcode", parent.conFrame.document).val(r.lcode);
+	parent.conFrame.fn_selMcode();
+	$("#mcode", parent.conFrame.document).val(r.mcode);
+	parent.conFrame.fn_selScode();
+	$("#scode", parent.conFrame.document).val(r.scode);
+	$("#cntrNo", parent.conFrame.document).val(r.cntrNo);
+	$("#custNm", parent.conFrame.document).val(r.custNm);
+	$("#tellNum", parent.conFrame.document).val(r.tellNum);
+	//$("#userNm", parent.conFrame.document).val(r.userNm);
+	$("#recvNote", parent.conFrame.document).text(r.recvNote);
+	$("#procNote", parent.conFrame.document).text(r.procNote);
+	$("#cnltProcCd", parent.conFrame.document).val(r.cnltProcCd);
+	$("#untyCntrNo", parent.conFrame.document).val(r.untyCntrNo);
+};
+
+/* 예약전화 상세 조회 콜백세팅 */
+function fn_rsrv_detailBack2(ret) {
+	var r = ret.rsrvd;
+	$("#custSpecial", parent.custFrame.document).hide();
+	parent.custFrame.inbound(r);
+};
+
+/* CallBack 상세 조회 and Outbound */
+function fn_callback_detail(seq, tellNum, chnlCode) {
+	if($("#ctiYn", parent.parent.topFrame.document).val() != "Y" || $("#ctiLoginYn", parent.parent.topFrame.document).val() != "Y"){
+		alert("CTI로그인을 해주세요.");
+		return false;
+	}else{
+		if(parent.parent.topFrame.SCall.CtiAgentStateEx() != "B"){
+			$("#chnlCode").val(chnlCode);
+			$("#callSeq").val(seq);
+			$("#tellNum").val(tellNum);
+			KBIZUI.highlightTrByEvent(window.event);
+			KBIZIO.requestParamAjax("/inbound/customer/custInbound.json", fn_Callback, {params: {tlno: tellNum}});
+		}else{
+			alert("지금은 통화중입니다.");
+		}
+	}
+};
+
+/* CallBack 조회값으로 상담세팅 후 상담시작 */
+function fn_Callback(ret){
+	// 고객조회 후 2개이상이면 선택팝업, 1개일 경우 고객정보 세팅
+	var r = ret.totList;
+	var len = r.length;
+	if(len>1){
+		var con = confirm("고객 또는 계약이 2건 이상 조회되었습니다. 고객/계약 선택창으로 이동하고 전화를 거시겠습니까?");
+		if(con){
+			KBIZIO.requestParamAjax("/inbound/customer/callbackYn.json", fn_Callback2, {params: {callbackSeq: $("#callSeq").val()}});
+		}
+	}else if(len==1){
+		var con = confirm("계약이 1건이거나 계약이 없는 고객 1명이 검색되었습니다. 고객정보를 조회하고 전화를 거시겠습니까?");
+		if(con){
+			KBIZIO.requestParamAjax("/inbound/customer/callbackYn.json", fn_Callback1, {params: {callbackSeq: $("#callSeq").val()}});
+		}
+	}else{
+		var con = confirm("고객이 검색되지 않았습니다. 전화를 거시겠습니까?");
+		if(con){
+			KBIZIO.requestParamAjax("/inbound/customer/callbackYn.json", fn_Callback0, {params: {callbackSeq: $("#callSeq").val()}});
+		}
+	}
+};
+
+function fn_Callback2(ret){
+	var r = ret.callYn;
+	if(r == "N"){
+		KBIZIO.requestParamAjax("/inbound/consult/callbackProc.json","", {params: {callbackSeq: $("#callSeq").val()}}); // 선점 = Y
+		var chnlCode = $("#chnlCode").val();
+		var tellNum = $("#tellNum").val();
+		var seq = $("#callSeq").val();
+		$("#chnlCode",parent.conFrame.document).val(chnlCode);
+		parent.conFrame.fn_selLcode();
+		$("#tellNum",parent.parent.topFrame.document).val(tellNum);
+		$("#tellNum",parent.conFrame.document).val(tellNum);
+		$("#recUrl",parent.parent.topFrame.document).val("");
+		parent.parent.mainFrame.location.href = "/inbound/main.do?chnlCode="+chnlCode+"&startCon=";
+		parent.parent.topFrame.consult_popUp();
+		parent.parent.topFrame.manualCall(seq);
+	}else{
+		alert("이미 선점되었습니다.");
+	}
+};
+function fn_Callback1(ret){
+	var r = ret.callYn;
+	if(r == "N"){
+		KBIZIO.requestParamAjax("/inbound/consult/callbackProc.json","", {params: {callbackSeq: $("#callSeq").val()}}); // 선점 = Y
+		var chnlCode = $("#chnlCode").val();
+		var tellNum = $("#tellNum").val();
+		var seq = $("#callSeq").val();
+		$("#chnlCode",parent.conFrame.document).val(chnlCode);
+		parent.conFrame.fn_selLcode();
+		$("#tellNum",parent.parent.topFrame.document).val(tellNum);
+		$("#tellNum",parent.conFrame.document).val(tellNum);
+		$("#recUrl",parent.parent.topFrame.document).val("");
+		parent.parent.mainFrame.location.href = "/inbound/main.do?chnlCode="+chnlCode+"&startCon=Y";
+		parent.parent.topFrame.manualCall(seq);
+	}else{
+		alert("이미 선점되었습니다.");
+	}
+};
+function fn_Callback0(ret){
+	var r = ret.callYn;
+	if(r == "N"){
+		KBIZIO.requestParamAjax("/inbound/consult/callbackProc.json","", {params: {callbackSeq: $("#callSeq").val()}}); // 선점 = Y
+		var chnlCode = $("#chnlCode").val();
+		var tellNum = $("#tellNum").val();
+		var seq = $("#callSeq").val();
+		$("#chnlCode",parent.conFrame.document).val(chnlCode);
+		parent.conFrame.fn_selLcode();
+		$("#tellNum",parent.parent.topFrame.document).val(tellNum);
+		$("#tellNum",parent.conFrame.document).val(tellNum);
+		$("#recUrl",parent.parent.topFrame.document).val("");
+		parent.parent.mainFrame.location.href = "/inbound/main.do?chnlCode="+chnlCode+"&startCon=N";
+		parent.parent.topFrame.manualCall(seq);
+	}else{
+		alert("이미 선점되었습니다.");
+	}
+};
+</script>
+</head>
+<body>
+<input type="hidden" id="chnlCode" value=""/>
+<input type="hidden" id="callSeq" value=""/>
+<input type="hidden" id="tellNum" value=""/>
+<div class="brd_top clfix">
+	<!--탭//-->
+	<div class="com_tab db">
+		<ul class="tabs color03">
+			<li class="active" rel="tab1" onclick="fn_searchConsult()"><a href="#">나의상담이력</a></li>
+			<li rel="tab2" onclick="fn_searchConsult2()"><a href="#">고객상담이력</a></li>
+			<li rel="tab3" onclick="fn_callbackList()"><a href="#">CallBack</a></li>
+			<li rel="tab4" onclick="fn_reserveList()"><a href="#">예약전화</a></li>
+			<li rel="tab5" onclick="fn_transferList()"><a href="#">이관내역</a></li>
+		</ul>
+	</div>
+	<!--//탭-->
+</div>
+<div class="tab_container">
+	<div id="tab1" class="tab_content">
+		<form id="consultSearchForm" action="/inbound/consult/view/consultInfo.view" method="post" onsubmit="return false;">
+        <input type="hidden" id="pageIdx1" name="pageIdx" value="1" />
+		<input type="hidden" id="rowsPerPage1" name="rowsPerPage" value="5" />
+        <table width="100%" border="0"  cellspacing="0" cellpadding="0" class="brd_sch mgb10">
+            <colgroup>
+	            <col style="width:80px"/>
+	            <col style="width:120px"/>
+	            <col style="width:80px"/>
+	            <col style="width:80px"/>
+	            <col style="width:56px"/>
+            </colgroup>
+            <thead>
+            <tr>
+                <th>고객명</th>
+                <td><input type="text" name="custNm" id="custNm" value="" onkeypress="fn_searchConsultKey()"/></td>
+                <th>처리구분</th>
+                <td>
+                	<select name="cnltProcCd" id="cnltProcCd" onkeypress="fn_searchConsultKey()">
+                		<option value="">선택</option>
+						<c:forEach items="${code}" var="c">
+							<c:if test="${c.lcode == 001}">
+								<c:if test="${c.mcode != 00}">
+									<option value="${c.mcode}">${c.codeName}</option>
+								</c:if>
+							</c:if>
+						</c:forEach>
+					</select>
+                </td>
+                <td class="ar"><a href="#" class="btn small g_orange" id="consultInfoSearch">조회</a></td>
+            </tr>
+           </thead>
+        </table>
+		</form>
+        <div id="consultInfoView">
+        </div>
+    </div>
+
+	<div id="tab2" class="tab_content">
+		<form id="consultSearchForm2" action="/inbound/consult/view/consultInfo2.view" method="post" onsubmit="return false;">
+        <input type="hidden" id="pageIdx2" name="pageIdx" value="1" />
+		<input type="hidden" id="rowsPerPage2" name="rowsPerPage" value="5" />
+		<input type="hidden" id="untyCsno" name="untyCsno" value=""/>
+        <table width="100%" border="0"  cellspacing="0" cellpadding="0" class="brd_sch mgb10">
+            <colgroup>
+				<col width="65px"/>
+	            <col width="80px"/>
+	            <col width="25px"/>
+	            <col width="80px"/>
+	            <col width="55px"/>
+	            <col width="90px"/>
+	            <col width="55px"/>
+	            <col width="65px"/>
+	            <col width="65px"/>
+	            <col width="75px"/>
+	            <col width="55px"/>
+            </colgroup>
+            <thead>
+            <tr>
+            	<th>상담일시</th>
+            	<td class="ellips min_width80"><input type="text" name="startDate" id="startDate2" onkeypress="fn_searchConsult2Key()"/></td>
+            	<th>~</th>
+            	<td class="ellips min_width80"><input type="text" name="endDate" id="endDate2" onkeypress="fn_searchConsult2Key()"/></td>
+                <th>상담사</th>
+                <td class="ellips min_width80"><input type="text" name="userNm" id="userNm2" value=""  onkeypress="fn_searchConsult2Key()"/></td>
+                <th>고객명</th>
+                <td class="ellips min_width90"><input type="text" name="custNm" id="custNm2" value=""  onkeypress="fn_searchConsult2Key()"/></td>
+                <th>처리구분</th>
+                <td class="ellips min_width90">
+                	<select name="cnltProcCd" id="cnltProcCd2" onkeypress="fn_searchConsult2Key()">
+                		<option value="">선택</option>
+						<c:forEach items="${code}" var="c">
+							<c:if test="${c.lcode == 001}">
+								<c:if test="${c.mcode != 00}">
+									<option value="${c.mcode}">${c.codeName}</option>
+								</c:if>
+							</c:if>
+						</c:forEach>
+					</select>
+                </td>
+                <td class="ar min_width60"><a href="#" class="btn small g_orange" id="consultInfoSearch2">조회</a></td>
+            </tr>
+           </thead>
+        </table>
+		</form>
+        <div id="consultInfoView2">
+        </div>
+    </div>
+
+    <div id="tab3" class="tab_content">
+	<form id="callbackListForm" action="/inbound/consult/view/callbackList.view" onsubmit="return false;">
+	 	<input type="hidden" id="pageIdx3" name="pageIdx" value="1" />
+		<input type="hidden" id="rowsPerPage3" name="rowsPerPage" value="5" />
+	</form>
+		<div id="callbackView">
+		</div>
+    </div>
+
+    <div id="tab4" class="tab_content">
+    	<form id="reserveListForm" action="/inbound/consult/view/reserveList.view" onsubmit="return false;">
+	 		<input type="hidden" id="pageIdx4" name="pageIdx" value="1" />
+			<input type="hidden" id="rowsPerPage4" name="rowsPerPage" value="5" />
+		</form>
+		<div id="reserveView">
+		</div>
+    </div>
+
+    <div id="tab5" class="tab_content">
+		<form id="transferListForm" action="/inbound/consult/view/transferList.view" onsubmit="return false;">
+	 		<input type="hidden" id="pageIdx5" name="pageIdx" value="1" />
+			<input type="hidden" id="rowsPerPage" name="rowsPerPage" value="5" />
+		</form>
+		<div id="transferView">
+		</div>
+    </div>
+</div>
+
+</body>
+</html>

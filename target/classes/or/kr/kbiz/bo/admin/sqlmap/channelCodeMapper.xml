@@ -1,0 +1,199 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper
+  PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+  "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="channelCode">
+
+    <!-- [인입채널코드] 목록 조회 -->
+	<select id="select" resultType="ChannelCodeDomain" parameterType="ChannelCodeDomain">
+	       SELECT CHNL_CODE
+                      , CHNL_CODE_NAME
+                      , LCODE
+                      , LCODE_NAME
+                      , MCODE
+                      , MCODE_NAME
+                      , SCODE
+                      , SCODE_NAME
+                      , USE_YN
+                      , CALL_GB_NM
+                      , SORT_IDX
+                      , REG_NM
+                      , RNUM
+            FROM (
+                SELECT
+                    CHNL_CODE
+                  , CHNL_CODE_NAME
+                  , LCODE
+                  , LCODE_NAME
+                  , MCODE
+                  , MCODE_NAME
+                  , SCODE
+                  , SCODE_NAME
+                  , USE_YN
+                  , CALL_GB_NM
+                  , SORT_IDX
+                  , REG_NM
+                 , ROWNUM AS RNUM
+                    FROM (
+				       SELECT TCC.CHNL_CODE
+								, (SELECT CODE_NAME FROM TH_CONSULT_CODE WHERE CHNL_CODE = TCC.CHNL_CODE AND LCODE='00' AND MCODE='00' AND SCODE='00') AS CHNL_CODE_NAME
+								, TCC.LCODE
+								, (SELECT CODE_NAME FROM TH_CONSULT_CODE WHERE CHNL_CODE = TCC.CHNL_CODE AND LCODE=TCC.LCODE  AND LCODE <![CDATA[<>]]> '00' AND MCODE='00' AND SCODE='00') AS LCODE_NAME
+								, TCC.MCODE
+								, (SELECT CODE_NAME FROM TH_CONSULT_CODE WHERE CHNL_CODE = TCC.CHNL_CODE AND LCODE=TCC.LCODE AND MCODE=TCC.MCODE AND MCODE <![CDATA[<>]]> '00' AND SCODE='00') AS MCODE_NAME
+								, TCC.SCODE
+								, (SELECT CODE_NAME FROM TH_CONSULT_CODE WHERE CHNL_CODE = TCC.CHNL_CODE AND LCODE=TCC.LCODE AND MCODE=TCC.MCODE AND SCODE=TCC.SCODE AND SCODE <![CDATA[<>]]> '00') AS SCODE_NAME
+								, USE_YN
+                                , (SELECT CODE_NAME FROM TH_CODE WHERE LCODE='005' AND MCODE=TCC.CALL_GB_CD) AS CALL_GB_NM
+                                , CALL_GB_CD
+								, SORT_IDX
+			                    , (SELECT USER_NM FROM IF_CO_USER_MA WHERE USER_ID = TCC.REG_ID) AS REG_NM
+						FROM TH_CONSULT_CODE TCC
+				      WHERE 1=1
+			             <if test="selChnlCode != null and selChnlCode != ''">
+			              AND TCC.CHNL_CODE = #{selChnlCode}
+			              </if>
+			              <if test="selLcode != null and selLcode != '' and selLcode != '00'" >
+			              AND TCC.LCODE = #{selLcode}
+			              </if>
+			              <if test="selMcode != null and selMcode != ''and selMcode != '00'">
+			              AND TCC.MCODE  = #{selMcode}
+			              </if>
+			              <if test="selCallGb != null and selCallGb != ''">
+			              AND TCC.CALL_GB_CD  = #{selCallGb}
+			              </if>
+				      ORDER BY TCC.CHNL_CODE , TCC.LCODE, TCC.MCODE , TCC.SCODE
+                           )
+                 )
+         WHERE RNUM BETWEEN #{fromRowPerPage} AND #{toRowPerPage}
+	</select>
+
+    <!--[인입채널코드] 페이징  -->
+    <select id="selectChnlCodeTotalCount" resultType="int">
+        SELECT
+            COUNT(*) AS TOTALCNT
+         FROM TH_CONSULT_CODE TCC
+        WHERE 1=1
+           <if test="selChnlCode != null and selChnlCode != ''">
+            AND TCC.CHNL_CODE = #{selChnlCode}
+            </if>
+            <if test="selLcode != null and selLcode != '' and selLcode != '00'" >
+            AND TCC.LCODE = #{selLcode}
+            </if>
+            <if test="selMcode != null and selMcode != ''and selMcode != '00'">
+            AND TCC.MCODE  = #{selMcode}
+            </if>
+            <if test="selCallGb != null and selCallGb != ''">
+            AND TCC.CALL_GB_CD  = #{selCallGb}
+            </if>
+    </select>
+
+    <!-- [인입채널코드] 상세목록 조회 -->
+    <select id="selectDetail" resultType="ChannelCodeDomain" parameterType="ChannelCodeDomain">
+           SELECT CHNL_CODE
+                    , LCODE
+                    , MCODE
+                    , SCODE
+                    , CODE_NAME
+                    , SORT_IDX
+                    , USE_YN
+                    , CALL_GB_CD
+                    , (SELECT USER_NM FROM IF_CO_USER_MA WHERE USER_ID = A.REG_ID) AS REG_NM
+                    , REG_DATE
+            FROM TH_CONSULT_CODE  A
+          WHERE 1=1
+               AND CHNL_CODE = #{chnlCode}
+               AND LCODE = #{lcode}
+               AND MCODE = #{mcode}
+               AND SCODE = #{scode}
+    </select>
+
+    <!-- [인입채널코드] 중복 조회 -->
+    <select id="selectCheck" resultType="ChannelCodeDomain" parameterType="ChannelCodeDomain">
+           SELECT COUNT(*) AS OVERLAP_CNT
+            FROM TH_CONSULT_CODE
+          WHERE 1=1
+               AND CHNL_CODE = #{chnlCode}
+               AND LCODE = #{lcode}
+               AND MCODE = #{mcode}
+               AND SCODE = #{scode}
+    </select>
+
+    <!-- [인입채널코드] 저장-->
+    <insert id="insertChannelCode" parameterType="ChannelCodeDomain">
+           INSERT INTO TH_CONSULT_CODE(
+                CHNL_CODE
+				,LCODE
+				,MCODE
+				,SCODE
+				,CODE_NAME
+				,SORT_IDX
+                ,USE_YN
+                ,CALL_GB_CD
+				,REG_ID
+				,REG_DATE
+				,MOD_ID
+				,MOD_DATE
+           )VALUES(
+                #{chnlCode}
+                ,#{lcode}
+                ,#{mcode}
+                ,#{scode}
+                ,#{codeName}
+                ,#{sortIdx}
+                ,#{useYn}
+                ,#{callGbCd}
+                ,#{loginUserId}
+                ,sysdate
+                ,#{loginUserId}
+                ,sysdate
+           )
+    </insert>
+
+    <!-- [인입채널코드] 수정 -->
+    <update id="updateChannelCode" parameterType="ChannelCodeDomain">
+        UPDATE TH_CONSULT_CODE
+             SET USE_YN = #{useYn},
+                    SORT_IDX = #{sortIdx},
+                    CALL_GB_CD = #{callGbCd},
+                    MOD_ID = #{loginUserId},
+                    MOD_DATE = sysdate
+          WHERE CHNL_CODE = #{chnlCode}
+              AND LCODE = #{lcode}
+              AND MCODE = #{mcode}
+              AND SCODE = #{scode}
+
+    </update>
+
+
+    <!-- [인입채널코드] 대분류 조회 -->
+    <select id="selectLcode" resultType="ChannelCodeDomain" parameterType="ChannelCodeDomain">
+           SELECT LCODE
+                    , CODE_NAME
+            FROM TH_CONSULT_CODE
+          WHERE 1=1
+             <if test="chnlCode != null and chnlCode != ''">
+              AND CHNL_CODE =  #{chnlCode}
+              AND LCODE<![CDATA[<>]]>'00'
+              AND MCODE='00'
+              AND SCODE='00'
+              </if>
+ ORDER BY SORT_IDX ASC
+    </select>
+
+    <!-- [인입채널코드] 중분류 조회 -->
+    <select id="selectMcode" resultType="ChannelCodeDomain" parameterType="ChannelCodeDomain">
+           SELECT MCODE
+                    , CODE_NAME
+            FROM TH_CONSULT_CODE
+          WHERE 1=1
+             <if test="chnlCode != null and chnlCode != ''">
+              AND CHNL_CODE =  #{chnlCode}
+              AND LCODE = #{lcode}
+              AND MCODE<![CDATA[<>]]>'00'
+              AND SCODE='00'
+              </if>
+ ORDER BY SORT_IDX ASC
+
+    </select>
+</mapper>

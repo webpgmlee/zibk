@@ -1,0 +1,266 @@
+<!doctype html>
+<html lang="ko">
+<head>
+<meta http-equiv="content-type" content="text/html; charset=utf-8">
+<meta http-equiv="X-UA-Compatible" content="IE=edge">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, minimum-scale=1.0, user-scalable=no">
+<meta name="subject" content="KBIZ">
+<meta name="author" content="KBIZ">
+<meta name="keywords" content="KBIZ">
+<meta name="description" content="KBIZ">
+<title>KBIZ</title>
+<script type="text/javascript" src="http://code.jquery.com/jquery-latest.min.js"></script>
+<script type="text/javascript" src="js/common.js"></script>
+<link rel="stylesheet" href="css/reset.css" type="text/css" media="screen" />
+<link rel="stylesheet" href="css/common.css" type="text/css" media="screen" />
+<script type="text/javascript">
+
+</script>
+<style>
+
+</style>
+</head>
+<body>
+<form id="frm" name="frm"> 
+<input type="hidden" name="cus_id" id="cus_id" value=""/>
+<input type="hidden" name="from_date" id="from_date" value=""/><!-- 첫번째 날짜 -->
+<input type="hidden" name="curr_date" id="curr_date" value=""/><!-- 현재 날짜 -->
+<!--게시판-->
+<div class="brd_top clfix">
+	<!--탭//-->
+	<div class="com_tab db">
+		<ul class="tabs color02">
+			<li class="active" rel="tab1"><a href="#">공지사항</a><!--<img src="./images/tab04_01_ov.gif" border="0" name="image1" id="image1" onMouseOut="f_MA_out('1')" onMouseOver="f_MA_over('1')" style="cursor:pointer;">--></li>
+			<li rel="tab2"><a href="#">일정</a><!--<img src="./images/tab04_02_off.gif" border="0" name="image2" id="image2" onMouseOut="f_MA_out('2')" onMouseOver="f_MA_over('2')" style="cursor:pointer;">--></li>
+		</ul>
+	</div>
+	<!--//탭-->
+</div>
+<!-- cn_MAIN end -->
+<div class="tab_container">
+    <!-- cn_LI01 start -->
+    <div id="tab1" class="tab_content">
+        <input type="hidden" name="hid_from_date" id="hid_from_date" value=""/>
+        <input type="hidden" name="hid_curr_date" id="hid_curr_date" value=""/> 
+        <input type="hidden" name="" id="" value=""/>
+        <table width="100%" border="0"  cellspacing="0" cellpadding="0" class="brd_list_a hover_action">
+            <colgroup>
+                <col style="width:30px">
+                <col style="width:50px">
+                <col>
+                <col style="width:70px">
+                <col style="width:50px">
+            </colgroup>
+			<thead>
+            <tr>
+                <th>NO</th>
+                <th>구분</th>
+                <th>제목</th>
+                <th>공지일시</th>
+                <th>등록자</th>
+            </tr>
+			</thead>
+			<tbody>
+            <tr onclick="javascrpit:f_selectpopup('');parent.MouseClick(this);">
+                <td>1</td>
+                <td>구분</td>
+                <td class="ellips al">중소기업중앙회 노란공제 일정을 알려드리겠습니다.</td>
+                <td>2017/11/16</td>
+                <td>홍길동</td>
+            </tr>
+            <tr onclick="javascrpit:f_selectpopup('');parent.MouseClick(this);">
+                <td>1</td>
+                <td>구분</td>
+                <td class="ellips al">중소기업중앙회 노란공제 일정을 알려드리겠습니다.</td>
+                <td>2017/11/16</td>
+                <td>홍길동</td>
+            </tr>
+            <tr onclick="javascrpit:f_selectpopup('');parent.MouseClick(this);">
+                <td>1</td>
+                <td>구분</td>
+                <td class="ellips al">중소기업중앙회 노란공제 일정을 알려드리겠습니다.</td>
+                <td>2017/11/16</td>
+                <td>홍길동</td>
+            </tr>
+            <tr onclick="javascrpit:f_selectpopup('');parent.MouseClick(this);">
+                <td>1</td>
+                <td>구분</td>
+                <td class="ellips al">중소기업중앙회 노란공제 일정을 알려드리겠습니다.</td>
+                <td>2017/11/16</td>
+                <td>홍길동</td>
+            </tr>
+            <tr onclick="javascrpit:f_selectpopup('');parent.MouseClick(this);">
+                <td>1</td>
+                <td>구분</td>
+                <td class="ellips al">중소기업중앙회 노란공제 일정을 알려드리겠습니다.</td>
+                <td>2017/11/16</td>
+                <td>홍길동</td>
+            </tr>
+            <tr onclick="javascrpit:f_selectpopup('');parent.MouseClick(this);">
+                <td>1</td>
+                <td>구분</td>
+                <td class="ellips al">중소기업중앙회 노란공제 일정을 알려드리겠습니다.</td>
+                <td>2017/11/16</td>
+                <td>홍길동</td>
+            </tr>
+			</tbody>
+			<tfoot>
+            <tr>
+                <td colspan="5" style="height:50px">조회 결과가 없습니다.</td>
+            </tr>
+			</tfoot>
+        </table>
+        <!--/게시판-->
+        <table width="100%" border="0"  cellspacing="0" cellpadding="0" class="brd_sch">
+            <colgroup>
+                <col style="width:80px">
+                <col>
+                <col style="width:80px">
+                <col>
+                <col style="width:80px">
+                <col>
+                <col style="width:80px">
+                <col>
+            </colgroup>
+            <tr>
+                <th>상담일시</th>
+                <td>2017-10-25</td>
+                <th>고객명</th>
+                <td>홍길동</td>
+                <th>상담사</th>
+                <td>김영수</td>
+                <th>처리구분</th>
+                <td>완료</td>
+            </tr>
+            <tr>
+                <th>내용</th>
+                <td colspan="7" align="left">처리가 완료되었습니다.</td>
+            </tr>
+        </table>
+    </div>
+    <!-- cn_LI01 end -->
+    <!-- cn_LI02 start -->
+    <div id="tab2" class="tab_content">
+        <input type="hidden" name="hid_work_tm" id="hid_work_tm" value="" /><!-- 근무타임 -->
+        <input type="hidden" name="hid_sch_nm" id="hid_sch_nm" value="" /><!-- 일정구분 -->
+        <input type="hidden" name="user_name" id="user_name" value="" /><!-- 상담원명 -->
+        <input type="hidden" name="hid_reg_id" id="hid_reg_id" value="" /><!-- 등록자ID -->
+        <input type="hidden" name="hid_reg_name" id="hid_reg_name" value="" /><!-- 등록자명 --> 
+        <input type="hidden" name="sel_Year" id="sel_Year" value="" /><!-- 현재년도 -->
+        <input type="hidden" name="sel_Month" id="sel_Month" value="" /><!-- 현재월 -->
+        <input type="hidden" name="sel_Day" id="sel_Day" value="" /><!-- 현재일 -->
+        <table width="100%" border="0"  cellspacing="0" cellpadding="0" class="brd_list_a calendar mgb10">
+            <thead>
+			<tr>
+                <th>일</th>
+                <th>월</th>
+                <th>화</th>
+                <th>수</th>
+                <th>목</th>
+                <th>금</th>
+                <th>토</th>
+            </tr>
+			</thead>
+			<tbody>
+            <tr>
+                <td>&nbsp;</td>
+                <td>&nbsp;</td>
+                <td><a href="#stop">1</a></td>
+                <td><a href="#stop">2</a></td>
+                <td><a href="#stop">3</a></td>
+                <td><a href="#stop">4</a></td>
+                <td><a href="#stop">5</a></td>
+            </tr>
+            <tr>
+                <td><a href="#stop">6</a></td>
+                <td><a href="#stop">7</a></td>
+                <td><a href="#stop">8</a></td>
+                <td><a href="#stop">9</a></td>
+                <td><a href="#stop">10</a></td>
+                <td><a href="#stop">11</a></td>
+                <td><a href="#stop">12</a></td>
+            </tr>
+            <tr>
+                <td><a href="#stop">13</a></td>
+                <td><a href="#stop">14</a></td>
+                <td><a href="#stop">15</a></td>
+                <td><a href="#stop">16</a></td>
+                <td><a href="#stop">17</a></td>
+                <td><a href="#stop">18</a></td>
+                <td><a href="#stop">19</a></td>
+            </tr>
+            <tr>
+                <td><a href="#stop">20</a></td>
+                <td><a href="#stop">21</a></td>
+                <td><a href="#stop">22</a></td>
+                <td><a href="#stop">23</a></td>
+                <td><a href="#stop">24</a></td>
+                <td><a href="#stop">25</a></td>
+                <td><a href="#stop">26</a></td>
+            </tr>
+            <tr>
+                <td><a href="#stop">27</a></td>
+                <td><a href="#stop">28</a></td>
+                <td><a href="#stop">29</a></td>
+                <td><a href="#stop">30</a></td>
+                <td>&nbsp;</td>
+                <td>&nbsp;</td>
+                <td>&nbsp;</td>
+            </tr>
+			</tbody>
+        </table>
+        <div style="overflow-y:auto;width:100%;">
+            <table width="100%" border="0"  cellspacing="0" cellpadding="0" class="brd_sch">
+                <tr>
+                    <td>
+                        <table width="100%" border="0"  cellspacing="0" cellpadding="0">
+                            <tr>
+                                <td>&nbsp;</td>
+                            </tr>
+                            <tr>
+                                <td>&nbsp;</td>
+                            </tr>
+                        </table>
+                    </td>
+                    <td>
+                        <table width="100%" border="0"  cellspacing="0" cellpadding="0">
+                            <tr>
+                                <td>&nbsp;</td>
+                            </tr>
+                            <tr>
+                                <td>&nbsp;</td>
+                            </tr>
+                        </table>
+                    </td>
+                </tr>
+                <tr>
+                    <td>
+                        <table width="100%" border="0"  cellspacing="0" cellpadding="0">
+                            <tr>
+                                <td>&nbsp;</td>
+                            </tr>
+                            <tr>
+                                <td>&nbsp;</td>
+                            </tr>
+                        </table>
+                    </td>
+                    <td>
+                        <table width="100%" border="0"  cellspacing="0" cellpadding="0">
+                            <tr>
+                                <td>&nbsp;</td>
+                            </tr>
+                            <tr>
+                                <td>&nbsp;</td>
+                            </tr>
+                        </table>
+                    </td>
+                </tr>
+                <!--/6-->
+            </table>
+        </div>
+    </div>
+    <!-- cn_LI02 end -->
+</div>
+</form>
+</body>
+</html>

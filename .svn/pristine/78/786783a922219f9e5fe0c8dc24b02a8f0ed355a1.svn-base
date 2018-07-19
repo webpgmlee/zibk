@@ -1,0 +1,45 @@
+<!doctype html>
+<html lang="ko">
+<head>
+<meta http-equiv="content-type" content="text/html; charset=utf-8">
+<meta http-equiv="X-UA-Compatible" content="IE=edge">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, minimum-scale=1.0, user-scalable=no">
+<meta name="subject" content="KBIZ">
+<meta name="author" content="KBIZ">
+<meta name="keywords" content="KBIZ">
+<meta name="description" content="KBIZ">
+<title>KBIZ</title>
+<script type="text/javascript" src="http://code.jquery.com/jquery-latest.min.js"></script>
+<script type="text/javascript" src="js/common.js"></script>
+<link rel="stylesheet" href="css/reset.css" type="text/css" media="screen" />
+<link rel="stylesheet" href="css/common.css" type="text/css" media="screen" />
+<script type="text/javascript">
+
+</script>
+<style>
+
+</style>
+</head>
+<body>
+<form id="custfrm" name="custfrm">
+<input type="hidden" name="hid_cust_id" id="hid_cust_id" value="" /><!-- 고객ID -->
+<div class="status_wrap clfix">
+    <ul class="tel_sch fl clfix">
+        <li><strong>전화번호</strong></li>
+        <li><input type="text" name="dnis_num" id="dnis_num" value="" style="width:120px;" onkeydown="JavaScript:if(event.keyCode == 13){f_cust_exist('',document.custfrm.dnis_num.value);return false;}" /></li>
+        <li><a href="#" class="btn_sch">검색</a><!--<img src="./images/search_btn01.gif" border="0" style="cursor:pointer;" onClick="JavaScript:f_cust_exist('',document.custfrm.dnis_num.value);" >--></li>
+    </ul>
+    <ul class="status fl clfix">
+        <!--<li><a href="#" class="reject_call"><img src="./images/icon/icon_in_on_normal.gif" onClick="JavaScript:parent.parent.topFrame.f_call_refuse('1121');" style="cursor:pointer;" alt="통화거부" /></a></li>-->
+        <li><span>통화시간</span><strong>00:25:30</strong></li>
+        <li><span>일통화건</span><strong>0</strong></li>
+        <li><span>당일응대율</span><strong>0%</strong></li>
+        <li><span>대기콜</span><strong>0</strong></li>
+        <li><span>CallBack</span><strong>0</strong></li>
+        <li><span>이관건수</span><strong>0</strong></li>
+        <li><span>미처리건</span><strong>0</strong></li>
+    </ul>
+</div>
+</form>
+</body>
+</html>

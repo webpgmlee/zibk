@@ -1,0 +1,75 @@
+package or.kr.kbiz.bo.batch.service.impl;
+
+import java.util.List;
+
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Qualifier;
+import org.springframework.stereotype.Component;
+
+import or.kr.kbiz.bo.batch.domain.RenewIfCaUntycntrDomain;
+import or.kr.kbiz.bo.batch.domain.RenewIfCmAdrDomain;
+import or.kr.kbiz.bo.batch.domain.RenewIfCmCnplDomain;
+import or.kr.kbiz.bo.batch.domain.RenewIfCmEmailDomain;
+import or.kr.kbiz.bo.batch.domain.RenewIfCmUntycsDomain;
+import or.kr.kbiz.bo.batch.service.RenewUntyBatchService;
+import or.kr.kbiz.serv.spring.mvc.BaseDao;
+
+@Component(value="renewUntyBatchService")
+public class RenewUntyBatchServiceImpl implements RenewUntyBatchService {
+	private final Logger LOG = LoggerFactory.getLogger(getClass());
+
+	@Autowired(required=true)
+	@Qualifier(value="kbizBaseDao")
+	private BaseDao kbizBaseDao;
+
+	@Autowired(required=true)
+	@Qualifier(value="apBaseDao")
+	private BaseDao apBaseDao;
+
+	@SuppressWarnings("unchecked")
+	public List<RenewIfCaUntycntrDomain> selectIfCaUntycntrList(int diffDay) {
+		return kbizBaseDao.getList("kbizUntyInterface.selectIfCaUntycntrList", diffDay);
+	}
+
+	@SuppressWarnings("unchecked")
+	public List<RenewIfCmUntycsDomain> selectIfCmUntycsList(int diffDay) {
+		return kbizBaseDao.getList("kbizUntyInterface.selectIfCmUntycsList", diffDay);
+	}
+
+	@SuppressWarnings("unchecked")
+	public List<RenewIfCmCnplDomain> selectIfCmCnplList(int diffDay) {
+		return kbizBaseDao.getList("kbizUntyInterface.selectIfCmCnplList", diffDay);
+	}
+
+	@SuppressWarnings("unchecked")
+	public List<RenewIfCmAdrDomain> selectIfCmAdrList(int diffDay) {
+		return kbizBaseDao.getList("kbizUntyInterface.selectIfCmAdrList", diffDay);
+	}
+
+	@SuppressWarnings("unchecked")
+	public List<RenewIfCmEmailDomain> selectIfCmEmailList(int diffDay) {
+		return kbizBaseDao.getList("kbizUntyInterface.selectIfCmEmailList", diffDay);
+	}
+
+	public void saveIfCaUntycntr(RenewIfCaUntycntrDomain renewIfCaUntycntrDomain) {
+		apBaseDao.update("renewCustomerBatch.mergeIfCaUntycntr", renewIfCaUntycntrDomain);
+	}
+
+	public void saveIfCmUntycs(RenewIfCmUntycsDomain renewIfCmUntycsDomain) {
+		apBaseDao.update("renewCustomerBatch.mergeIfCmUntycs", renewIfCmUntycsDomain);
+	}
+
+	public void saveIfCmCnpl(RenewIfCmCnplDomain renewIfCmCnplDomain) {
+		apBaseDao.update("renewCustomerBatch.mergeIfCmCnpl", renewIfCmCnplDomain);
+	}
+
+	public void saveIfCmAdr(RenewIfCmAdrDomain renewIfCmAdrDomain) {
+		apBaseDao.update("renewCustomerBatch.mergeIfCmAdr", renewIfCmAdrDomain);
+	}
+
+	public void saveIfCmEmail(RenewIfCmEmailDomain renewIfCmEmailDomain) {
+		apBaseDao.update("renewCustomerBatch.mergeIfCmEmail", renewIfCmEmailDomain);
+	}
+}

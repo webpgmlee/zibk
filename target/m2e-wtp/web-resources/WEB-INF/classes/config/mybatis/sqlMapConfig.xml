@@ -1,0 +1,28 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE configuration PUBLIC "-//mybatis.org//DTD SQL Map Config 3.0//EN"
+"http://mybatis.org/dtd/mybatis-3-config.dtd">
+<configuration>
+
+    <!-- USE CAMEL IN DOMAIN -->
+    <settings>
+        <setting name="mapUnderscoreToCamelCase" value="true" />
+        <!-- <setting name="cacheEnabled" value="true" /> -->
+        <!-- <setting name="callSettersOnNulls" value="true" /> -->
+        <setting name="jdbcTypeForNull" value="NULL" />
+    </settings>
+
+    <!-- TYPE ALIAS -->
+	<typeAliases>
+	   <package name="or.kr.kbiz.bo.template.domain"/>
+	   <package name="or.kr.kbiz.bo.inbound.domain"/>
+       <package name="or.kr.kbiz.bo.main.domain"/>
+       <package name="or.kr.kbiz.bo.admin.domain"/>
+       <package name="or.kr.kbiz.bo.common.domain"/>
+       <package name="or.kr.kbiz.bo.batch.domain"/>
+       <package name="or.kr.kbiz.bo.login.domain"/>
+       <package name="or.kr.kbiz.bo.mypage.domain"/>
+	</typeAliases>
+	<typeHandlers>
+        <typeHandler handler="org.apache.ibatis.type.ClobTypeHandler" jdbcType="CLOB" javaType="java.lang.String"/>
+	</typeHandlers>
+</configuration>

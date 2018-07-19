@@ -1,0 +1,138 @@
+<!doctype html>
+<html lang="ko">
+<head>
+<meta http-equiv="content-type" content="text/html; charset=utf-8">
+<meta http-equiv="X-UA-Compatible" content="IE=edge">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, minimum-scale=1.0, user-scalable=no">
+<meta name="subject" content="KBIZ">
+<meta name="author" content="KBIZ">
+<meta name="keywords" content="KBIZ">
+<meta name="description" content="KBIZ">
+<title>KBIZ</title>
+<script type="text/javascript" src="http://code.jquery.com/jquery-latest.min.js"></script>
+<script type="text/javascript" src="js/common.js"></script>
+<link rel="stylesheet" href="css/reset.css" type="text/css" media="screen" />
+<link rel="stylesheet" href="css/common.css" type="text/css" media="screen" />
+<script type="text/javascript">
+
+</script>
+<style>
+
+</style>
+</head>
+<body>
+<!--비밀번호변경 모달창//-->
+<div class="popup-wrap">
+    <div class="popup-layer">
+		<div class="popup-header"><h1>특이성향 고객</h1><button type="button" class="closeBtn" onClick="javascript:window.close();"><img src="img/btn_layer_close.gif"></button></div>
+        <div class="popup-container">
+            <div class="popup-conts">
+                <!--content //-->
+				<div class="pdb10" style="width:100%;">
+					<table border="0" cellspacing="0" cellpadding="0" class="brd_sch">
+						<colgroup>
+							<col style="width:100px">
+							<col style="width:">
+                            <col style="width:100px">
+							<col style="width:">
+                        <col style="width:60px">
+						</colgroup>
+						<tr>
+						  <th>고객명</th>
+						  <td class="pdl10">홍길동</td>
+						  <th>휴대폰번호</th>
+						  <td><input name="input" type="text"></td>
+						  <td class="ar"><a href="#stop" class="btn small g_orange">조회</a></td>
+						</tr>
+					</table>
+				</div>
+                <div class="pdb10" style="width:100%;">
+                    <table width="100%" border="0"  cellspacing="0" cellpadding="0" class="brd_list_a hover_action">
+                        <colgroup>
+                            <col style="width:70px">
+                            <col>
+                            <col style="width:60px">
+                        </colgroup>
+                        <thead>
+                        <tr>
+                          <th>고객명</th>
+                            <th>내용</th>
+                            <th>상담사</th>
+                          </tr>
+                        </thead>
+                        <tbody>
+                        <tr>
+                          <td>김대준</td>
+                            <td class="ellips al">고객이 만족할만한 이런이런 내용으로 처리하였습니다.</td>
+                            <td>홍길동</td>
+                          </tr>
+                        <tr>
+                          <td>김대준</td>
+                            <td class="ellips al">고객이 만족할만한 이런이런 내용으로 처리하였습니다.</td>
+                            <td>홍길동</td>
+                          </tr>
+                        <tr>
+                          <td>김대준</td>
+                            <td class="ellips al">고객이 만족할만한 이런이런 내용으로 처리하였습니다.</td>
+                            <td>홍길동</td>
+                          </tr>
+                        <tr>
+                          <td>김대준</td>
+                            <td class="ellips al">고객이 만족할만한 이런이런 내용으로 처리하였습니다.</td>
+                            <td>홍길동</td>
+                          </tr>
+                        <tr>
+                          <td>김대준</td>
+                            <td class="ellips al">고객이 만족할만한 이런이런 내용으로 처리하였습니다.</td>
+                            <td>홍길동</td>
+                          </tr>
+                        </tbody>
+                        <tfoot>
+                        <tr>
+                            <td colspan="3" style="height:50px;">조회 결과가 없습니다.</td>
+                        </tr>
+                        </tfoot>
+                    </table>
+                </div>
+                <div class="pdb10" style="width:100%;">
+                    <table width="100%" border="0"  cellspacing="0" cellpadding="0" class="brd_sch">
+                        <colgroup>
+                            <col style="width:80px">
+                            <col>
+                            <col style="width:80px">
+                            <col>
+                            <col style="width:80px">
+                            <col>
+                        </colgroup>
+                        <tr>
+                          <th>계약번호</th>
+                            <td class="pdl10">AKSJD-192837L</td>
+                            <th>고객명</th>
+                            <td class="pdl10">홍길동</td>
+                            <th>휴대폰번호</th>
+                            <td class="pdl10">010-1245-7899</td>
+                        </tr>
+                        <tr>
+                          <th>사업장명</th>
+                            <td class="pdl10">성산식품</td>
+                            <th>사업장번호</th>
+                            <td colspan="3" class="pdl10">9123847-8129374</td>
+                        </tr>
+                        <tr>
+                          <th>특이성향내용</th>
+                            <td colspan="5" align="left" class="pdl10">처리가 완료되었습니다.</td>
+                        </tr>
+                    </table>
+              </div>
+              <div class="btn_area pdb20" style="text-align:center"><a href="#stop" class="btn small g_blue"><span class="buttonStyleText">변경</span></a> <a href="#stop" class="btn small g_blue"><span class="buttonStyleText">취소</span></a></div>
+                <!--// content-->
+            </div>
+        </div>
+		<div class="popup-footer">
+			<a href="#stop" class="btn small g_lightgray clostBtn" onClick="javascript:window.close();"><span class="buttonStyleText">닫기</span></a>
+		</div>
+    </div>
+</div>
+<!--//이름검색 모달창-->
+</body>
+</html>

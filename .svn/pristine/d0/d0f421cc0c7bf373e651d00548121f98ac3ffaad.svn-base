@@ -1,0 +1,137 @@
+package or.kr.kbiz.bo.inbound.controller;
+
+import java.util.List;
+
+import javax.servlet.http.HttpServletRequest;
+import javax.servlet.http.HttpServletResponse;
+
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.stereotype.Controller;
+import org.springframework.ui.Model;
+import org.springframework.web.bind.annotation.ModelAttribute;
+import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestParam;
+
+import or.kr.kbiz.bo.admin.domain.ChannelCodeDomain;
+import or.kr.kbiz.bo.admin.domain.NoticeDomain;
+import or.kr.kbiz.bo.admin.service.ScriptService;
+import or.kr.kbiz.bo.inbound.domain.CodeDomain;
+import or.kr.kbiz.bo.inbound.service.InboundService;
+import or.kr.kbiz.bo.main.service.MainService;
+
+
+@Controller
+@RequestMapping(value="/inbound")
+public class InboundController {
+
+	private static final Logger logger = LoggerFactory.getLogger(InboundController.class);
+
+	private static String PREFIX = "inbound";
+
+	@Autowired
+	private InboundService inboundService;
+
+	@Autowired
+	private MainService mainService;
+
+	@Autowired
+	private ScriptService sciptService;
+
+	@RequestMapping(value="/main.do")
+	public String main(@RequestParam String chnlCode, @RequestParam String startCon, Model model){
+		if(chnlCode != null){
+			model.addAttribute("chnlCode", chnlCode);
+		}
+		if(startCon != null){
+			model.addAttribute("startCon", startCon);
+		}
+		return PREFIX+"/main";
+	}
+
+	/**
+	 * 스크립트 리스트
+	 *
+	 * @param codeDomain
+	 * @return String
+	 */
+	@RequestMapping(value="/knowledge/view/knowledgeList.view")
+	public String knowledgeList(Model model, @ModelAttribute CodeDomain codeDomain){
+		if(codeDomain.getChnlCode() != null && codeDomain.getChnlCode().length() > 0){
+			codeDomain.setChnlCode(codeDomain.getChnlCode());
+		}else{
+			codeDomain.setChnlCode("A");
+		}
+		model.addAttribute("script", inboundService.selectScript(codeDomain));
+		model.addAttribute("pageDomain", codeDomain);
+		return PREFIX+"/knowledge/view/knowledgeList";
+	}
+
+	/**
+	 * 스크립트
+	 *
+	 * @param codeDomain
+	 * @return String
+	 */
+	@RequestMapping(value="/knowledge/knowledge.do")
+	public String knowledge(@RequestParam String chnlCode, Model model){
+		model.addAttribute("chCode", inboundService.selectChCode());
+		return PREFIX+"/knowledge/knowledge";
+	}
+
+	/**
+	 * 스크립트
+	 *
+	 * @param codeDomain
+	 * @return String
+	 */
+	@RequestMapping(value="/script/downloadFile.do")
+	public void knowledge(@ModelAttribute ChannelCodeDomain channelCodeDomain, HttpServletRequest request, HttpServletResponse response){
+		try {
+			sciptService.downloadFile(channelCodeDomain, request, response);
+		} catch (Exception e) {
+			e.printStackTrace();
+		}
+	}
+
+	/**
+	 * 공지사항 리스트
+	 *
+	 * @param
+	 * @return String
+	 */
+	@RequestMapping(value="/notice/notice.do")
+	public String notice(@ModelAttribute NoticeDomain noticeDomain, Model model){
+		model.addAttribute("code", inboundService.selectCode());
+		return PREFIX+"/notice/notice";
+	}
+
+	/**
+	 * 공지사항뷰
+	 *
+	 * @param
+	 * @return String
+	 */
+	@RequestMapping(value="/notice/view/notice.view")
+	public String noticeView(@ModelAttribute NoticeDomain noticeDomain, Model model){
+		List<NoticeDomain> nd = mainService.selectNoticeList(noticeDomain);
+		noticeDomain.setTotalcnt(mainService.selectNoticeTotalCnt(noticeDomain));
+		model.addAttribute("noticeList", nd);
+		model.addAttribute("pageDomain", noticeDomain);
+		return PREFIX+"/notice/view/noticeView";
+	}
+
+	/**
+	 * 공지사항 상세
+	 *
+	 * @param NoticeDomain.not_seq
+	 * @return String
+	 */
+	@RequestMapping(value="/notice/noticeDetail.do")
+	public String mainNoticeDetail(@ModelAttribute NoticeDomain noticeDomain, Model model) {
+		model.addAttribute("noticeDetail", mainService.selectNoticeDetail(noticeDomain));
+		return PREFIX+"/notice/noticeDetail";
+	}
+
+}

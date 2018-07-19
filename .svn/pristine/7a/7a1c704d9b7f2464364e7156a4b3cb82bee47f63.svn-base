@@ -1,0 +1,349 @@
+<!doctype html>
+<html lang="ko">
+<head>
+<meta http-equiv="content-type" content="text/html; charset=utf-8">
+<meta http-equiv="X-UA-Compatible" content="IE=edge">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, minimum-scale=1.0, user-scalable=no">
+<meta name="subject" content="KBIZ">
+<meta name="author" content="KBIZ">
+<meta name="keywords" content="KBIZ">
+<meta name="description" content="KBIZ">
+<title>KBIZ</title>
+<script type="text/javascript" src="http://code.jquery.com/jquery-latest.min.js"></script>
+<script type="text/javascript" src="js/common.js"></script>
+<link rel="stylesheet" href="css/reset.css" type="text/css" media="screen" />
+<link rel="stylesheet" href="css/common.css" type="text/css" media="screen" />
+<script type="text/javascript">
+
+</script>
+<style>
+
+</style>
+</head>
+<body>
+<form id="frm" name="frm">
+<input type="hidden" name="ctl_cust_id" id="ctl_cust_id" value="" />
+<div class="brd_top clfix">
+	<!--탭//-->
+	<div class="com_tab db">
+		<ul class="tabs color03">
+			<li class="active" rel="tab1"><a href="#">상담이력</a><!--<img src="./images/tab03_01_ov.gif" name="image1" id="image1" onMouseOut="f_MA_out('1')" onMouseOver="f_MA_over('1')"  border="0" style="cursor:pointer;" >--></li>
+			<li rel="tab2"><a href="#">CallBack</a><!--<img src="./images/tab03_02_off.gif" name="image2" id="image2" onMouseOut="f_MA_out('2')" onMouseOver="f_MA_over('2')"  border="0" style="cursor:pointer;" >--></li>
+			<li rel="tab3"><a href="#">예약전화</a><!--<img src="./images/tab03_03_off.gif" name="image3" id="image3" onMouseOut="f_MA_out('3')" onMouseOver="f_MA_over('3')"  border="0" style="cursor:pointer;" >--></li>
+		</ul>
+	</div>
+	<!--//탭-->
+</div> 
+<div class="tab_container">
+    <!-- cr_LI01 start --> 
+    <div id="tab1" class="tab_content">
+        <input type="hidden" name="a_s_page" id="a_s_page" value="1" /><!-- 한화면 첫페이지 -->
+        <input type="hidden" name="s_row" id="s_row" value="" /><!-- 한목록 첫 로우 -->
+        <input type="hidden" name="p_row" id="p_row" value="" />
+        <input type="hidden" name="all_page" id="all_page" value="" /> 
+        <input type="hidden" name="all_last_page" id="all_last_page" value="" /><!-- 총 페이지 수 -->
+        <table width="100%" border="0"  cellspacing="0" cellpadding="0" class="brd_sch mgb10">
+            <colgroup>
+                <col style="width:60px">
+                <col>
+                <col style="width:60px">
+                <col>
+                <col style="width:60px">
+                <col>
+                <col style="width:60px">
+                <col>
+                <col style="width:60px">
+            </colgroup>
+            <tr>
+                <th>선택</th>
+                <td><select id="cus_tp" name="cus_tp"><option value="">전체</option><option value=""></option></select></td>
+                <th>점포명</th>
+                <td><input type="text" name="store_name" id="store_name" value="" /></td>
+                <th>처리구분</th>
+                <td><select id="pro_tp" name="pro_tp"><option value="">전체</option><option value=""></option></select></td>
+                <th>이관자</th>
+                <td><input type="text" name="trans_name" id="trans_name" value="" /></td>
+                <td class="ar"><a href="#" class="btn small g_orange">조회</a><!--<img src="./images/btn_select01.gif" border="0" onClick="JavaScript:f_loadList('0')" style="cursor:pointer;" />--></td>
+            </tr>
+        </table>
+        <!--게시판-->
+        <table width="100%" border="0"  cellspacing="0" cellpadding="0" class="brd_list_a hover_action">
+            <colgroup>
+                <col style="width:70px">
+                <col>
+                <col style="width:60px">
+                <col style="width:60px">
+                <col style="width:60px">
+            </colgroup>
+			<thead>
+            <tr>
+                <th>상담일시</th>
+                <th>내용</th>
+                <th>고객명</th>
+                <th>상담사</th>
+                <th>처리구분</th>
+            </tr>
+			</thead>
+			<tbody>
+            <tr>
+                <td>2017/11/02</td>
+                <td class="ellips al">고객이 만족할만한 이런이런 내용으로 처리하였습니다.</td>
+                <td>김대준</td>
+                <td>홍길동</td>
+                <td>완료</td>
+            </tr>
+            <tr>
+                <td>2017/11/02</td>
+                <td class="ellips al">고객이 만족할만한 이런이런 내용으로 처리하였습니다.</td>
+                <td>김대준</td>
+                <td>홍길동</td>
+                <td>완료</td>
+            </tr>
+            <tr>
+                <td>2017/11/02</td>
+                <td class="ellips al">고객이 만족할만한 이런이런 내용으로 처리하였습니다.</td>
+                <td>김대준</td>
+                <td>홍길동</td>
+                <td>완료</td>
+            </tr>
+            <tr>
+                <td>2017/11/02</td>
+                <td class="ellips al">고객이 만족할만한 이런이런 내용으로 처리하였습니다.</td>
+                <td>김대준</td>
+                <td>홍길동</td>
+                <td>완료</td>
+            </tr>
+            <tr>
+                <td>2017/11/02</td>
+                <td class="ellips al">고객이 만족할만한 이런이런 내용으로 처리하였습니다.</td>
+                <td>김대준</td>
+                <td>홍길동</td>
+                <td>완료</td>
+            </tr>
+			</tbody>
+			<tfoot>
+            <tr>
+                <td colspan="5" style="height:50px;">조회 결과가 없습니다.</td>
+            </tr>
+			</tfoot>
+        </table>
+        <!--/게시판-->
+        <iframe name="frmpaging" frameborder="0"  width="100%" height="0" src="" scrolling="no" marginwidth="0" marginheight="0" ></iframe>
+        <table width="100%" border="0"  cellspacing="0" cellpadding="0" class="brd_sch">
+            <colgroup>
+                <col style="width:80px">
+                <col>
+                <col style="width:80px">
+                <col>
+                <col style="width:80px">
+                <col>
+                <col style="width:80px">
+                <col>
+            </colgroup>
+            <tr>
+                <th>상담일시</th>
+                <td>2017-10-25</td>
+                <th>고객명</th>
+                <td>홍길동</td>
+                <th>상담사</th>
+                <td>김영수</td>
+                <th>처리구분</th>
+                <td>완료</td>
+            </tr>
+            <tr>
+                <th>내용</th>
+                <td colspan="7" align="left">처리가 완료되었습니다.</td>
+            </tr>
+        </table>
+    </div>
+    <!-- cr_LI01 end -->
+    <!-- cr_LI02 start -->
+    <div id="tab2" class="tab_content">
+        <input type="hidden" name="a_s_page" id="a_s_page" value="1" /><!-- 한화면 첫페이지 -->
+        <input type="hidden" name="s_row" id="s_row" value="" /><!-- 한목록 첫 로우 -->
+        <input type="hidden" name="p_row" id="p_row" value="" />
+        <input type="hidden" name="all_page" id="all_page" value="" />
+        <input type="hidden" name="all_last_page" id="all_last_page" value="" /><!-- 총 페이지 수 -->
+        <input type="hidden" name="user_id" id="user_id" value="" /><!-- 상담사 ID -->
+        <input type="hidden" name="ses_usernm" id="ses_usernm" value=""/><!-- 상담사이름 -->
+        <input type="hidden" name="snl_usertm" id="snl_usertm" value="" /><!-- 상담사근무타임 -->
+        <input type="hidden" name="ses_auth" id="ses_auth" value="" /><!-- 사용자권한 -->
+        <table width="100%" border="0"  cellspacing="0" cellpadding="0" class="brd_sch mgb10">
+            <colgroup>
+                <col style="width:60px">
+                <col>
+                <col style="width:60px">
+            </colgroup>
+            <tr>
+                <th>상담구분</th>
+                <td><select id="cnsl_tp" name="cnsl_tp"><option value="">전체</option><option value=""></option></select></td>
+                <td class="ar"><a href="#" class="btn small g_orange">조회</a><!--<img src="./images/btn_select01.gif" border="0" onClick="JavaScript:f_loadList('0')" style="cursor:pointer;" />--></td>
+            </tr>
+        </table>
+        <!--게시판-->
+        <table width="100%" border="0"  cellspacing="0" cellpadding="0" class="brd_list_a hover_action">
+            <colgroup>
+                <col style="width:20%">
+                <col style="width:20%">
+                <col style="width:20%">
+                <col style="width:20%">
+                <col style="width:20%">
+            </colgroup>
+			<thead>
+            <tr>
+                <th>일시</th>
+                <th>상담구분</th>
+                <th>전화번호</th>
+                <th>처리구분</th>
+                <th>처리자명</th>
+            </tr>
+			</thead>
+			<tbody>
+            <tr>
+                <td>2017/11/02</td>
+                <td>대출안내</td>
+                <td>010-1245-5896 <img src="images/icon/outcall_red01.gif"></td>
+                <td>완료</td>
+                <td>홍길동</td>
+            </tr>
+            <tr>
+                <td>2017/11/02</td>
+                <td>대출안내</td>
+                <td>010-1245-5896 <img src="images/icon/outcall_red01.gif"></td>
+                <td>완료</td>
+                <td>홍길동</td>
+            </tr>
+            <tr>
+                <td>2017/11/02</td>
+                <td>대출안내</td>
+                <td>010-1245-5896 <img src="images/icon/outcall_red01.gif"></td>
+                <td>완료</td>
+                <td>홍길동</td>
+            </tr>
+            <tr>
+                <td>2017/11/02</td>
+                <td>대출안내</td>
+                <td>010-1245-5896 <img src="images/icon/outcall_red01.gif"></td>
+                <td>완료</td>
+                <td>홍길동</td>
+            </tr>
+            <tr>
+                <td>2017/11/02</td>
+                <td>대출안내</td>
+                <td>010-1245-5896 <img src="images/icon/outcall_red01.gif"></td>
+                <td>완료</td>
+                <td>홍길동</td>
+            </tr>
+			</tbody>
+			<tfoot>
+            <tr>
+                <td colspan="5" style="height:50px;">조회 결과가 없습니다.</td>
+            </tr>
+			</tfoot>
+        </table>
+        <!--/게시판-->
+        
+        <iframe name="frmpaging" frameborder="0"  width="100%" height="0" src="" scrolling="no" marginwidth="0" marginheight="0" ></iframe>
+    </div>
+    <!-- cr_LI02 end -->
+    <!-- cr_LI03 start -->
+    <div id="tab3" class="tab_content">
+        <input type="hidden" name="a_s_page" id="a_s_page" value="1" /><!-- 한화면 첫페이지 -->
+        <input type="hidden" name="s_row" id="s_row" value="" /><!-- 한목록 첫 로우 -->
+        <input type="hidden" name="p_row" id="p_row" value="" />
+        <input type="hidden" name="all_page" id="all_page" value="" />
+        <input type="hidden" name="all_last_page" id="all_last_page" value="" /><!-- 총 페이지 수 -->
+        <input type="hidden" name="user_id" id="user_id" value="" /><!-- 상담사 ID -->
+        <input type="hidden" name="pro_tp" id="pro_tp" value="03" /><!-- 처리구분이 예약일 경우 -->
+        <table width="100%" border="0"  cellspacing="0" cellpadding="0" class="brd_list_a hover_action">
+            <colgroup>
+                <col style="width:70px">
+                <col>
+                <col style="width:60px">
+                <col style="width:60px">
+                <col style="width:60px">
+            </colgroup>
+			<thead>
+            <tr>
+                <th>상담일시</th>
+                <th>내용</th>
+                <th>고객명</th>
+                <th>상담사</th>
+                <th>처리구분</th>
+            </tr>
+			</thead>
+			<tbody>
+            <tr>
+                <td>2017/11/02</td>
+                <td class="ellips al">고객이 만족할만한 이런이런 내용으로 처리하였습니다.</td>
+                <td>김대준</td>
+                <td>홍길동</td>
+                <td>완료</td>
+            </tr>
+            <tr>
+                <td>2017/11/02</td>
+                <td class="ellips al">고객이 만족할만한 이런이런 내용으로 처리하였습니다.</td>
+                <td>김대준</td>
+                <td>홍길동</td>
+                <td>완료</td>
+            </tr>
+            <tr>
+                <td>2017/11/02</td>
+                <td class="ellips al">고객이 만족할만한 이런이런 내용으로 처리하였습니다.</td>
+                <td>김대준</td>
+                <td>홍길동</td>
+                <td>완료</td>
+            </tr>
+            <tr>
+                <td>2017/11/02</td>
+                <td class="ellips al">고객이 만족할만한 이런이런 내용으로 처리하였습니다.</td>
+                <td>김대준</td>
+                <td>홍길동</td>
+                <td>완료</td>
+            </tr>
+            <tr>
+                <td>2017/11/02</td>
+                <td class="ellips al">고객이 만족할만한 이런이런 내용으로 처리하였습니다.</td>
+                <td>김대준</td>
+                <td>홍길동</td>
+                <td>완료</td>
+            </tr>
+			</tbody>
+			<tfoot>
+            <tr>
+                <td colspan="5" style="height:50px;">조회 결과가 없습니다.</td>
+            </tr>
+			</tfoot>
+        </table>
+        <table width="100%" border="0"  cellspacing="0" cellpadding="0" class="brd_sch">
+            <colgroup>
+                <col style="width:80px">
+                <col>
+                <col style="width:80px">
+                <col>
+                <col style="width:80px">
+                <col>
+                <col style="width:80px">
+                <col>
+            </colgroup>
+            <tr>
+                <th>상담일시</th>
+                <td>2017-10-25</td>
+                <th>고객명</th>
+                <td>홍길동</td>
+                <th>상담사</th>
+                <td>김영수</td>
+                <th>처리구분</th>
+                <td>완료</td>
+            </tr>
+            <tr>
+                <th>내용</th>
+                <td colspan="7" align="left">처리가 완료되었습니다.</td>
+            </tr>
+        </table>
+    </div>
+    <!-- cr_LI03 end -->
+</div>
+</form>
+</body>
+</html>

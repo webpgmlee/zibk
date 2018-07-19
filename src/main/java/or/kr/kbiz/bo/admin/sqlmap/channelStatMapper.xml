@@ -1,0 +1,130 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper
+  PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+  "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="channelStat">
+
+    <!-- [인입채널별] 코드조회-->
+    <select id="selectCode" resultType="ChannelStatDomain">
+        SELECT CODE_NAME
+          FROM TH_CONSULT_CODE
+        WHERE LCODE = '00'
+           AND MCODE = '00'
+           AND SCODE = '00'
+           AND USE_YN = 'Y'
+    </select>
+
+    <!-- [인입채널별] 목록 조회 -->
+	<select id="select" parameterType="ChannelStatDomain" resultType="ChannelStatDomain">
+      select a.code_name,nvl(b.cnt,0) as a_cnt,nvl(c.cnt,0) as b_cnt,nvl(d.cnt,0) as c_cnt,nvl(e.cnt,0) as d_cnt,nvl(f.cnt,0) as e_cnt,nvl(g.cnt,0) as f_cnt,nvl(h.cnt,0) as g_cnt
+        from th_consult_code a
+        ,(select chnl_code, sum(1) as cnt
+            from (
+                select cnlt_seq, cnlt_detail_no,chnl_code
+                 from th_consult_detail
+                 where cnlt_proc_cd='01'
+                 <if test="selFromDt != null and selFromDt != '' and selDate ==  'date'">
+                 and cnlt_date  between to_date(#{selFromDt},'YYYY-MM-DD') and (to_date(#{selToDt}|| '235959','YYYYMMDDHH24MISS'))
+                 </if>
+                 <if test="selFromDt != null and selFromDt != '' and selDate ==  'month'">
+                 and cnlt_date  between to_date(#{selFromDt},'YYYY-MM') and add_months(to_date(#{selToDt} || '01235959','YYYYMMDDHH24MISS'), 1) - 1
+                 </if>
+                 group by cnlt_seq,cnlt_detail_no,chnl_code
+               )
+            group by chnl_code) b
+            ,(select chnl_code, sum(1) as cnt
+            from (
+                select cnlt_seq, cnlt_detail_no,chnl_code
+                 from th_consult_detail
+                 where cnlt_proc_cd='02'
+                 <if test="selFromDt != null and selFromDt != '' and selDate ==  'date'">
+                 and cnlt_date  between to_date(#{selFromDt},'YYYY-MM-DD') and (to_date(#{selToDt}|| '235959','YYYYMMDDHH24MISS'))
+                 </if>
+                 <if test="selFromDt != null and selFromDt != '' and selDate ==  'month'">
+                 and cnlt_date  between to_date(#{selFromDt},'YYYY-MM') and add_months(to_date(#{selToDt} || '01235959','YYYYMMDDHH24MISS'), 1) - 1
+                 </if>
+                 group by cnlt_seq,cnlt_detail_no,chnl_code
+               )
+            group by chnl_code) c
+            ,(select chnl_code, sum(1) as cnt
+            from (
+                select cnlt_seq, cnlt_detail_no,chnl_code
+                 from th_consult_detail
+                 where cnlt_proc_cd='03'
+                 <if test="selFromDt != null and selFromDt != '' and selDate ==  'date'">
+                 and cnlt_date  between to_date(#{selFromDt},'YYYY-MM-DD') and (to_date(#{selToDt}|| '235959','YYYYMMDDHH24MISS'))
+                 </if>
+                 <if test="selFromDt != null and selFromDt != '' and selDate ==  'month'">
+                 and cnlt_date  between to_date(#{selFromDt},'YYYY-MM') and add_months(to_date(#{selToDt} || '01235959','YYYYMMDDHH24MISS'), 1) - 1
+                 </if>
+                 group by cnlt_seq,cnlt_detail_no,chnl_code
+               )
+            group by chnl_code) d
+            ,(select chnl_code, sum(1) as cnt
+            from (
+                select cnlt_seq, cnlt_detail_no,chnl_code
+                 from th_consult_detail
+                 where cnlt_proc_cd='04'
+                 <if test="selFromDt != null and selFromDt != '' and selDate ==  'date'">
+                 and cnlt_date  between to_date(#{selFromDt},'YYYY-MM-DD') and (to_date(#{selToDt}|| '235959','YYYYMMDDHH24MISS'))
+                 </if>
+                 <if test="selFromDt != null and selFromDt != '' and selDate ==  'month'">
+                 and cnlt_date  between to_date(#{selFromDt},'YYYY-MM') and add_months(to_date(#{selToDt} || '01235959','YYYYMMDDHH24MISS'), 1) - 1
+                 </if>
+                 group by cnlt_seq,cnlt_detail_no,chnl_code
+               )
+            group by chnl_code) e
+            ,(select chnl_code, sum(1) as cnt
+            from (
+                select cnlt_seq, cnlt_detail_no,chnl_code
+                 from th_consult_detail
+                 where cnlt_proc_cd='05'
+                 <if test="selFromDt != null and selFromDt != '' and selDate ==  'date'">
+                 and cnlt_date  between to_date(#{selFromDt},'YYYY-MM-DD') and (to_date(#{selToDt}|| '235959','YYYYMMDDHH24MISS'))
+                 </if>
+                 <if test="selFromDt != null and selFromDt != '' and selDate ==  'month'">
+                 and cnlt_date  between to_date(#{selFromDt},'YYYY-MM') and add_months(to_date(#{selToDt} || '01235959','YYYYMMDDHH24MISS'), 1) - 1
+                 </if>
+                 group by cnlt_seq,cnlt_detail_no,chnl_code
+               )
+            group by chnl_code) f
+            ,(select chnl_code, sum(1) as cnt
+            from (
+                select cnlt_seq, cnlt_detail_no,chnl_code
+                 from th_consult_detail
+                 where cnlt_proc_cd='06'
+                 <if test="selFromDt != null and selFromDt != '' and selDate ==  'date'">
+                 and cnlt_date  between to_date(#{selFromDt},'YYYY-MM-DD') and (to_date(#{selToDt}|| '235959','YYYYMMDDHH24MISS'))
+                 </if>
+                 <if test="selFromDt != null and selFromDt != '' and selDate ==  'month'">
+                 and cnlt_date  between to_date(#{selFromDt},'YYYY-MM') and add_months(to_date(#{selToDt} || '01235959','YYYYMMDDHH24MISS'), 1) - 1
+                 </if>
+                 group by cnlt_seq,cnlt_detail_no,chnl_code
+               )
+            group by chnl_code) g
+            ,(select chnl_code, sum(1) as cnt
+            from (
+                select cnlt_seq, cnlt_detail_no,chnl_code
+                 from th_consult_detail
+                 where cnlt_proc_cd='07'
+                 <if test="selFromDt != null and selFromDt != '' and selDate ==  'date'">
+                 and cnlt_date  between to_date(#{selFromDt},'YYYY-MM-DD') and (to_date(#{selToDt}|| '235959','YYYYMMDDHH24MISS'))
+                 </if>
+                 <if test="selFromDt != null and selFromDt != '' and selDate ==  'month'">
+                 and cnlt_date  between to_date(#{selFromDt},'YYYY-MM') and add_months(to_date(#{selToDt} || '01235959','YYYYMMDDHH24MISS'), 1) - 1
+                 </if>
+                 group by cnlt_seq,cnlt_detail_no,chnl_code
+               )
+            group by chnl_code) h
+        where a.lcode = '00' and a.mcode  = '00' and a.scode ='00'
+        and a.use_yn='Y'
+        and a.chnl_code = b.chnl_code(+)
+        and a.chnl_code = c.chnl_code(+)
+        and a.chnl_code = d.chnl_code(+)
+        and a.chnl_code = e.chnl_code(+)
+        and a.chnl_code = f.chnl_code(+)
+        and a.chnl_code = g.chnl_code(+)
+        and a.chnl_code = h.chnl_code(+)
+        order by  a.sort_idx
+	</select>
+</mapper>

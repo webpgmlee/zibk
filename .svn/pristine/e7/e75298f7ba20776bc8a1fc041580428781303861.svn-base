@@ -1,0 +1,28 @@
+package or.kr.kbiz.serv.util;
+
+import java.security.MessageDigest;
+import java.security.NoSuchAlgorithmException;
+
+public class SecureUtil {
+
+	private final static String ENC_MTHD = "SHA1";
+
+	public final static String encrypt(String strData) {
+		MessageDigest md;
+		StringBuffer sb = new StringBuffer();
+
+		try {
+			md = MessageDigest.getInstance(ENC_MTHD);
+			byte[] byBytes = strData.getBytes();
+			md.update(byBytes);
+			byte[] digest = md.digest();
+			for (int i = 0; i < digest.length; i++) {
+				sb.append(Integer.toHexString(digest[i] & 0xFF).toUpperCase());
+			}
+			return sb.toString();
+		} catch (NoSuchAlgorithmException e) {
+			System.err.println("System Error 9");
+			return sb.toString();
+		}
+	}
+}

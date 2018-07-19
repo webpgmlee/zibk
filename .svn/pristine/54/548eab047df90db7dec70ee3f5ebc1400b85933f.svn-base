@@ -1,0 +1,126 @@
+package or.kr.kbiz.bo.main.service.impl;
+
+import java.io.File;
+import java.io.FileInputStream;
+import java.io.InputStream;
+import java.io.OutputStream;
+import java.net.URLEncoder;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
+
+import javax.servlet.http.HttpServletRequest;
+import javax.servlet.http.HttpServletResponse;
+
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Qualifier;
+import org.springframework.stereotype.Service;
+
+import or.kr.kbiz.bo.admin.domain.NoticeDomain;
+import or.kr.kbiz.bo.common.domain.LoginSessDomain;
+import or.kr.kbiz.bo.main.service.MainService;
+import or.kr.kbiz.serv.spring.mvc.BaseDao;
+
+@Service
+public class MainServiceImpl implements MainService {
+
+	private static final Logger logger = LoggerFactory.getLogger(MainService.class);
+
+	@Autowired(required=true)
+	@Qualifier("apBaseDao")
+	private BaseDao baseDao;
+
+	@Autowired(required=true)
+	@Qualifier("recBaseDao1")
+	private BaseDao baseDao3;
+
+	@Autowired(required=true)
+	@Qualifier("recBaseDao2")
+	private BaseDao baseDao4;
+
+	@Override
+	@SuppressWarnings("unchecked")
+	public Map<String, Integer> callCurCount(String userId) {
+		return (Map<String, Integer>)baseDao.getObject("main.callCurCount", userId);
+	}
+
+	@Override
+	public Integer callbackCurCount() {
+		return (Integer)baseDao.getObject("main.callbackCurCount");
+	}
+
+	@Override
+	@SuppressWarnings("unchecked")
+	public List<NoticeDomain> selectNoticeList(NoticeDomain noticeDomain) {
+		return baseDao.getList("main.selectNoticeList", noticeDomain);
+	}
+
+	@Override
+	public Integer selectNoticeTotalCnt(NoticeDomain noticeDomain){
+		return (Integer) baseDao.getObject("main.selectNoticeTotalCnt");
+	}
+
+	@Override
+	public NoticeDomain selectNoticeDetail(NoticeDomain noticeDomain) {
+		return (NoticeDomain)baseDao.getObject("main.selectNoticeDetail", noticeDomain);
+	}
+
+	@Override
+	public void downloadFile(NoticeDomain noticeDomain, HttpServletRequest request, HttpServletResponse response) throws Exception{
+		String fileName = noticeDomain.getNotiFilename();
+		String reFileName =  URLEncoder.encode(noticeDomain.getNotiFilename(),"UTF-8").replaceAll("\\+", "%20");
+		File file = new File("D:\\upload\\notice\\"+fileName);
+		response.setContentLength((int)file.length());
+		response.setContentType("application/octet-stream");
+		response.setHeader("Content-Description", "JSP Generated Data");
+		response.setHeader("Content-Disposition","attachment;filename=\"" +reFileName +"\";");
+		response.setHeader("Content-Type", "application/octet-stream; charset=utf-8");
+		InputStream in = null;
+		OutputStream os = null;
+		try{ // 파일을 읽어 스트림에 담기
+			in = new FileInputStream(file);
+			os = response.getOutputStream();
+            byte b[] = new byte[(int)file.length()];
+            int leng = 0;
+            while( (leng = in.read(b)) > 0 ){
+                os.write(b,0,leng);
+            }
+            in.close();
+            os.close();
+		}catch(Exception e){
+			logger.error("error : "+e);
+		}
+	}
+
+	@Override
+	@SuppressWarnings("unchecked")
+	public Map<String,Integer> ystdCount(String userId) {
+		return (Map<String,Integer>)baseDao.getObject("main.ystdCount", userId);
+	}
+
+	@Override
+	public void recInitialize(LoginSessDomain lsd) {
+		String userId = lsd.getLoginUserId();
+		baseDao3.update("rec1.recInitialize", userId);
+		baseDao4.update("rec2.recInitialize", userId);
+	}
+
+	@Override
+	public void recUpdate(String groupId, String callTelNum, LoginSessDomain lsd, HttpServletRequest request) {
+		Map<String,String> map = new HashMap<String,String>();
+		String ip = request.getHeader("X-Forwarded-For");
+		 if (ip == null || ip.length() == 0 || "unknown".equalsIgnoreCase(ip)) {
+		     ip = request.getRemoteAddr();
+		     logger.debug("Client IP Address7="+ip);
+		 }
+		map.put("userIp", ip);
+		map.put("groupId", groupId);
+		map.put("callTelNum", callTelNum);
+		map.put("userId", lsd.getLoginUserId());
+		map.put("userNm", lsd.getLoginUserNm());
+		baseDao3.update("rec1.recUpdate", map);
+		baseDao4.update("rec2.recUpdate", map);
+	}
+}

@@ -1,0 +1,7 @@
+<project>
+  <modelVersion>4.0.0</modelVersion>
+  <groupId>com.servlets</groupId>
+  <artifactId>cos</artifactId>
+  <version>09May2002</version>
+  <url>http://www.servlets.com/cos/</url>
+</project>

@@ -1,0 +1,29 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper
+  PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+  "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="smsInterface">
+	<!-- SMS전송 -->
+	<insert id="sendSms" parameterType="java.util.Map">
+		INSERT INTO em_tran (TRAN_ID, TRAN_PHONE, TRAN_CALLBACK, TRAN_STATUS, TRAN_DATE, TRAN_MSG, TRAN_TYPE)
+		VALUES
+		('KR/S_KBIZNRP',#{tellNum}, '1666-9988', '1', now(), #{content}, 4)
+	</insert>
+
+	<!-- LMS전송1 -->
+	<insert id="sendLms" parameterType="java.util.Map">
+		INSERT INTO em_tran_mms (FILE_CNT, MMS_BODY, MMS_SUBJECT)
+		VALUES
+		(1, #{content}, #{title})
+		<selectKey resultType="java.lang.Integer" keyProperty="id" order="AFTER">
+		    SELECT LAST_INSERT_ID()
+		</selectKey>
+	</insert>
+
+	<!-- LMS전송2 -->
+	<insert id="sendLms2" parameterType="java.util.Map">
+		INSERT INTO em_tran (TRAN_ID, TRAN_PHONE, TRAN_CALLBACK, TRAN_STATUS, TRAN_DATE, TRAN_TYPE, TRAN_ETC4)
+        VALUES('KR/S_KBIZNRP',#{tellNum}, '1666-9988', '1', NOW(), 6, #{id})
+	</insert>
+
+</mapper>

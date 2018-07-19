@@ -1,0 +1,146 @@
+/**
+ * stringUtil.js
+ */
+(function() {
+
+    var KORBYTE = 3;
+
+
+    _NARU.stringUtil.getKorByte = function() {
+        return KORBYTE;
+    };
+
+    _NARU.stringUtil.setKorByte = function(korByte) {
+        KORBYTE = korByte;
+    };
+
+	/**
+	 * 문자열 바이트 수 계산
+	 * 한글은 (KORBYTE)에 입력된 수로 계산
+	 * 영문/숫자는 1
+	 *
+	 * @param str 대상
+	 */
+	_NARU.stringUtil.byteLen = function(str)
+	{
+	    var tc = 0, c, ts = new String(str);
+	    var t = ts.length;
+	    for ( k=0; k<t; k++ ) {
+	        c = ts.charAt(k);
+	        if (escape(c).length > 4) tc += this.getKorByte();
+	        else tc += 1;
+	    }
+	    return tc;
+	};
+
+	/**
+	 *
+	 * @param str
+	 */
+	_NARU.stringUtil.parseTell = function(tell){
+		var result = "";
+		if(tell == null || tell.trim() == ""){
+			return result;
+		}else{
+			if(tell.substring(0,2).indexOf("02")!=-1){
+				if(tell.length==10){
+					result = tell.substring(0,2)+"-"+tell.substring(2,6)+"-"+tell.substring(6,10);
+				}else{
+					result = tell.substring(0,2)+"-"+tell.substring(2,5)+"-"+tell.substring(5,9);
+				}
+			}else if(tell.length==10){
+				result = tell.substring(0,3)+"-"+tell.substring(3,6)+"-"+tell.substring(6,10);
+			}else if(tell.length==11){
+				result = tell.substring(0,3)+"-"+tell.substring(3,7)+"-"+tell.substring(7,11);
+			}else if(tell.length==12){
+				result = tell.substring(0,4)+"-"+tell.substring(4,8)+"-"+tell.substring(8,12);
+			}else{
+				result = tell;
+			}
+
+			return result;
+		}
+	};
+
+	/**
+	 * 문장 앞뒤 공백 제거
+	 *
+	 * @param str
+	 */
+	_NARU.stringUtil.trim = function(str){
+		return str.replace(/(^\s*)|(\s*$)/gi, '');
+	};
+
+	/**
+	 * 문장 전체 공백 제거
+	 *
+	 * @param str
+	 */
+	_NARU.stringUtil.trimAll = function(str){
+		return str.replace(/\s/gi,'');
+	};
+
+	/**
+	 * 특정 문자 변환
+	 *
+	 * @param src 변경 대상
+	 * @param tar 변경할 문자
+	 * @param def 변경될 문자
+	 */
+	_NARU.stringUtil.replaceAll = function(src, tar, def) {
+	    return str.split(tar).join(def);
+	};
+
+	/**
+	 * 숫자제외 문자 제거
+	 *
+	 * @param src 변경 대상
+	 */
+	_NARU.stringUtil.removeNotNumber = function(src) {
+	    return this.toDefaultString(src, "").replace(/[^0-9]/gi, '');
+	};
+
+	/**
+	 * null 이거나 빈 문자열일 경우 지정된 문자로 변경
+	 *
+	 * @param src 변경 대상
+	 * @param def 변경할 문자
+	 */
+	_NARU.stringUtil.toDefaultString = function(src, def) {
+	    if (src == 'undefined' || src == null) {
+	        return def || "";
+	    }else{
+	    	return src;
+	    }
+	};
+
+	/**
+	 * 전화번호 조회시 '-'제거
+	 * @param src 변경대상
+	 */
+	_NARU.stringUtil.replaceTell = function(src){
+		return src.replace(/\-/gi,'');
+	};
+
+	/**
+	 * 녹취파일명 a태그에 넣어 보내기 (kbiz용)
+	 * @param recUrl
+	 */
+	_NARU.stringUtil.getRecSplit =function(recUrl){
+		if(recUrl == null || recUrl.trim() == ""){
+			return "";
+		}
+		var arr = new Array();
+		arr = recUrl.split("&");
+		var sb = "";
+		for(var i=0;i<arr.length;i++){
+			sb += "<a href='javascript:fn_recUrl("+i+");'  id='rec"+i+"'>";
+			if(i != 0){
+				sb +=", ";
+			}
+			sb += "REC"+i;
+			sb += "</a>";
+		}
+		return sb.toString();
+	}
+})();

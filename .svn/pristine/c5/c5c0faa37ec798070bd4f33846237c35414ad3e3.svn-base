@@ -1,0 +1,179 @@
+package or.kr.kbiz.serv.web.filter;
+
+import java.io.IOException;
+import java.io.OutputStream;
+import java.io.UnsupportedEncodingException;
+import java.util.Collections;
+import java.util.Enumeration;
+import java.util.HashMap;
+import java.util.Map;
+
+import javax.servlet.FilterChain;
+import javax.servlet.ServletException;
+import javax.servlet.http.HttpServletRequest;
+import javax.servlet.http.HttpServletRequestWrapper;
+import javax.servlet.http.HttpServletResponse;
+import javax.servlet.http.HttpSession;
+
+import org.apache.poi.util.StringUtil;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+import org.springframework.web.filter.OncePerRequestFilter;
+import org.springframework.web.util.NestedServletException;
+
+import or.kr.kbiz.serv.exception.CommonWarning;
+
+public class RequestMethodFilter extends OncePerRequestFilter {
+	private static final Logger LOG = LoggerFactory.getLogger(RequestMethodFilter.class);
+	private boolean allowPOST = false;
+	private boolean allowGET  = false;
+
+	@SuppressWarnings("deprecation")
+	@Override
+	public void doFilterInternal(HttpServletRequest request,
+			HttpServletResponse response, FilterChain filterChain)
+			throws ServletException, IOException {
+		try {
+			LOG.debug("--------------- RequestMethodFilter --------------------");
+			HttpSession session = request.getSession();
+			HttpServletRequest httpServletRequest = request;
+			NaruServletRequestWrapper wrappedReqest = new NaruServletRequestWrapper(
+					httpServletRequest);
+			if (session.getAttribute("id") == null || "".equals(session.getAttribute("id"))) {
+				if (request.getRequestURI().indexOf("login") < 0
+						&& request.getRequestURI().lastIndexOf(".do") > -1) {
+					response.sendRedirect("/login.do");
+				}
+			} else {
+				wrappedReqest.setParameter("loginUserId", session.getAttribute("id").toString());
+				wrappedReqest.setParameter("loginUserNm", session.getAttribute("name").toString());
+				wrappedReqest.setParameter("loginCallApGrade", session.getAttribute("callApGrade").toString());
+				if (session.getAttribute("ctiDevice") != null && !"".equals(session.getAttribute("ctiDevice"))) {
+					wrappedReqest.setParameter("loginCallApGrade", session.getAttribute("ctiDevice").toString());
+				}
+				if (request.getRequestURI().indexOf("/admin/") >= 0) {
+					int callApGrade = Integer.parseInt((String) session.getAttribute("callApGrade"));
+					if (callApGrade > 2) {
+						response.sendRedirect("/index.do");
+					}
+				}
+			}
+
+			if(isAllowPOST() && "POST".equals(request.getMethod())){
+				LOG.debug("#### "+request.getMethod()+" Reqeust["+isAllowPOST()+"]:"+request.getRequestURI());
+				filterChain.doFilter(wrappedReqest, response);
+			}else if(isAllowGET() && "GET".equals(request.getMethod())){
+				LOG.debug("#### "+request.getMethod()+" Reqeust["+isAllowGET()+"]:"+request.getRequestURI());
+				filterChain.doFilter(wrappedReqest, response);
+			}else{
+				LOG.debug("#### @405 Method Not Allowed["+request.getMethod()+"]:"+request.getRequestURI());
+
+				response.setContentType("application/json");
+				response.setStatus(405, "Method Not Allowed");
+				OutputStream out = null;
+				try{
+					out = response.getOutputStream();
+					out.write(JsonUtils.writeValueAsString(null, false, false).getBytes());
+				}catch(Exception e){
+
+				}finally{
+					try {
+						if(out != null) out.close();
+					} catch (IOException ie) {
+						LOG.error(ie.getMessage());
+					}
+				}
+				return;
+			}
+		} catch (Throwable a) {
+			String message = "";
+			if (a instanceof NestedServletException && a.getCause() instanceof CommonWarning) {
+				CommonWarning cw = (CommonWarning)a.getCause();
+				message = cw.getMsg_xml();
+			} else {
+				message = "서버에서 에러가 발생하였습니다.";
+			}
+			response.setStatus(405, message);
+			OutputStream out = null;
+			try{
+				out = response.getOutputStream();
+				out.write(message.getBytes());
+			}catch(Exception e){
+
+			}finally{
+				try {
+					if(out != null) out.close();
+				} catch (IOException ie) {
+					LOG.error(ie.getMessage());
+				}
+			}
+
+		}
+	}
+
+	public void setAllowPOST(boolean allowPOST) {
+		this.allowPOST = allowPOST;
+	}
+	protected boolean isAllowPOST() {
+		return allowPOST;
+	}
+
+	public void setAllowGET(boolean allowGET) {
+		this.allowGET = allowGET;
+	}
+	protected boolean isAllowGET() {
+		return allowGET;
+	}
+
+	public class NaruServletRequestWrapper extends HttpServletRequestWrapper {
+
+		HashMap<String, Object> params;
+
+		@SuppressWarnings("unchecked")
+		public NaruServletRequestWrapper(HttpServletRequest request) throws UnsupportedEncodingException {
+			super(request);
+			request.setCharacterEncoding("UTF-8");
+			this.params = new HashMap<String, Object>(request.getParameterMap());
+		}
+
+		public String getParameter(String name){
+			String returnValue = null;
+			String[] paramArray = getParameterValues(name);
+			if (paramArray != null && paramArray.length > 0){
+				returnValue = paramArray[0];
+			}
+			return returnValue;
+		}
+
+		@SuppressWarnings("rawtypes")
+		public Map getParameterMap() {
+			return Collections.unmodifiableMap(params);
+		}
+
+		@SuppressWarnings("rawtypes")
+		public Enumeration getParameterNames() {
+			return Collections.enumeration(params.keySet());
+		}
+
+		public String[] getParameterValues(String name) {
+			String[] result = null;
+			String[] temp = (String[])params.get(name);
+			if (temp != null){
+				result = new String[temp.length];
+				System.arraycopy(temp, 0, result, 0, temp.length);
+			}
+			return result;
+		}
+
+		public void setParameter(String name, String value){
+			String[] oneParam = {value};
+			setParameterValues(name, oneParam);
+		}
+
+		public void setParameterValues(String name, String[] value){
+			params.put(name, value);
+		}
+
+	}
+
+}

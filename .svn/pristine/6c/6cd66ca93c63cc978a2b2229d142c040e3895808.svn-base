@@ -1,0 +1,112 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper
+  PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+  "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="loginUser">
+
+    <!-- [로그인] 로그인 처리용 조회 -->
+    <select id="selectLoginUserInfo" resultType="LoginUserDomain" parameterType="java.lang.String">
+        SELECT
+                MA.USER_ID
+                , MA.USER_NM
+                , HI.CALL_AP_GRADE
+                , HI.DEPT_CD
+                , CASE WHEN PS.PSWD_CHNG_DATE <![CDATA[<]]> ADD_MONTHS(SYSDATE, -3) THEN 'Y' ELSE 'N' END AS PSWD_CHNG_YN
+                , PS.PSWD
+                , PS.LOGN_ATMP_CONT
+                , PS.INIT_PSWD_YN
+                , CASE WHEN NVL(PS.LAST_LOGN_DATE, SYSDATE) <![CDATA[<]]> ADD_MONTHS(SYSDATE, -3) THEN 'Y' ELSE 'N' END AS ACCT_LOCKED_YN
+          FROM IF_CO_USER_MA MA
+                    , IF_CO_USER_HI HI
+                    , TH_USER_PSWD PS
+         WHERE MA.USER_ID = HI.USER_ID
+           AND MA.USER_ID = PS.USER_ID
+           AND HI.LAST_YN = 'Y'
+           AND HI.RTRM_YN = 'N'
+           AND MA.IS_DELETED = 0
+           AND PS.CURR_PSWD_YN = 'Y'
+           AND MA.USER_ID = #{value} /* P: 사용자ID */
+           AND ROWNUM = 1
+    </select>
+
+    <!-- [로그인] 로그인 성공 처리 -->
+    <update id="updateSuccessLogin" parameterType="java.lang.String">
+        UPDATE TH_USER_PSWD
+            SET
+                LOGN_ATMP_CONT = 0
+                , LAST_LOGN_DATE = SYSDATE
+         WHERE USER_ID = #{value}
+           AND CURR_PSWD_YN = 'Y'
+    </update>
+
+    <!-- [로그인] 로그인 실패 처리 -->
+    <update id="updateFailLogin" parameterType="java.lang.String">
+        UPDATE TH_USER_PSWD
+            SET
+                LOGN_ATMP_CONT = LOGN_ATMP_CONT + 1
+         WHERE USER_ID = #{value}
+           AND CURR_PSWD_YN = 'Y'
+    </update>
+
+    <!-- [로그인] 사용자 비밀번호 변경 이력 조회 -->
+    <select id="selectThUserPswdByUser" resultType="LoginUserDomain" parameterType="java.lang.String">
+        SELECT
+                USER_ID
+                , PSWD
+          FROM TH_USER_PSWD
+         WHERE USER_ID = #{value}
+           AND INIT_PSWD_YN = 'N'
+         ORDER BY PSWD_CHNG_DATE DESC
+    </select>
+
+    <!-- [로그인] 사용자 가장 예전에 사용한 비밀번호 변경 이력 삭제 -->
+    <delete id="deleteThUserPswdByMinChngDate" parameterType="java.lang.String">
+        DELETE FROM TH_USER_PSWD
+          WHERE (USER_ID, PSWD_CHNG_DATE)
+                    = (SELECT USER_ID, MIN(PSWD_CHNG_DATE)
+                          FROM TH_USER_PSWD
+                         WHERE USER_ID = #{value}
+                         GROUP BY USER_ID)
+            AND INIT_PSWD_YN = 'N'
+    </delete>
+
+    <!-- [로그인] 사용자 이전 비밀번호 미사용 처리 -->
+    <update id="updateNotUsePrePswd" parameterType="java.lang.String">
+        UPDATE TH_USER_PSWD
+            SET
+                CURR_PSWD_YN = 'N'
+         WHERE USER_ID = #{value}
+    </update>
+
+    <!-- [로그인] 사용자 변경 비밀번호 저장 -->
+    <insert id="insertThUserPswd" parameterType="LoginUserDomain">
+        INSERT INTO TH_USER_PSWD
+        (
+            USER_ID
+            , PSWD_CHNG_DATE
+            , PSWD
+            , CURR_PSWD_YN
+            , LOGN_ATMP_CONT
+            , INIT_PSWD_YN
+            , REG_ID
+            , REG_DATE
+        ) VALUES (
+            #{chngUserId}
+            , SYSDATE
+            , #{chngNewPswd}
+            , 'Y'
+            , 0
+            , 'N'
+            , #{chngUserId}
+            , SYSDATE
+        )
+    </insert>
+
+    <!-- [로그인] 비밀번호 초기화 데이터 삭제 -->
+    <delete id="deleteThUserPswdByInitPswd" parameterType="java.lang.String">
+        DELETE FROM TH_USER_PSWD
+         WHERE USER_ID = #{value}
+           AND INIT_PSWD_YN = 'Y'
+    </delete>
+
+</mapper>

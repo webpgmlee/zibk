@@ -1,0 +1,191 @@
+package or.kr.kbiz.bo.admin.domain;
+
+import or.kr.kbiz.serv.spring.mvc.BaseDomain;
+
+public class UserDomain extends BaseDomain {
+	private String userId;				//사용자ID
+	private String userNm;				//사용자
+	private String ofrmTelNo;			//사무실전화번호
+	private String ofrmTelNo2;		//사무실전화번호2
+	private String pswdChngDate;	//비밀번호 변경일시
+	private String pswd; 				//비밀번호
+	private String newPswd;			//비밀번호초기화용
+	private String currPswdYn;		//현재 사용중인 비밀번호 여부[Y, N]
+	private String lognAtmpCont;		//로그인 시도 횟수
+	private String initPswdYn;			//비밀번호 초기화 여부
+	private String lastLognDate;		//마지막 로그인 일시
+	private String regId;				//등록자ID
+	private String regDate;				//등록일시
+	private String deptNm;				//부서명
+	private String rspofcNm;			//직책
+	private String ofcpsNm;			//직위
+	private String callTelNum;         //내선번호
+	private String hidUserId;			//사용자ID
+	private String callApGrade;		//사용자등급
+	private String apGradeNm;
+	private String apGrade;
+	private String rnum;
+
+	//조회조건
+	private String selUserId;				//사용자ID
+	private String selUserNm;				//사용자
+	private String selDeptNm;				//부서명
+	private String selOfrmTelNo;			//사무실전화번호
+
+	public String getUserId() {
+		return userId;
+	}
+	public void setUserId(String userId) {
+		this.userId = userId;
+	}
+	public String getUserNm() {
+		return userNm;
+	}
+	public void setUserNm(String userNm) {
+		this.userNm = userNm;
+	}
+	public String getPswdChngDate() {
+		return pswdChngDate;
+	}
+	public void setPswdChngDate(String pswdChngDate) {
+		this.pswdChngDate = pswdChngDate;
+	}
+	public String getPswd() {
+		return pswd;
+	}
+	public void setPswd(String pswd) {
+		this.pswd = pswd;
+	}
+	public String getCurrPswdYn() {
+		return currPswdYn;
+	}
+	public void setCurrPswdYn(String currPswdYn) {
+		this.currPswdYn = currPswdYn;
+	}
+	public String getLognAtmpCont() {
+		return lognAtmpCont;
+	}
+	public void setLognAtmpCont(String lognAtmpCont) {
+		this.lognAtmpCont = lognAtmpCont;
+	}
+	public String getInitPswdYn() {
+		return initPswdYn;
+	}
+	public void setInitPswdYn(String initPswdYn) {
+		this.initPswdYn = initPswdYn;
+	}
+	public String getLastLognDate() {
+		return lastLognDate;
+	}
+	public void setLastLognDate(String lastLognDate) {
+		this.lastLognDate = lastLognDate;
+	}
+	public String getRegId() {
+		return regId;
+	}
+	public void setRegId(String regId) {
+		this.regId = regId;
+	}
+	public String getRegDate() {
+		return regDate;
+	}
+	public void setRegDate(String regDate) {
+		this.regDate = regDate;
+	}
+	public String getOfrmTelNo() {
+		return ofrmTelNo;
+	}
+	public void setOfrmTelNo(String ofrmTelNo) {
+		this.ofrmTelNo = ofrmTelNo;
+	}
+	public String getOfrmTelNo2() {
+		return ofrmTelNo2;
+	}
+	public void setOfrmTelNo2(String ofrmTelNo2) {
+		this.ofrmTelNo2 = ofrmTelNo2;
+	}
+	public String getDeptNm() {
+		return deptNm;
+	}
+	public void setDeptNm(String deptNm) {
+		this.deptNm = deptNm;
+	}
+	public String getRnum() {
+		return rnum;
+	}
+	public void setRnum(String rnum) {
+		this.rnum = rnum;
+	}
+	public String getSelUserId() {
+		return selUserId;
+	}
+	public void setSelUserId(String selUserId) {
+		this.selUserId = selUserId;
+	}
+	public String getSelUserNm() {
+		return selUserNm;
+	}
+	public void setSelUserNm(String selUserNm) {
+		this.selUserNm = selUserNm;
+	}
+	public String getSelDeptNm() {
+		return selDeptNm;
+	}
+	public void setSelDeptNm(String selDeptNm) {
+		this.selDeptNm = selDeptNm;
+	}
+	public String getSelOfrmTelNo() {
+		return selOfrmTelNo;
+	}
+	public void setSelOfrmTelNo(String selOfrmTelNo) {
+		this.selOfrmTelNo = selOfrmTelNo;
+	}
+	public String getRspofcNm() {
+		return rspofcNm;
+	}
+	public void setRspofcNm(String rspofcNm) {
+		this.rspofcNm = rspofcNm;
+	}
+	public String getOfcpsNm() {
+		return ofcpsNm;
+	}
+	public void setOfcpsNm(String ofcpsNm) {
+		this.ofcpsNm = ofcpsNm;
+	}
+	public String getCallTelNum() {
+		return callTelNum;
+	}
+	public void setCallTelNum(String callTelNum) {
+		this.callTelNum = callTelNum;
+	}
+	public String getNewPswd() {
+		return newPswd;
+	}
+	public void setNewPswd(String newPswd) {
+		this.newPswd = newPswd;
+	}
+	public String getHidUserId() {
+		return hidUserId;
+	}
+	public void setHidUserId(String hidUserId) {
+		this.hidUserId = hidUserId;
+	}
+	public String getCallApGrade() {
+		return callApGrade;
+	}
+	public void setCallApGrade(String callApGrade) {
+		this.callApGrade = callApGrade;
+	}
+	public String getApGrade() {
+		return apGrade;
+	}
+	public void setApGrade(String apGrade) {
+		this.apGrade = apGrade;
+	}
+	public String getApGradeNm() {
+		return apGradeNm;
+	}
+	public void setApGradeNm(String apGradeNm) {
+		this.apGradeNm = apGradeNm;
+	}
+}

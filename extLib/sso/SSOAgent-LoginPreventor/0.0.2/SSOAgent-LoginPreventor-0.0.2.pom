@@ -1,0 +1,6 @@
+<project>
+  <modelVersion>4.0.0</modelVersion>
+  <groupId>sso</groupId>
+  <artifactId>SSOAgent-LoginPreventor</artifactId>
+  <version>0.0.2</version>
+</project>

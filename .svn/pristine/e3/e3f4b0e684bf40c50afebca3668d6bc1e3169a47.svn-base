@@ -1,0 +1,265 @@
+<%--
+ * file name    : reserveCall.jsp
+ * description  : 전화예약
+ * author       : 백소영
+ * initial date : 2017.11.20
+ * history
+  수정일자      수정자     수정내용
+  2017.11.20    백소영     Initialization
+  --%>
+<%@ page language="java" contentType="text/html; charset=UTF-8" pageEncoding="UTF-8"%>
+<%@ taglib prefix="c" uri="/WEB-INF/tld/c.tld" %>
+<%@ taglib prefix="kbiz" uri="/WEB-INF/tld/kbiz.tld" %>
+<!DOCTYPE html>
+<html>
+<head>
+    <meta http-equiv="Content-Type" content="text/html; charset=UTF-8" />
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, minimum-scale=1.0, user-scalable=no">
+    <meta name="subject" content="KBIZ">
+    <meta name="author" content="KBIZ">
+    <meta name="keywords" content="KBIZ">
+    <meta name="description" content="KBIZ">
+    <title>KBIZ</title>
+    <%@ include file="/WEB-INF/jsp/comm_top.jsp"%>
+    <script type="text/javascript">
+
+       $(document).ready(function() {
+           var now = new Date();
+           var year= now.getFullYear();
+           var mon = now.getMonth()+1;
+           var day = now.getDate();
+
+           $("#selFromDt").val(KBIZDT.addFormattedDate(year+''+mon+''+day,'m',-1));
+           $("#selToDt").val(KBIZDT.addFormattedDate(year+''+mon+''+day,'m',0));
+           fn_searchClick();
+
+           KBIZDT.setDatepicker("selFromDt");
+           KBIZDT.setDatepicker("selToDt");
+           KBIZDT.datepicker();
+
+           $("#btn_excel").click(function(){
+               $("#reserveCallSearchForm").attr("action","/admin/reserveCall/excel");
+               document.reserveCallSearchForm.submit();
+           });
+        });
+       //조회
+       function fn_searchClick(){
+           $("#pageIdx").val("1");
+           fn_submit();
+       }
+
+        function fn_submit() {
+        	 //날짜검사
+            if($("#selFromDt").val() == ""){
+                alert("날짜를 입력해주세요.");
+                $("#selFromDt").focus();
+                return;
+            }else if($("#selToDt").val() == ""){
+                alert("날짜를 입력해주세요.");
+                $("#selToDt").focus();
+                return;
+            }
+
+           if($("#selFromDt").val().length == 10){           //날짜가 정확하게 입력되었는지 검사
+                if($("#selToDt").val().length == 10){
+                    //skip
+                }else{
+                    alert("검색할 날짜를 제대로 설정해주세요.\nex) 2018-01-01");
+                    $("#selToDt").focus();
+                    return;
+                }
+            }else{
+                alert("검색할 날짜를 제대로 설정해주세요.\nex) 2018-01-01");
+                $("#selFromDt").focus();
+                return;
+            }
+           $("#selTellNum").val(KBIZST.replaceTell($("#selTellNum").val()));
+           $("#reserveCallSearchForm").attr("action","/admin/reserveCallList.view");
+            KBIZIO.requestViewAjax("reserveCallSearchForm", "reserveCallListView", fn_submitCallback);
+        }
+
+        function fn_submitCallback(ret) {
+        	fn_init();
+            console.log('------- fn_submitCallback() ---------');
+        }
+
+        function fn_detail(seq,deSeq) {
+            KBIZUI.highlightTrByEvent(window.event);
+        	KBIZIO.requestParamAjax("/admin/reserveCallDetail.json", fn_detailCallback, {params: {cnltSeq: seq,cnltDetailNo:deSeq}});
+        }
+
+        function fn_detailCallback(ret) {
+            var r = ret.result;
+            $("#cnltDate").text(KBIZDT.getFormattedDate(r.cnltDate, "yyyy-MM-dd HH:mm:ss"));
+            $("#userNm").text(KBIZST.toDefaultString(r.userNm,''));
+            $("#custNm").text(KBIZST.toDefaultString(r.custNm,''));
+            $("#rsrvDate").text(KBIZDT.getFormattedDate(r.rsrvDate, "yyyy-MM-dd HH:mm"));
+            $("#chnlCodeName").text(KBIZST.toDefaultString(r.chnlCodeName,''));
+            $("#lcodeName").text(KBIZST.toDefaultString(r.lcodeName,''));
+            $("#mcodeName").text(KBIZST.toDefaultString(r.mcodeName,''));
+            $("#scodeName").text(KBIZST.toDefaultString(r.scodeName,''));
+            $("#recvNote").text(KBIZST.toDefaultString(r.recvNote,''));
+            $("#procNote").text(KBIZST.toDefaultString(r.procNote,''));
+            $("#tellNum").text(KBIZST.parseTell(r.tellNum));
+            $("#cntrNo").text(KBIZST.toDefaultString(r.cntrNo,''));
+            $("#rsrvTellNum").text(KBIZST.parseTell(KBIZST.toDefaultString(r.rsrvTellNum,'')));
+            $("#recUrl").val(KBIZST.toDefaultString(r.recUrl,''));
+            $("#reRecUrl").html(KBIZST.getRecSplit(KBIZST.toDefaultString(r.recUrl,'')));
+            //녹취파일 존재유무
+            var wav = document.getElementById("PlayWav");
+            if($("#recUrl").val() == ""){
+                wav.style.display = "none";
+            }else{
+                wav.style.display = "inline";
+            }
+            PlayWav.Stop();
+        }
+
+        function fn_init() {
+            //document.reserveCallDetailForm.reset();
+            $("#cnltDate").text('');
+            $("#userNm").text('');
+            $("#custNm").text('');
+            $("#rsrvDate").text('');
+            $("#chnlCodeName").text('');
+            $("#lcodeName").text('');
+            $("#mcodeName").text('');
+            $("#scodeName").text('');
+            $("#recvNote").text('');
+            $("#recvNote").text('');
+            $("#procNote").text('');
+            $("#cntrNo").text('');
+            $("#rsrvTellNum").text('');
+            $("#reRecUrl").text('');
+            $("#recUrl").val('');
+        }
+
+      //녹취청취
+        function fn_recUrl(seq){
+             var m_path="http://172.30.2.39:8080/";
+             var recArr = new Array();
+             recArr = ($("#recUrl").val()).split("&");
+             var path = m_path+recArr[seq];
+             //console.log(path);
+             PlayWav.OpenURL(path);
+        }
+    </script>
+</head>
+<body>
+
+<div class="template_wrap">
+<form id="reserveCallSearchForm" name="reserveCallSearchForm" method="post" action="/admin/reserveCallList.view" onsubmit="return false;">
+<input type="hidden" id="pageIdx" name="pageIdx" value="1" />
+<input type="hidden" id="rowsPerPage" name="rowsPerPage" value="10" />
+    <div class="section">
+        <h3><span class="sec_tit">예약내역 검색</span></h3>
+        <table width="100%" border="0"  cellspacing="0" cellpadding="0" class="brd_sch">
+            <colgroup>
+                <col style="width:60px">
+                <col style="width:100px">
+                <col style="width:10px">
+                <col style="width:100px">
+                <col style="width:60px">
+                <col style="width:160px">
+                <col style="width:60px">
+                <col style="width:160px">
+                <col style="width:60px">
+                <col style="width:160px">
+                <col style="width:80px">
+            </colgroup>
+            <tr>
+                <th>예약일자</th>
+                <td><input type="text" name="selFromDt" id="selFromDt" value="" /></td>
+                <th>~</th>
+                <td><input type="text" name="selToDt" id="selToDt" value="" /></td>
+                <th>고객명</th>
+                <td><input type="text" id="selCustNm" name="selCustNm" value="" onkeydown="if(event.keyCode == 13) fn_searchClick();"/></td>
+                <th>연락처</th>
+                <td><input type="text" id="selTellNum" name="selTellNum" value="" placeholder="ex)01012345678" onkeydown="if(event.keyCode == 13) fn_searchClick();" /></td>
+                <th>상담사명</th>
+                <td><input type="text" id="selUserNm" name="selUserNm" value="" onkeydown="if(event.keyCode == 13) fn_searchClick();"/></td>
+                <td class="ar" colspan="2">
+                    <a href="#" class="btn small g_orange" onclick="fn_searchClick();">조회</a>
+                    <a href="#" id="btn_excel" class="btn small g_green" onclick="fn_submit();">엑셀</a>
+                </td>
+             </tr>
+        </table>
+    </div>
+</form>
+
+<div class="section">
+	<div id="reserveCallListView">
+	</div>
+</div>
+<div class="section"><h3><span class="sec_tit">예약내역 상세보기</span></h3></div>
+<div id="reserveCallDetailJson">
+    <form id="reserveCallDetailForm" name="reserveCallDetailForm" method="post" action="/admin/saveReserveCall.json" onsubmit="return false;">
+        <input type="hidden" id="recUrl" name="recUrl" value=""/>
+        <table width="100%" border="0"  cellspacing="0" cellpadding="0" class="brd_sch mgb10">
+             <colgroup>
+                <col style="width:60px">
+                <col style="width:100px">
+                <col style="width:60px">
+                <col style="width:100px">
+                <col style="width:60px">
+                <col style="width:100px">
+                <col style="width:60px">
+                <col style="width:100px">
+                <col style="width:60px">
+                <col style="width:100px">
+            </colgroup>
+            <tbody>
+               <tr>
+                   <th scope="row">상담일시</th>
+                   <td id="cnltDate"></td>
+                   <th scope="row">상담사명</th>
+                   <td id="userNm"></td>
+                   <th scope="row">고객명</th>
+                   <td id="custNm"></td>
+                   <th scope="row">연락처</th>
+                   <td id="tellNum"></td>
+               </tr>
+               <tr>
+                   <th scope="row">인입채널</th>
+                   <td id="chnlCodeName"></td>
+                   <th scope="row">대분류</th>
+                   <td id="lcodeName"></td>
+                   <th scope="row">중분류</th>
+                   <td id="mcodeName"></td>
+                   <th scope="row">소분류</th>
+                   <td id="scodeName"></td>
+               </tr>
+               <tr>
+                   <th scope="row">계약번호</th>
+                   <td id="cntrNo"></td>
+                   <th scope="row">예약일시</th>
+                   <td id="rsrvDate"></td>
+                   <th scope="row">예약전화번호</th>
+                   <td id="rsrvTellNum"></td>
+                   <th colspan="2"></th>
+               </tr>
+               <tr>
+                    <th scope="row">문의</th>
+                    <td colspan="9">
+                        <textarea rows="6" id="recvNote" name="recvNote" readonly="readonly"></textarea>
+                    </td>
+               </tr>
+               <tr>
+                    <th scope="row">답변</th>
+                    <td colspan="9">
+                        <textarea rows="6"  id="procNote" name="procNote" readonly="readonly"></textarea>
+                    </td>
+               </tr>
+               <tr>
+                    <th scope="row">녹취파일</th>
+                    <td colspan="9" id="reRecUrl"></td>
+               </tr>
+            </tbody>
+        </table>
+    </form>
+    </div>
+     <object id='PlayWav' classid='CLSID:5474D51F-02EE-4EB5-AC97-5F27E094EE4D' width='100%' height='115' style="display: none;"></object>
+</div>
+</body>
+</html>

@@ -1,0 +1,120 @@
+package or.kr.kbiz.serv.web.tags;
+
+import java.util.List;
+
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.config.AutowireCapableBeanFactory;
+import org.springframework.web.context.WebApplicationContext;
+import org.springframework.web.servlet.tags.RequestContextAwareTag;
+
+import or.kr.kbiz.bo.common.domain.CommonCodeDomain;
+import or.kr.kbiz.bo.common.service.CommonService;
+
+
+/**
+ * <pre>page navigation element 생성 TAG library</pre>
+ *
+ * @author hyeok
+ * @since 2017.12.05
+ * @version 1.0
+ *
+ */
+public class CommCodeSelectTag extends RequestContextAwareTag {
+
+	private static final long serialVersionUID = -1131086068927100675L;
+
+	@Autowired
+	private CommonService commonService;
+
+	private CommonCodeDomain commonCodeDomain = new CommonCodeDomain();
+	private String firstOption, selectId, selectName, selectClass, title;
+
+	private static final Logger LOG = LoggerFactory.getLogger(CommCodeSelectTag.class);
+
+	@Override
+    protected int doStartTagInternal() throws Exception {
+		if (commonService == null) {
+            WebApplicationContext wac = getRequestContext().getWebApplicationContext();
+            AutowireCapableBeanFactory beanFactory = wac.getAutowireCapableBeanFactory();
+            beanFactory.autowireBean(this);
+        }
+
+		List<CommonCodeDomain> resultList = commonService.getCommonCodeList(commonCodeDomain);
+		StringBuffer sb = new StringBuffer();
+
+		sb.append("<select id=\"");
+		sb.append(selectId);
+		sb.append("\" name=\"");
+		sb.append(selectName);
+		if (selectClass != null) {
+			sb.append("\"");
+			sb.append(" class=\"");
+			sb.append(selectClass);
+		}
+		if (title != null) {
+			sb.append("\"");
+			sb.append(" title=\"");
+			sb.append(title);
+		}
+		sb.append("\">");
+
+		if (firstOption != null) {
+			if (firstOption.equals("ALL")) {
+				sb.append("<option value=\"\">전체</option>");
+			} else if (firstOption.equals("SEL")) {
+				sb.append("<option value=\"\">선택</option>");
+			}
+		}
+
+		if (resultList != null) {
+			for (int i = 0; i < resultList.size(); i++) {
+				sb.append("<option value=\"");
+				sb.append(resultList.get(i).getMcode());
+				sb.append("\">");
+				sb.append(resultList.get(i).getCodeName());
+				sb.append("</option>");
+			}
+		}
+
+		sb.append("</select>");
+
+		pageContext.getOut().write(sb.toString());
+        return SKIP_BODY;
+    }
+
+	public void setLcode(String lcode) {
+		this.commonCodeDomain.setLcode(lcode);
+	}
+
+	public void setRemk1(String remk1) {
+		this.commonCodeDomain.setRemk1(remk1);
+	}
+
+	public void setRemk2(String remk2) {
+		this.commonCodeDomain.setRemk2(remk2);
+	}
+
+	public void setFirstOption(String firstOption) {
+		this.firstOption = firstOption;
+	}
+
+	public void setSelectId(String selectId) {
+		this.selectId = selectId;
+		this.selectName = selectId;
+	}
+
+	public void setSelectName(String selectName) {
+		this.selectName = selectName;
+	}
+
+	public void setSelectClass(String selectClass) {
+		this.selectClass = selectClass;
+	}
+
+	public void setTitle(String title) {
+		this.title = title;
+	}
+
+}

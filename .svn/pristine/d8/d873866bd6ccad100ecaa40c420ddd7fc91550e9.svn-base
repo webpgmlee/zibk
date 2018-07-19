@@ -1,0 +1,195 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper
+  PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+  "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="notice">
+
+    <!-- [공지사항] 목록 조회 -->
+	<select id="select" resultType="NoticeDomain" parameterType="NoticeDomain">
+	       SELECT NOTI_SEQ
+	                , NOTI_TITLE
+	                , NOTI_TYPE_CD
+	                , REG_DATE
+	                , REG_NM
+	                , REMK1
+	                , RNUM
+            FROM (
+	            SELECT
+	                NOTI_SEQ
+                   , NOTI_TITLE
+                   , NOTI_TYPE_CD
+                   , REG_DATE
+                   , REG_NM
+                   , REMK1
+	                , ROWNUM AS RNUM
+                    FROM (
+                        SELECT  NOTI_SEQ
+                           , NOTI_TITLE
+                           , NOTI_TYPE_CD
+                           , REG_NM
+                           , REMK1
+                           , REG_DATE FROM(
+							       SELECT A.NOTI_SEQ
+						                    , A.NOTI_TITLE
+						                    , A.NOTI_TYPE_CD
+                                            , A.REG_DATE
+                                            , (SELECT REMK1 FROM TH_CODE WHERE LCODE='004' AND MCODE = A.NOTI_TYPE_CD) AS REMK1
+						                    , B.USER_NM AS REG_NM
+										  FROM TH_NOTICE A, IF_CO_USER_MA B
+									     WHERE 1=1
+									         AND A.REG_ID = B.USER_ID
+			                                 AND A.NOTI_TYPE_CD='07'
+									         <if test="selRegNm != null and selRegNm != '' ">
+									         AND B.USER_NM LIKE '%'|| #{selRegNm} ||'%'
+									         </if>
+									         <if test="selKeyword != null and selKeyword != '' ">
+						                     AND (A.NOTI_TITLE LIKE '%'|| #{selKeyword} ||'%' OR A.NOTI_CONTENTS  LIKE '%'|| #{selKeyword} ||'%')
+						                     </if>
+						                     <if test="selNotiTypeCd != null and selNotiTypeCd != '' ">
+						                     AND A.NOTI_TYPE_CD =  #{selNotiTypeCd}
+						                     </if>
+						                     <if test="selFromDt != null and selFromDt != '' ">
+						                     AND A.REG_DATE BETWEEN TO_DATE(#{selFromDt},'YYYY-MM-DD') AND (TO_DATE(#{selToDt},'YYYY-MM-DD') +1)
+						                     </if>
+						                  ORDER BY A.REG_DATE DESC
+						                  )
+						             UNION ALL
+						             SELECT  NOTI_SEQ
+					                           , NOTI_TITLE
+					                           , NOTI_TYPE_CD
+					                           , REG_NM
+					                           , REMK1
+					                           , REG_DATE FROM(
+								             SELECT A.NOTI_SEQ
+					                                , A.NOTI_TITLE
+					                                , A.NOTI_TYPE_CD
+                                                    , (SELECT REMK1 FROM TH_CODE WHERE LCODE='004' AND MCODE = A.NOTI_TYPE_CD) AS REMK1
+					                                , A.REG_DATE
+					                                , B.USER_NM AS REG_NM
+					                              FROM TH_NOTICE A, IF_CO_USER_MA B
+					                             WHERE 1=1
+					                                 AND A.REG_ID = B.USER_ID
+					                                 AND A.NOTI_TYPE_CD<![CDATA[<>]]>'07'
+					                                 <if test="selRegNm != null and selRegNm != '' ">
+					                                 AND B.USER_NM LIKE '%'|| #{selRegNm} ||'%'
+					                                 </if>
+					                                 <if test="selKeyword != null and selKeyword != '' ">
+					                                 AND (A.NOTI_TITLE LIKE '%'|| #{selKeyword} ||'%' OR A.NOTI_CONTENTS  LIKE '%'|| #{selKeyword} ||'%')
+					                                 </if>
+					                                 <if test="selNotiTypeCd != null and selNotiTypeCd != '' ">
+					                                 AND A.NOTI_TYPE_CD =  #{selNotiTypeCd}
+					                                 </if>
+					                                 <if test="selFromDt != null and selFromDt != '' ">
+					                                 AND A.REG_DATE BETWEEN TO_DATE(#{selFromDt},'YYYY-MM-DD') AND (TO_DATE(#{selToDt},'YYYY-MM-DD') +1)
+					                                 </if>
+					                              ORDER BY A.REG_DATE DESC
+					                              )
+		                      )
+		         )
+         WHERE RNUM BETWEEN #{fromRowPerPage} AND #{toRowPerPage}
+	</select>
+
+    <!--[공지사항] 페이징  -->
+    <select id="selectNoticeTotalCount" resultType="int">
+        SELECT
+            COUNT(*) AS TOTALCNT
+         FROM TH_NOTICE A, IF_CO_USER_MA B
+        WHERE 1=1
+            AND A.REG_ID = B.USER_ID
+            <if test="selRegNm != null and selRegNm != '' ">
+            AND B.USER_NM LIKE '%'|| #{selRegNm} ||'%'
+            </if>
+            <if test="selKeyword != null and selKeyword != '' ">
+            AND (A.NOTI_TITLE LIKE '%'|| #{selKeyword} ||'%' OR A.NOTI_CONTENTS  LIKE '%'|| #{selKeyword} ||'%')
+            </if>
+            <if test="selNotiTypeCd != null and selNotiTypeCd != '' ">
+            AND A.NOTI_TYPE_CD =  #{selNotiTypeCd}
+            </if>
+            <if test="selFromDt != null and selFromDt != '' ">
+            AND A.REG_DATE BETWEEN TO_DATE(#{selFromDt},'YYYY-MM-DD') AND (TO_DATE(#{selToDt},'YYYY-MM-DD') +1)
+            </if>
+    </select>
+
+	<!-- [공지사항] 상세목록 조회 -->
+    <select id="selectDetail" resultType="NoticeDomain" parameterType="NoticeDomain">
+        SELECT A.NOTI_SEQ
+                  , A.NOTI_TITLE
+                  , A.NOTI_TYPE_CD
+                  , A.NOTI_CONTENTS
+                  , A.NOTI_FILENAME
+                  , A.NOTI_DISP_DATE
+                  , A.NOTI_DEL_YN
+                  , DECODE(A.REG_ID,#{loginUserId},'true','false') AS AUTH_FLAG
+              <!--     , A.REG_DATE
+                  , B.USER_NM AS REG_NM
+                  , A.MOD_DATE
+                  , B.USER_NM AS MOD_NM
+                  , A.MOD_ID -->
+          FROM TH_NOTICE A
+         WHERE 1=1
+             AND A.NOTI_SEQ = #{notiSeq}
+
+    </select>
+
+	<select id="currNoticeSeq" resultType="integer">
+		SELECT MAX(NOTI_SEQ) FROM TH_NOTICE
+	</select>
+
+	<update id="updateFile" parameterType="NoticeDomain">
+		UPDATE TH_NOTICE SET
+		NOTI_FILENAME = #{notiFilename},
+		NOTI_FILEPATH = #{notiFilepath}
+		WHERE NOTI_SEQ = #{notiSeq}
+	</update>
+
+    <!-- [공지사항] 저장 -->
+    <insert id="insertNotice" parameterType="NoticeDomain">
+     INSERT INTO TH_NOTICE(
+              NOTI_SEQ
+            , NOTI_TITLE
+            , NOTI_TYPE_CD
+            , NOTI_CONTENTS
+            , NOTI_DISP_DATE
+            , REG_DATE
+            , REG_ID
+            , MOD_DATE
+            , MOD_ID
+     )VALUES(
+             SEQ_TH_NOTICE .NEXTVAL
+            ,#{notiTitle}
+            ,#{notiTypeCd}
+            ,#{notiContents}
+            ,#{notiDispDate}
+            ,sysdate
+            ,#{loginUserId}
+            ,sysdate
+            ,#{loginUserId}
+     )
+    </insert>
+
+    <!-- [공지사항] 수정 -->
+    <update id="updateNotice" parameterType="NoticeDomain">
+        UPDATE TH_NOTICE SET
+             NOTI_TITLE            = #{notiTitle}
+            ,NOTI_TYPE_CD        = #{notiTypeCd}
+            , NOTI_CONTENTS     = #{notiContents}
+            , NOTI_DISP_DATE    = #{notiDispDate}
+            , MOD_DATE             = sysdate
+            , MOD_ID                 = #{loginUserId}
+         WHERE NOTI_SEQ         = #{notiSeq}
+    </update>
+
+    <!-- [공지사항] 삭제 -->
+    <update id="deleteNotice" parameterType="int">
+        DELETE FROM  TH_NOTICE
+         WHERE NOTI_SEQ = #{notiSeq}
+    </update>
+
+	<!-- [공지사항] 상시공지 최대3개 -->
+    <select id="notiTypeMax" parameterType="String" resultType="NoticeDomain">
+    SELECT COUNT(*) AS TYPE_MAX
+      FROM TH_NOTICE
+    WHERE NOTI_TYPE_CD = #{notiTypeCd}
+
+    </select>
+</mapper>

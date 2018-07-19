@@ -1,0 +1,79 @@
+<!doctype html>
+<html lang="ko">
+<head>
+<meta http-equiv="content-type" content="text/html; charset=utf-8">
+<meta http-equiv="X-UA-Compatible" content="IE=edge">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, minimum-scale=1.0, user-scalable=no">
+<meta name="subject" content="KBIZ">
+<meta name="author" content="KBIZ">
+<meta name="keywords" content="KBIZ">
+<meta name="description" content="KBIZ">
+<title>KBIZ</title>
+<script type="text/javascript" src="http://code.jquery.com/jquery-latest.min.js"></script>
+<script type="text/javascript" src="js/common.js"></script>
+<link rel="stylesheet" href="css/reset.css" type="text/css" media="screen" />
+<link rel="stylesheet" href="css/common.css" type="text/css" media="screen" />
+<script type="text/javascript">
+
+</script>
+<style>
+
+</style>
+</head>
+
+<body style="overflow:hidden">
+<div class="admin_warp">
+	<div class="admin_header">
+		<!--상단메뉴//-->
+		<form id="softphfrm" name="softphfrm">
+		<input type="hidden" name="hid_userid" id="hid_userid" value="" />                              
+		<input type="hidden" name="hid_state" id="hid_state" value="" />
+		<div class="gnb_wrap clfix">                                
+			<dl class="gnb clfix fl">
+				<dt><h1><img src="img/logo_admin.png" border="0"></h1></dt>
+				<dd class="bgnone"><a href="#"><span><img src="img/index_type01_05.png"></span>전화걸기</a><!--<img src="./images/softphone/topmenu02_off.gif" border="0" name="image1" id="image1" onMouseOut="f_MA_out('1')" onMouseOver="f_MA_over('1')"  onClick="JavaScript:onMakeCall(parent.mainFrame.topFrame2.custfrm.dnis_num);" style="cursor:pointer;"  />--></dd><!-- 전화걸기 -->
+				<dd><a href="#"><span><img src="img/index_type01_07.png"></span>전화받기</a><!--<img src="./images/softphone/topmenu03_off.gif" name="image2" id="image2" onMouseOut="f_MA_out('2')" onMouseOver="f_MA_over('2')"  onClick="JavaScript:f_onAnswer();f_btnOff('2');" border="0" style="cursor:pointer;" />--></dd><!-- 전화받기 -->
+				<dd><a href="#"><span><img src="img/index_type01_09.png"></span>전화끊기</a><!--<img src="./images/softphone/topmenu04_off.gif" name="image3" id="image3" onMouseOut="f_MA_out('3')" onMouseOver="f_MA_over('3')"  onClick="JavaScript:f_onEnd();f_btnOff('2');" border="0" style="cursor:pointer;" />--></dd><!-- 전화끊기 -->
+				<dd><a href="#"><span><img src="img/index_type01_11.png"></span>보류</a><!--<img src="./images/softphone/topmenu05_off.gif" border="0" name="image4" id="image4" onMouseOut="f_MA_out('4')" onMouseOver="f_MA_over('4')"  onClick="JavaScript:f_onHold();" style="cursor:pointer;" />--></dd><!-- 보류 -->
+				<dd><a href="#"><span><img src="img/index_type01_13.png"></span>전환요청</a><!--<img src="./images/softphone/topmenu06_off.gif" border="0" name="image5" id="image5" onMouseOut="f_MA_out('5')" onMouseOver="f_MA_over('5')"  onClick="JavaScript:f_trans_popup();" style="cursor:pointer;" />--></dd><!-- 전환요청 -->
+				<dd><a href="#"><span><img src="img/index_type01_15.png"></span>대기</a><!--<img src="./images/softphone/topmenu01_off.gif" border="0" name="image6" id="image6" onMouseOut="f_MA_out('6')" onMouseOver="f_MA_over('6')"  onClick="JavaScript:f_call_chg_state('0');f_callwait();" style="cursor:pointer;" />--></dd><!-- 대기 -->                
+				<dd><a href="#"><span><img src="img/index_type01_17.png"></span>후처리</a><!--<img src="./images/softphone/topmenu07_off.gif" border="0" name="image7" id="image7" />--></dd><!-- 후처리 -->
+				<dd><a href="#"><span><img src="img/index_type01_19.png"></span><span id="away">이석</span></a><!--<img src="./images/softphone/topmenu08_off.gif" border="0" name="image7" id="image7" />-->
+					<div class="away">
+						<ul>
+							<li><a href="#">이석</a></li> 
+							<li><a href="#">회의중 </a></li> 
+							<li><a href="#">작업중</a></li> 
+							<li><a href="#">식사중</a></li> 
+							<li><a href="#">휴식중</a></li> 
+						</ul>
+					</div>
+				</dd>
+			</dl>
+			<div class="fr" style="padding:11px">
+			<button type="button" class="btn small g_lightgray">로그아웃</button><!--<img src="./images/logout.gif" border="0" style="cursor:pointer;" onClick="JavaScript:f_logout();" >--> <!--<input type="button" value="패킷전송" onclick="f_callset('A0003|3000|0415516587|11653');" class="btn small g_darkgray" style="cursor:pointer" />-->
+			</div>
+		</div>
+		</form>	
+		<!--//상단메뉴-->
+	</div>
+	<div class="admin_container">
+		<div class="admin_lnb">
+			<!--좌측메뉴//-->
+			<div class="lnb_wrap">
+				<ul class="lnb">
+					<li><a href="frame_index.html" target="_parent">MAIN</a><!--<img src="./images/left_main_v.gif" name="image1" id="image1" border="0" align="absmiddle" style="cursor:pointer;" onMouseOut="f_MA_out('1')" onMouseOver="f_MA_over('1')" onClick="JavaScript:m_flag='1';f_MA_restore();f_click_link('main');" >--></li>
+					<li><a href="frame_main.html" target="_parent">IN</a><!--<img src="./images/left_in_d.gif" name="image2" id="image2" border="0" align="absmiddle" style="cursor:pointer;" onMouseOut="f_MA_out('2')" onMouseOver="f_MA_over('2')" onClick="JavaScript:m_flag='2';f_MA_restore();f_click_link('in');" >--></li>
+					<li><a href="#">MYPAGE</a><!--<img src="./images/left_mypage_d.gif" name="image3" id="image3" border="0" align="absmiddle" style="cursor:pointer;" onMouseOut="f_MA_out('3')" onMouseOver="f_MA_over('3')" onClick="JavaScript:m_flag='3';f_MA_restore();f_click_link('mypage');">--></li>
+					<li class="on"><a href="admin.html" target="_parent">ADMIN</a><!--<img src="./images/left_admin_d.gif" name="image4" id="image4" border="0" align="absmiddle" style="cursor:pointer;" onMouseOut="f_MA_out('4')" onMouseOver="f_MA_over('4')" onClick="JavaScript:m_flag='4';f_MA_restore();f_click_link('admin');" >--></li>
+				</ul>
+			</div>		
+			<!--//좌측메뉴-->
+		</div>
+		<div class="admin_content">
+			<iframe name="frmpaging" src="crud_sample.html" style="border:none; overflow:hidden; width:100%; height:100%"></iframe>
+		</div>
+	</div>
+</div>
+</body>
+</html>

@@ -1,0 +1,186 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper
+  PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+  "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="reserve">
+
+    <!-- [예약내역] 목록 조회 -->
+	<select id="select" resultType="ReserveCallDomain" parameterType="ReserveCallDomain">
+            SELECT CNLT_SEQ
+                    , CNLT_DETAIL_NO
+                    , CNLT_PROC_CD
+                    , CNLT_DATE
+                    , TELL_NUM
+                    , USER_NM
+                    , CHNL_CODE
+                    , CHNL_CODE_NAME
+                    , LCODE_NAME
+                    , MCODE_NAME
+                    , SCODE_NAME
+                    , REG_DATE
+                    , RSRV_DATE
+                    , RSRV_TELL_NUM
+                    , CUST_NM
+                    , REC_URL
+                    , RNUM
+            FROM (
+                SELECT
+                      CNLT_SEQ
+                    , CNLT_DETAIL_NO
+                    , CNLT_PROC_CD
+                    , CNLT_DATE
+                    , TELL_NUM
+                    , USER_NM
+                    , CHNL_CODE
+                    , CHNL_CODE_NAME
+                    , LCODE_NAME
+                    , MCODE_NAME
+                    , SCODE_NAME
+                    , REG_DATE
+                    , RSRV_DATE
+                    , RSRV_TELL_NUM
+                    , CUST_NM
+                    , REC_URL
+                    , ROWNUM AS RNUM
+                    FROM (
+				       SELECT A.CNLT_SEQ
+			                    , A.CNLT_DETAIL_NO
+			                    , A.CNLT_PROC_CD
+			                    , A.CNLT_DATE
+			                    , A.TELL_NUM
+			                    , C.USER_NM AS USER_NM
+			                    , A.CHNL_CODE
+			                     , (SELECT CODE_NAME FROM TH_CONSULT_CODE WHERE CHNL_CODE = A.CHNL_CODE AND LCODE='00' AND MCODE='00' AND SCODE='00') AS CHNL_CODE_NAME
+			                    , (SELECT CODE_NAME FROM TH_CONSULT_CODE WHERE CHNL_CODE = A.CHNL_CODE AND LCODE=A.LCODE AND LCODE <![CDATA[<>]]> '00' AND MCODE='00' AND SCODE='00') AS LCODE_NAME
+								, (SELECT CODE_NAME FROM TH_CONSULT_CODE WHERE CHNL_CODE = A.CHNL_CODE AND LCODE=A.LCODE AND MCODE=A.MCODE AND MCODE <![CDATA[<>]]> '00' AND SCODE='00') AS MCODE_NAME
+								, (SELECT CODE_NAME FROM TH_CONSULT_CODE WHERE CHNL_CODE = A.CHNL_CODE AND LCODE=A.LCODE AND MCODE=A.MCODE AND SCODE=A.SCODE AND SCODE <![CDATA[<>]]> '00') AS SCODE_NAME
+								, A.REG_DATE
+			                    , A.RSRV_DATE
+			                    , A.RSRV_TELL_NUM
+			                    , (SELECT CUST_NM FROM TH_CONSULT WHERE CNLT_SEQ = B.CNLT_SEQ) AS CUST_NM
+			                    , A.REC_URL
+                        FROM TH_CONSULT_DETAIL  A , TH_RESERVE B ,IF_CO_USER_MA C
+				      WHERE 1=1
+						  AND A.CNLT_SEQ = B.CNLT_SEQ
+                          AND A.CNLT_DETAIL_NO = B.CNLT_DETAIL_NO
+                          AND A.USER_ID = C.USER_ID
+						  AND A.CNLT_PROC_CD = '02'
+			              <if test="selCustNm != null and selCustNm != ''">
+                          AND A.CNLT_SEQ IN (SELECT CNLT_SEQ FROM TH_CONSULT WHERE CUST_NM LIKE '%'|| #{selCustNm} ||'%')
+			              </if>
+			              <if test="selTellNum != null and selTellNum != ''">
+			              AND A.TELL_NUM  LIKE '%'|| #{selTellNum} ||'%'
+			              </if>
+			              <if test="selUserNm != null and selUserNm != ''">
+			              AND C.USER_NM LIKE '%'|| #{selUserNm} ||'%'
+			              </if>
+			              <if test="selFromDt != null and selFromDt != ''">
+			               AND A.RSRV_DATE  BETWEEN TO_DATE(#{selFromDt},'YYYY-MM-DD') AND (TO_DATE(#{selToDt},'YYYY-MM-DD') +1)
+			              </if>
+              ORDER BY A.CNLT_DATE DESC
+                           )
+                 )
+         WHERE RNUM BETWEEN #{fromRowPerPage} AND #{toRowPerPage}
+	</select>
+
+	<!--[예약내역] 페이징  -->
+    <select id="selectReserveCallTotalCount" resultType="int">
+        SELECT
+            COUNT(*) AS TOTALCNT
+           FROM TH_CONSULT_DETAIL  A , TH_RESERVE B ,IF_CO_USER_MA C
+         WHERE 1=1
+             AND A.CNLT_SEQ = B.CNLT_SEQ
+              AND A.CNLT_DETAIL_NO = B.CNLT_DETAIL_NO
+             AND A.USER_ID = C.USER_ID
+             AND A.CNLT_PROC_CD = '02'
+             <if test="selCustNm != null and selCustNm != ''">
+              AND A.CNLT_SEQ IN (SELECT CNLT_SEQ FROM TH_CONSULT WHERE CUST_NM LIKE '%'|| #{selCustNm} ||'%')
+             </if>
+             <if test="selTellNum != null and selTellNum != ''">
+             AND A.TELL_NUM  LIKE '%'|| #{selTellNum} ||'%'
+             </if>
+             <if test="selUserNm != null and selUserNm != ''">
+             AND C.USER_NM LIKE '%'|| #{selUserNm} ||'%'
+             </if>
+             <if test="selFromDt != null and selFromDt != ''">
+              AND A.RSRV_DATE  BETWEEN TO_DATE(#{selFromDt},'YYYY-MM-DD') AND (TO_DATE(#{selToDt},'YYYY-MM-DD') +1)
+             </if>
+    </select>
+
+    <!-- [예약내역] 상세목록 조회 -->
+    <select id="selectDetail" resultType="ReserveCallDomain" parameterType="ReserveCallDomain">
+           SELECT A.CNLT_SEQ
+                    , A.CNLT_DETAIL_NO
+                    , A.CNLT_PROC_CD
+                    , A.CNLT_DATE
+                    , A.TELL_NUM
+                    , C.USER_NM AS USER_NM
+                    , A.REG_DATE
+                    , A.RSRV_DATE
+                    , A.RSRV_TELL_NUM
+                    , A.RECV_NOTE
+                    , A.PROC_NOTE
+                    , A.CHNL_CODE
+                     , A.CNTR_NO
+	                 , (SELECT CODE_NAME FROM TH_CONSULT_CODE WHERE CHNL_CODE = A.CHNL_CODE AND LCODE='00' AND MCODE='00' AND SCODE='00') AS CHNL_CODE_NAME
+	                 , A.LCODE
+	                 , (SELECT CODE_NAME FROM TH_CONSULT_CODE WHERE CHNL_CODE = A.CHNL_CODE AND LCODE=A.LCODE AND LCODE <![CDATA[<>]]> '00' AND MCODE='00' AND SCODE='00') AS LCODE_NAME
+	                 , A.MCODE
+	                 , (SELECT CODE_NAME FROM TH_CONSULT_CODE WHERE CHNL_CODE = A.CHNL_CODE AND LCODE=A.LCODE AND MCODE=A.MCODE AND MCODE <![CDATA[<>]]> '00' AND SCODE='00') AS MCODE_NAME
+	                 , A.SCODE
+	                 , (SELECT CODE_NAME FROM TH_CONSULT_CODE WHERE CHNL_CODE = A.CHNL_CODE AND LCODE=A.LCODE AND MCODE=A.MCODE AND SCODE=A.SCODE AND SCODE <![CDATA[<>]]> '00') AS SCODE_NAME
+	                , A.TELL_NUM
+                    , (SELECT CUST_NM FROM TH_CONSULT WHERE CNLT_SEQ = B.CNLT_SEQ) AS CUST_NM
+                    , A.REC_URL
+            FROM TH_CONSULT_DETAIL  A , TH_RESERVE B ,IF_CO_USER_MA C
+          WHERE 1=1
+              AND A.CNLT_SEQ = B.CNLT_SEQ
+              AND A.CNLT_DETAIL_NO = B.CNLT_DETAIL_NO
+              AND A.USER_ID = C.USER_ID
+              AND A.CNLT_PROC_CD = '02'
+             AND A.CNLT_SEQ = #{cnltSeq}
+             AND A.CNLT_DETAIL_NO = #{cnltDetailNo}
+    </select>
+
+    <!-- [예약내역 엑셀] 목록 조회 -->
+    <select id="selectExcel" resultType="ReserveCallDomain" parameterType="ReserveCallDomain">
+           SELECT A.CNLT_SEQ
+                    , A.CNLT_DETAIL_NO
+                    , A.CNLT_PROC_CD
+                    , A.CNLT_DATE
+                    , A.TELL_NUM
+                    , C.USER_NM AS USER_NM
+                    , A.CHNL_CODE
+                     , (SELECT CODE_NAME FROM TH_CONSULT_CODE WHERE CHNL_CODE = A.CHNL_CODE AND LCODE='00' AND MCODE='00' AND SCODE='00') AS CHNL_CODE_NAME
+                    , (SELECT CODE_NAME FROM TH_CONSULT_CODE WHERE CHNL_CODE = A.CHNL_CODE AND LCODE=A.LCODE AND LCODE <![CDATA[<>]]> '00' AND MCODE='00' AND SCODE='00') AS LCODE_NAME
+                    , (SELECT CODE_NAME FROM TH_CONSULT_CODE WHERE CHNL_CODE = A.CHNL_CODE AND LCODE=A.LCODE AND MCODE=A.MCODE AND MCODE <![CDATA[<>]]> '00' AND SCODE='00') AS MCODE_NAME
+                    , (SELECT CODE_NAME FROM TH_CONSULT_CODE WHERE CHNL_CODE = A.CHNL_CODE AND LCODE=A.LCODE AND MCODE=A.MCODE AND SCODE=A.SCODE AND SCODE <![CDATA[<>]]> '00') AS SCODE_NAME
+                    , A.REG_DATE
+                    , A.RSRV_DATE
+                    , A.RSRV_TELL_NUM
+	                , A.PROC_NOTE
+                    , A.RECV_NOTE
+                    , A.CNTR_NO
+                   , (SELECT CUST_NM FROM TH_CONSULT WHERE CNLT_SEQ = B.CNLT_SEQ) AS CUST_NM
+           FROM TH_CONSULT_DETAIL  A , TH_RESERVE B ,IF_CO_USER_MA C
+         WHERE 1=1
+             AND A.CNLT_SEQ = B.CNLT_SEQ
+             AND A.CNLT_DETAIL_NO = B.CNLT_DETAIL_NO
+             AND A.USER_ID = C.USER_ID
+              AND A.CNLT_PROC_CD = '02'
+              <if test="selCustNm != null and selCustNm != ''">
+              AND A.CNLT_SEQ IN (SELECT CNLT_SEQ FROM TH_CONSULT WHERE CUST_NM LIKE '%'|| #{selCustNm} ||'%')
+              </if>
+              <if test="selTellNum != null and selTellNum != ''">
+              AND A.TELL_NUM  LIKE '%'|| #{selTellNum} ||'%'
+              </if>
+              <if test="selUserNm != null and selUserNm != ''">
+              AND C.USER_NM LIKE '%'|| #{selUserNm} ||'%'
+              </if>
+              <if test="selFromDt != null and selFromDt != ''">
+               AND A.RSRV_DATE  BETWEEN TO_DATE(#{selFromDt},'YYYY-MM-DD') AND (TO_DATE(#{selToDt},'YYYY-MM-DD') +1)
+              </if>
+    ORDER BY A.CNLT_DATE DESC
+    </select>
+
+</mapper>

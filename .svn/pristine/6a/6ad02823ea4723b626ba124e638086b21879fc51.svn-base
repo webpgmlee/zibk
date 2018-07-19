@@ -1,0 +1,58 @@
+package or.kr.kbiz.bo.login.controller;
+
+import javax.servlet.http.HttpServletRequest;
+import javax.servlet.http.HttpSession;
+
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.stereotype.Controller;
+import org.springframework.ui.Model;
+import org.springframework.web.bind.annotation.ModelAttribute;
+import org.springframework.web.bind.annotation.RequestMapping;
+
+import or.kr.kbiz.bo.login.domain.LoginUserDomain;
+import or.kr.kbiz.bo.login.service.LoginUserService;
+
+/**
+ * <pre>로그인 컨트롤러</pre>
+ *
+ * @author hyeok
+ * @since 2018.01.04
+ * @version 1.0
+ */
+
+@Controller
+public class LoginUserController {
+
+	private static final Logger LOG = LoggerFactory.getLogger(LoginUserController.class);
+
+	@Autowired
+	LoginUserService loginUserService;
+
+	@RequestMapping(value="/login")
+	public String login(Model model) {
+		return "login";
+	}
+
+	@RequestMapping(value="/execLogin")
+	public void execLogin(@ModelAttribute LoginUserDomain loginUserDomain, HttpServletRequest request, Model model) {
+		model.addAttribute("result", loginUserService.execLogin(loginUserDomain, request));
+	}
+
+	@RequestMapping(value="/execLogout")
+	public void execLogout(HttpServletRequest request, Model model) {
+		HttpSession session = request.getSession();
+		session.removeAttribute("id");
+		session.removeAttribute("name");
+		session.removeAttribute("callApGrade");
+		session.removeAttribute("ctiDevice");
+		session.invalidate();
+	}
+
+	@RequestMapping(value="/execChngPswd")
+	public void execChngPswd(@ModelAttribute LoginUserDomain loginUserDomain, HttpServletRequest request, Model model) {
+		model.addAttribute("result", loginUserService.execChngPswd(loginUserDomain));
+	}
+
+}

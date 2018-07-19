@@ -1,0 +1,82 @@
+<%@ taglib prefix="c" uri="/WEB-INF/tld/c.tld" %>
+<!doctype html>
+<jsp:include page="/WEB-INF/jsp/comm_top.jsp"/>
+<html lang="ko">
+<head>
+<meta http-equiv="content-type" content="text/html; charset=utf-8">
+<meta http-equiv="X-UA-Compatible" content="IE=edge">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, minimum-scale=1.0, user-scalable=no">
+<meta name="subject" content="KBIZ">
+<meta name="author" content="KBIZ">
+<meta name="keywords" content="KBIZ">
+<meta name="description" content="KBIZ">
+<link rel="stylesheet" href="/css/common.css" type="text/css" media="screen" />
+<link rel="stylesheet" href="/css/reset.css" type="text/css" media="screen" />
+<title>KBIZ</title>
+</head>
+<body>
+<div class="wrap">
+	<div class="sch_wap">
+		<c:if test="${startCon ne null}">
+			<c:if test="${chnlCode ne null}">
+	    		<iframe name="custFrame" id="custFrame" src="/inbound/customer/custInfo.do?chnlCode=${chnlCode}&startCon=${startCon}" class="frame"></iframe>
+	    	</c:if>
+	    	<c:if test="${chnlCode eq null}">
+	    		<iframe name="custFrame" id="custFrame" src="/inbound/customer/custInfo.do?chnlCode=&startCon=${startCon}" class="frame"></iframe>
+	    	</c:if>
+	    </c:if>
+	    <c:if test="${startCon eq null}">
+			<c:if test="${chnlCode ne null}">
+	    		<iframe name="custFrame" id="custFrame" src="/inbound/customer/custInfo.do?chnlCode=${chnlCode}&startCon=" class="frame"></iframe>
+	    	</c:if>
+	    	<c:if test="${chnlCode eq null}">
+	    		<iframe name="custFrame" id="custFrame" src="/inbound/customer/custInfo.do?chnlCode=&startCon=" class="frame"></iframe>
+	    	</c:if>
+	    </c:if>
+    </div>
+    <div class="container">
+        <table width="100%" border="0" cellspacing="0" cellpadding="0" class="frame_wrap">
+            <colgroup>
+                <col style="width:57%">
+                <col style="width:43%">
+            </colgroup>
+            <tr>
+				<td style="height:50%">
+					<c:if test="${startCon ne null}">
+						<c:if test="${chnlCode eq null}">
+							<iframe name="conFrame" id="conFrame" src="/inbound/consult/consult.do?chnlCode=&startCon=${startCon}" class="frame"></iframe>
+						</c:if>
+						<c:if test="${chnlCode ne null}">
+							<iframe name="conFrame" id="conFrame" src="/inbound/consult/consult.do?chnlCode=${chnlCode}&startCon=${startCon}" class="frame"></iframe>
+						</c:if>
+					</c:if>
+					<c:if test="${startCon eq null}">
+						<c:if test="${chnlCode eq null}">
+							<iframe name="conFrame" id="conFrame" src="/inbound/consult/consult.do?chnlCode=&startCon=" class="frame"></iframe>
+						</c:if>
+						<c:if test="${chnlCode ne null}">
+							<iframe name="conFrame" id="conFrame" src="/inbound/consult/consult.do?chnlCode=${chnlCode}&startCon=" class="frame"></iframe>
+						</c:if>
+					</c:if>
+				</td>
+				<c:if test="${chnlCode ne null}">
+                <td style="height:50%" rowspan="2"><iframe name="noticeFrame" id="noticeFrame" src="/inbound/notice/notice.do?chnlCode=${chnlCode}" class="frame"></iframe></td>
+            	</c:if>
+            	<c:if test="${chnlCode eq null}">
+            	<td style="height:50%" rowspan="2"><iframe name="noticeFrame" id="noticeFrame" src="/inbound/notice/notice.do?" class="frame"></iframe></td>
+            	</c:if>
+            </tr>
+            <tr>
+				<td style="height:50%;"><iframe name="conInfoFrame" id="conInfoFrame" src="/inbound/consult/consultInfo.do" class="frame"></iframe></td>
+				<%-- <c:if test="${chnlCode ne null}">
+                	<td style="height:50%;"><iframe name="knowledgeFrame" id="knowledgeFrame" src="/inbound/knowledge/knowledge.do?keyword=&chnlCode=${chnlCode}" class="frame"></iframe></td>
+            	</c:if>
+            	<c:if test="${chnlCode eq null}">
+            		<td style="height:50%;"><iframe name="knowledgeFrame" id="knowledgeFrame" src="/inbound/knowledge/knowledge.do?keyword=" class="frame"></iframe></td>
+            	</c:if> --%>
+            </tr>
+        </table>
+    </div>
+</div>
+</body>
+</html>

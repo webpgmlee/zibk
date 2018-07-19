@@ -1,0 +1,179 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper
+  PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+  "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="kbizinbound">
+	<!-- 상담내용 저장2(차세대) -->
+	<insert id="insertConsultDetail2" parameterType="ConsultDetailDomain">
+			INSERT INTO TB_CM_CSCOT_M
+			(
+				CSL_SEQNO, CSL_DETL_SN, CSL_PRCS_DSCD,
+				CSL_DTM, UNTY_CSNO, CS_KRN_NM,
+				UNTY_CNTR_NO, CNTR_NO, CSL_BGN_DTM,
+				CSL_END_DTM, CSL_TLNO, TECO_YN,
+				CSL_INBN_OTBN_DSCD, VRC_URL_ADR, VRC_NO,
+				CSL_DCTNS, CSL_ANSW_DCTNS, CSLER_NM,
+				CSL_CHNL_DSCD, SCL_DSCD, MCL_DSCD,
+				LCL_DSCD, TRNSF_PRCS_CHRPN_NM, RSRVT_DTM,
+				RSRVT_TLNO, FRST_REGPN_ID, FRST_REG_DTM,
+				FNL_UDTPN_ID, FNL_UDT_DTM
+			)
+			VALUES
+			(
+				#{cnltSeq}, #{cnltDetailNo}, #{cnltProcCd},
+				TO_DATE(#{cnltDate},'YYYY-MM-DD HH24:MI:SS'), #{custNo, jdbcType=VARCHAR}, #{custNm, jdbcType=VARCHAR},
+				#{untyCntrNo, jdbcType=VARCHAR}, #{cntrNo, jdbcType=VARCHAR}, TO_DATE(#{callStartDate},'YYYY-MM-DD HH24:MI:SS'),
+				TO_DATE(#{callEndDate},'YYYY-MM-DD HH24:MI:SS'), #{tellNum}, 'Y',
+				'I', #{recUrl, jdbcType=VARCHAR}, #{recKey, jdbcType=VARCHAR},
+				#{recvNote}, #{procNote}, #{userNm, jdbcType=VARCHAR},
+				#{chnlCode}, #{scode}, #{mcode},
+				#{lcode}, #{tranId, jdbcType=VARCHAR}, TO_DATE(#{rsrvDate, jdbcType=VARCHAR},'YYYY-MM-DD HH24:MI:SS'),
+				#{rsrvTellNum, jdbcType=VARCHAR}, #{regId}, sysdate,
+				#{modId}, sysdate
+			)
+	</insert>
+
+	<!-- 고객조회 검색조건 -->
+	<select id="selectCsSearch" resultType="CustomerDomain" parameterType="CustomerDomain">
+		SELECT
+			    DISTINCT A.UNTY_CSNO,
+                A.CS_KRN_NM,
+			    A.CS_DSCD,
+                B.TLNO,
+                A.CS_SRCH_NO
+			FROM VW_CM_UNTYCS_M_01 A, VW_CM_CNPL_M_01 B
+                WHERE A.UNTY_CSNO = B.UNTY_CSNO
+                <if test=" tlno != null and tlno !='' ">
+                AND B.TLNO=#{tlno}
+                </if>
+                <if test=" csKrnNm != null and csKrnNm !='' ">
+                AND A.CS_KRN_NM like '%' || #{csKrnNm} || '%'
+                </if>
+                AND NVL(B.UNTY_CNTR_NO,'N') != 'N'
+                <if test=" csDscd != null and csDscd !='' ">
+                AND A.CS_DSCD like '%' || #{csDscd} || '%'
+                </if>
+                AND NVL(A.CS_DSCD,'N') != 'N'
+	</select>
+
+	<!-- 고객번호조회 -->
+	<select id="selectUntyCsno" parameterType="CustomerDomain" resultType="CustomerDomain">
+		SELECT
+			DISTINCT(A.UNTY_CSNO),
+			B.CS_DSCD,
+			#{tlno} AS TLNO
+		FROM
+        	VW_CM_CNPL_M_01 A JOIN VW_CM_UNTYCS_M_01 B
+        	ON A.UNTY_CSNO = B.UNTY_CSNO
+        	WHERE A.TLNO = #{tlno}
+        	AND NVL(A.UNTY_CNTR_NO,'N') != 'N'
+        	AND NVL(B.CS_DSCD,'N') != 'N'
+	</select>
+
+	<!-- 고객번호로 고객/계약 조회 -->
+	<select id="selectUntyCs" parameterType="CustomerDomain" resultType="CustomerDomain">
+		SELECT
+			A.UNTY_CSNO,
+			A.CS_SRCH_NO,
+			A.CS_DSCD,
+			A.CS_KRN_NM,
+			A.RL_CS_KRN_NM,
+			B.UNTY_CNTR_NO,
+			B.CNTR_NO,
+			B.BZPL_UNTY_CSNO,
+			B.DLGT_UNTY_CSNO,
+			B.BZEN_CHRPN_NM,
+			B.SMS_YN,
+			B.ABND_YN,
+			(SELECT BADR || ' ' || DADR FROM VW_CM_ADR_M_01
+			    	WHERE B.UNTY_CNTR_NO = UNTY_CNTR_NO AND CS_ADR_POST_TRSPL_DSCD = '1') AS ADDR,
+			 #{tlno} AS TLNO
+		FROM
+			VW_CM_UNTYCS_M_01 A FULL OUTER JOIN VW_CM_UNTYCNTR_M_01 B
+			ON A.UNTY_CSNO =
+			<if test=" csDscd == '01' or csDscd == '07' ">
+			B.DLGT_UNTY_CSNO
+			</if>
+			<if test=" csDscd == '02' or csDscd == '03' ">
+			B.BZPL_UNTY_CSNO
+			</if>
+			WHERE A.UNTY_CSNO = #{untyCsno}
+	</select>
+
+	<!-- 고객조회(전화번호) -->
+	<select id="selectCustomer" resultType="CustomerDomain" parameterType="CustomerDomain">
+            SELECT
+			    DISTINCT A.UNTY_CSNO,
+                A.CS_KRN_NM,
+			    A.CS_DSCD,
+                #{tlno} AS TLNO,
+                A.CS_SRCH_NO
+			FROM VW_CM_UNTYCS_M_01 A, VW_CM_CNPL_M_01 B
+                WHERE A.UNTY_CSNO = B.UNTY_CSNO
+                AND B.TLNO=#{tlno}
+                AND NVL(B.UNTY_CNTR_NO,'N') != 'N'
+                AND NVL(A.CS_DSCD,'N') != 'N'
+	</select>
+
+	<!-- 고객조회(고객번호) -->
+	<select id="selectCustomer2" resultType="CustomerDomain" parameterType="CustomerDomain">
+			SELECT
+			    CS_KRN_NM,
+			    CS_DSCD,
+                #{tlno} AS TLNO,
+                UNTY_CSNO,
+                CS_SRCH_NO
+			FROM VW_CM_UNTYCS_M_01
+		        WHERE UNTY_CSNO = #{untyCsno}
+	</select>
+
+	<!-- 계약조회(고객번호) -->
+	<select id="selectContract" resultType="UntyCntrDomain" parameterType="CustomerDomain">
+		SELECT
+			UNTY_CNTR_NO,
+			CNTR_NO,
+			DDCT_BIZ_DSCD,
+			CNTR_BGN_DT,
+			ABND_YN,
+			DLGT_UNTY_CSNO,
+			BZPL_UNTY_CSNO,
+			#{untyCsno} AS UNTY_CSNO
+		FROM VW_CM_UNTYCNTR_M_01
+			WHERE
+		<choose>
+			<when test=" csDscd == '01' or csDscd == '07' ">
+				DLGT_UNTY_CSNO = #{untyCsno}
+			</when>
+			<when test=" csDscd == '02' or csDscd == '03' ">
+				BZPL_UNTY_CSNO = #{untyCsno}
+			</when>
+			<otherwise>
+				DLGT_UNTY_CSNO = #{untyCsno}
+			</otherwise>
+		</choose>
+	</select>
+
+	<!-- 고객/계약조회(계약번호) -->
+	<select id="selectCntrDetail" resultType="CustomerDomain" parameterType="CustomerDomain">
+		SELECT
+		    A.DLGT_UNTY_CSNO,
+		    A.BZPL_UNTY_CSNO,
+		    (SELECT CS_KRN_NM FROM VW_CM_UNTYCS_M_01
+		    	WHERE UNTY_CSNO = #{untyCsno}) AS CS_KRN_NM,
+		    (SELECT RL_CS_KRN_NM FROM VW_CM_UNTYCS_M_01
+		    WHERE UNTY_CSNO = #{untyCsno}) AS RL_CS_KRN_NM,
+		    (SELECT CS_DSCD FROM VW_CM_UNTYCS_M_01
+		    	WHERE UNTY_CSNO = #{untyCsno}) AS CS_DSCD,
+		    A.CNTR_NO,
+		    A.UNTY_CNTR_NO,
+		    A.ABND_YN,
+		    A.SMS_YN,
+		    A.DDCT_BIZ_DSCD,
+		    (SELECT BADR || ' ' || DADR FROM VW_CM_ADR_M_01
+		    	WHERE UNTY_CNTR_NO = A.UNTY_CNTR_NO AND CS_ADR_POST_TRSPL_DSCD = '3') AS ADDR,
+		    #{tlno} AS TLNO,
+		    #{untyCsno} AS UNTY_CSNO
+	    FROM VW_CM_UNTYCNTR_M_01 A
+	    	WHERE A.CNTR_NO = #{cntrNo}
+	</select>
+</mapper>

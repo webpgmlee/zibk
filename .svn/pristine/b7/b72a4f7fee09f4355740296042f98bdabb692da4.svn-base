@@ -1,0 +1,77 @@
+package or.kr.kbiz.bo.main.service.impl;
+
+import java.net.InetAddress;
+import java.net.UnknownHostException;
+import java.util.HashMap;
+import java.util.Map;
+
+import javax.servlet.http.HttpSession;
+
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Qualifier;
+import org.springframework.stereotype.Service;
+import org.springframework.web.bind.annotation.ModelAttribute;
+
+import or.kr.kbiz.bo.common.domain.LoginSessDomain;
+import or.kr.kbiz.bo.main.service.MainService;
+import or.kr.kbiz.serv.spring.mvc.BaseDao;
+
+@Service
+public class MainServiceImpl implements MainService {
+
+	@Autowired(required=true)
+	@Qualifier("apBaseDao")
+	private BaseDao baseDao;
+
+	@Autowired(required=true)
+	@Qualifier("recBaseDao1")
+	private BaseDao baseDao3;
+
+	@Autowired(required=true)
+	@Qualifier("recBaseDao2")
+	private BaseDao baseDao4;
+
+	@Override
+	@SuppressWarnings("unchecked")
+	public Map<String, Integer> callCurCount(String userId) {
+		return (Map<String, Integer>)baseDao.getObject("main.callCurCount", userId);
+	}
+
+	@Override
+	public Integer callbackCurCount() {
+		return (Integer)baseDao.getObject("main.callbackCurCount");
+	}
+
+	@Override
+	@SuppressWarnings("unchecked")
+	public Map<String,Integer> ystdCount(String userId) {
+		return (Map<String,Integer>)baseDao.getObject("main.ystdCount", userId);
+	}
+
+	@Override
+	public void recInitialize(LoginSessDomain lsd) {
+		String userId = lsd.getLoginUserId();
+		baseDao3.update("rec1.recInitialize", userId);
+		baseDao4.update("rec2.recInitialize", userId);
+	}
+
+	@Override
+	public void recUpdate(String groupId, String callTelNum, LoginSessDomain lsd) {
+		Map<String,String> map = new HashMap<String,String>();
+		InetAddress local;
+		String ip="";
+		try {
+			local = InetAddress.getLocalHost();
+			ip = local.getHostAddress();
+		} catch (UnknownHostException e) {
+			e.printStackTrace();
+		}
+		map.put("userIp", ip);
+		map.put("groupId", groupId);
+		map.put("callTelNum", callTelNum);
+		map.put("userId", lsd.getLoginUserId());
+		map.put("userNm", lsd.getLoginUserNm());
+		baseDao3.update("rec1.recUpdate", map);
+		baseDao4.update("rec2.recUpdate", map);
+	}
+}

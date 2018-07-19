@@ -1,0 +1,197 @@
+<%--
+ * file name    : special.jsp
+ * description  : 특이성향
+ * author       : 백소영
+ * initial date : 2017.11.20
+ * history
+  수정일자      수정자     수정내용
+  2017.11.20    백소영     Initialization
+  --%>
+<%@ page language="java" contentType="text/html; charset=UTF-8" pageEncoding="UTF-8"%>
+<%@ taglib prefix="c" uri="/WEB-INF/tld/c.tld" %>
+<%@ taglib prefix="kbiz" uri="/WEB-INF/tld/kbiz.tld" %>
+<!DOCTYPE html>
+<html>
+<head>
+    <meta http-equiv="Content-Type" content="text/html; charset=UTF-8" />
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, minimum-scale=1.0, user-scalable=no">
+    <meta name="subject" content="KBIZ">
+    <meta name="author" content="KBIZ">
+    <meta name="keywords" content="KBIZ">
+    <meta name="description" content="KBIZ">
+    <title>KBIZ</title>
+    <%@ include file="/WEB-INF/jsp/comm_top.jsp"%>
+
+    <script type="text/javascript">
+
+        $(document).ready(function() {
+            fn_searchClick();
+        });
+
+        //조회
+        function fn_searchClick(){
+            $("#pageIdx").val("1");
+            fn_submit();
+        }
+
+        function fn_submit() {
+            KBIZIO.requestViewAjax("specialSearchForm", "specialListView", fn_submitCallback);
+        }
+
+        function fn_submitCallback(ret) {
+            fn_init();
+        }
+
+        function fn_detail(seq,deSeq) {
+            KBIZUI.highlightTrByEvent(window.event);
+            KBIZIO.requestParamAjax("/admin/specailDetail.json", fn_detailCallback, {params: {cnltSeq: seq,cnltDetailNo:deSeq}});
+        }
+
+        function fn_detailCallback(ret) {
+            var r = ret.result;
+            $("#cnltSeq").val(r.cnltSeq);
+            $("#cnltDetailNo").val(r.cnltDetailNo);
+            $("#custNm").text(KBIZST.toDefaultString(r.custNm));
+            $("#tellNum").text(KBIZST.parseTell(r.tellNum));
+            $("#spclAppvYn").val(r.spclAppvYn);
+            $("#spclAppvUserNm").text(KBIZST.toDefaultString(r.spclAppvUserNm,''));
+            $("#regDate").text(KBIZDT.getFormattedDate(r.regDate, "yyyy-MM-dd HH:mm:ss"));
+            $("#regNm").text(r.regNm);
+            $("#spclCont").val(r.spclCont);
+        }
+
+        function fn_init() {
+            $("#cnltSeq").val('');
+            $("#cnltDetailNo").val('');
+            $("#custNm").text('');
+            $("#tellNum").text('');
+            $("#spclAppvYn").val('');
+            $("#spclAppvUserNm").text('');
+            $("#regDate").text('');
+            $("#regNm").text('');
+            $("#spclCont").val('');
+        }
+
+        //승인여부 저장
+        function fn_save() {
+            var $f = $("#specialDetailForm");
+            if ($.trim($f.find("#cnltSeq").val()) == '') {
+                alert("특이성향 항목을 선택해주세요.");
+                return;
+            }
+        	if (KBIZVA.isNullOrEmpty($.trim($f.find("#spclAppvYn").val())) == true) {
+                alert($f.find("#spclAppvYn").attr("title") + "은 필수입니다.");
+                $f.find("#spclAppvYn").focus();
+                return;
+            }
+            if(!confirm("저장하시겠습니까?"))return;
+            KBIZIO.requestJsonAjax("specialDetailForm", fn_saveCallback);
+        }
+
+        function fn_saveCallback(ret) {
+            alert("저장되었습니다.");
+            fn_searchClick();
+        }
+    </script>
+</head>
+<body>
+<div class="template_wrap">
+<form id="specialSearchForm" name="specialSearchForm" method="post" action="/admin/specialList.view" onsubmit="return false;">
+<input type="hidden" id="pageIdx" name="pageIdx" value="1" />
+<input type="hidden" id="rowsPerPage" name="rowsPerPage" value="10" />
+    <div class="section">
+        <h3><span class="sec_tit">특이성향 검색</span></h3>
+        <table width="100%" border="0"  cellspacing="0" cellpadding="0" class="brd_sch">
+            <colgroup>
+                <col style="width:60px">
+                <col style="width:180px">
+                <col style="width:60px">
+                <col style="width:180px">
+                <col style="width:60px">
+                <col style="width:180px">
+                <col style="width:60px">
+                <col style="width:180px">
+                <col style="width:20px">
+            </colgroup>
+            <tr>
+                <th>고객명</th>
+                <td><input type="text" id="selCustNm" name="selCustNm" value=""  onkeydown="if(event.keyCode == 13) fn_searchClick();"/></td>
+                 <th>전화번호</th>
+                <td><input type="text" id="selTellNum" name="selTellNum" placeholder="ex)01012345678" value="" onkeydown="if(event.keyCode == 13) fn_searchClick();" /></td>
+                <th>상담사명</th>
+                <td><input type="text" id="selRegNm" name="selRegNm" value="" onkeydown="if(event.keyCode == 13) fn_searchClick();"/></td>
+                 <th>승인여부</th>
+                <td>
+                     <select id="selSpclAppvYn" name="selSpclAppvYn">
+                           <option value="">선택</option>
+                           <option value="Y">Y</option>
+                           <option value="N">N</option>
+                       </select>
+                </td>
+                <td class="ar" ><a href="#" class="btn small g_orange" onclick="fn_searchClick();">조회</a></td>
+             </tr>
+        </table>
+    </div>
+</form>
+
+<div class="section">
+    <div id="specialListView">
+    </div>
+</div>
+<div class="section"><h3><span class="sec_tit">특이성향 상세보기</span></h3></div>
+<div id="specialDetailJson">
+    <form id="specialDetailForm" name="specialDetailForm" method="post" action="/admin/saveSpecial.json" onsubmit="return false;">
+        <input type="hidden" id="cnltSeq" name="cnltSeq" value="">
+        <input type="hidden" id="cnltDetailNo" name="cnltDetailNo" value="">
+        <table width="100%" border="0"  cellspacing="0" cellpadding="0" class="brd_sch mgb10">
+            <colgroup>
+                <col style="width:60px">
+                <col style="width:100px">
+                <col style="width:60px">
+                <col style="width:100px">
+                <col style="width:60px">
+                <col style="width:100px">
+            </colgroup>
+            <tbody>
+               <tr>
+                   <th scope="row">고객명</th>
+                   <td  id="custNm"></td>
+                   <th scope="row">전화번호</th>
+                   <td  id="tellNum"></td>
+                   <th scope="row">승인여부</th>
+	               <td>
+	                   <select id="spclAppvYn" name="spclAppvYn"  title="승인여부">
+	                       <option value="">선택</option>
+	                       <option value="Y">Y</option>
+	                       <option value="N">N</option>
+	                   </select>
+	               </td>
+               </tr>
+               <tr>
+                   <th scope="row">승인자명</th>
+                   <td  id="spclAppvUserNm"></td>
+                   <th scope="row">상담사명</th>
+                   <td  id="regNm"></td>
+                   <th scope="row">등록일시</th>
+                   <td  id="regDate"></td>
+               </tr>
+               <tr>
+                    <th scope="row">특이성향 내용</th>
+                    <td colspan="5">
+                        <textarea rows="8" id="spclCont" name="spclCont" readonly="readonly"></textarea>
+                    </td>
+               </tr>
+            </tbody>
+        </table>
+    </form>
+    </div>
+    <div class="btn_area clfix">
+        <div class="fr">
+            <button type="button" class="btn small g_blue" onclick="fn_save();">저장</button>
+        </div>
+    </div>
+</div>
+
+</body>
+</html>

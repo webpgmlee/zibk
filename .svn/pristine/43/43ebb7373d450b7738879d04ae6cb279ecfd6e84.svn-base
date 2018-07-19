@@ -1,0 +1,31 @@
+package or.kr.kbiz.bo.login.service;
+
+import javax.servlet.http.HttpServletRequest;
+
+import or.kr.kbiz.bo.login.domain.LoginUserDomain;
+
+/**
+ * 로그인 서비스
+ *
+ * @author hyeok
+ * @since 2018.01.08
+ * @version 1.0
+ */
+public interface LoginUserService {
+
+	/**
+	 * 로그인 실행
+	 *
+	 * @param loginUserDomain
+	 * @return LoginUserDomain
+	 */
+	abstract LoginUserDomain execLogin(LoginUserDomain loginUserDomain, HttpServletRequest request);
+
+	/**
+	 * 비밀번호 변경 실행
+	 *
+	 * @param loginUserDomain
+	 * @return LoginUserDomain
+	 */
+	abstract LoginUserDomain execChngPswd(LoginUserDomain loginUserDomain);
+}

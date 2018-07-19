@@ -1,0 +1,25 @@
+<!doctype html>
+<html lang="ko">
+<head>
+<meta http-equiv="content-type" content="text/html; charset=utf-8">
+<meta http-equiv="X-UA-Compatible" content="IE=edge">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, minimum-scale=1.0, user-scalable=no">
+<meta name="subject" content="KBIZ">
+<meta name="author" content="KBIZ">
+<meta name="keywords" content="KBIZ">
+<meta name="description" content="KBIZ">
+<title>KBIZ</title>
+</head>
+<frameset rows="50,50,*" cols="100%" frameborder="NO" border="0" framespacing="0">
+  <frame src="top_gnb.html" name="topFrame" scrolling="No" noresize="noresize" id="topFrame" title="topFrame" />
+   <frame src="top_status.html" name="topFrame2" scrolling="No" noresize="noresize" id="topFrame2" title="topFrame2" />
+  <frameset cols="90,*" frameborder="NO" border="0" framespacing="0">
+    <frame src="left_menu.html" name="leftFrame" scrolling="No" noresize="noresize" id="leftFrame" title="leftFrame" />
+    <frame src="body_index.html"  name="mainFrame"  id="mainFrame" title="mainFrame" scrolling="yes" noresize="noresize"/>
+  </frameset>
+</frameset> 
+<noframes>
+<body>
+</body>
+</noframes>
+</html>

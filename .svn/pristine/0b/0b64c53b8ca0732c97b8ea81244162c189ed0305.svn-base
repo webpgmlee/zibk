@@ -1,0 +1,191 @@
+package or.kr.kbiz.bo.main.controller;
+
+import java.util.HashMap;
+import java.util.Map;
+
+import javax.servlet.http.HttpServletRequest;
+import javax.servlet.http.HttpServletResponse;
+import javax.servlet.http.HttpSession;
+
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.stereotype.Controller;
+import org.springframework.ui.Model;
+import org.springframework.web.bind.annotation.ModelAttribute;
+import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestParam;
+
+import or.kr.kbiz.bo.admin.domain.NoticeDomain;
+import or.kr.kbiz.bo.admin.service.NoticeService;
+import or.kr.kbiz.bo.common.domain.LoginSessDomain;
+import or.kr.kbiz.bo.inbound.domain.ConsultDetailDomain;
+import or.kr.kbiz.bo.inbound.service.InboundService;
+import or.kr.kbiz.bo.login.domain.LoginUserDomain;
+import or.kr.kbiz.bo.main.service.MainService;
+
+@Controller
+public class MainController {
+
+	@Autowired
+	private NoticeService noticeService;
+
+	@Autowired
+	private InboundService inboundService;
+
+	@Autowired
+	private MainService mainService;
+
+	@RequestMapping(value="/home")
+	public String home(){
+		return "home";
+	}
+	/**
+	 * FrameSet
+	 *
+	 * @param
+	 * @return String
+	 */
+	@RequestMapping(value="/index.do")
+	public String fmain(@ModelAttribute LoginUserDomain loginUserDomain, Model model){
+		if(loginUserDomain.getCtiYn() != null &&  loginUserDomain.getCtiYn().length() > 0){
+			model.addAttribute("ctiYn", loginUserDomain.getCtiYn());
+		}else{
+			model.addAttribute("ctiYn", "N");
+		}
+		return "index";
+	}
+
+	/**
+	 * MainFrame
+	 *
+	 * @param
+	 * @return String
+	 */
+	@RequestMapping(value="/main/main.do")
+	public String vmain(Model model, @ModelAttribute LoginSessDomain lsd){
+		model.addAttribute("ystd", mainService.ystdCount(lsd.getLoginUserId()));
+		return "main/main";
+	}
+
+	/**
+	 * SoftPhoneFrame
+	 *
+	 * @param
+	 * @return String
+	 */
+	@RequestMapping(value="/softphone/softphone.do")
+	public String softphone(@ModelAttribute LoginSessDomain lsd, @RequestParam String ctiYn,  Model model){
+		model.addAttribute("ctiYn", ctiYn);
+		model.addAttribute("ctiId", lsd.getLoginUserId());
+		model.addAttribute("ctiDevice", lsd.getCtiDevice());
+		model.addAttribute("apGrade", lsd.getLoginCallApGrade());
+		return "softphone/softphone";
+	}
+
+	/**
+	 * REC 초기화, 상담원 정보 세팅
+	 *
+	 * @param groupId, callTelNum
+	 * @return
+	 */
+	@RequestMapping(value="/main/recUpdate.json")
+	public void recUpdate(@ModelAttribute LoginSessDomain lsd ,@RequestParam String groupId, @RequestParam String callTelNum, HttpServletRequest request) {
+		mainService.recInitialize(lsd);
+		mainService.recUpdate(groupId, callTelNum, lsd, request);
+	}
+
+	/**
+	 * 실시간 상단 업데이트
+	 *
+	 * @param
+	 * @return String
+	 */
+	@RequestMapping(value="/main/updateTop.json")
+	public void updateTop(@ModelAttribute LoginSessDomain lsd, Model model){
+		Map<String, Integer> map = new HashMap<String, Integer>();
+		map = mainService.callCurCount(lsd.getLoginUserId());
+		map.put("cbcc", mainService.callbackCurCount());
+		model.addAttribute("cc", map);
+	}
+
+	/**
+	 * LeftFrame
+	 *
+	 * @param
+	 * @return String
+	 */
+	@RequestMapping(value="/main/left.do")
+	public String leftMenu(){
+		return "main/left";
+	}
+
+	/**
+	 * TopFrame
+	 *
+	 * @param
+	 * @return String
+	 */
+	@RequestMapping(value="/main/top.do")
+	public String top_status(){
+		return "main/top";
+	}
+
+	/**
+	 * 공지사항뷰
+	 *
+	 * @param
+	 * @return String
+	 */
+	@RequestMapping(value="/main/view/notice.view")
+	public String noticeView(@ModelAttribute NoticeDomain noticeDomain, Model model) {
+		model.addAttribute("noticeList", mainService.selectNoticeList(noticeDomain));
+		model.addAttribute("pageDomain", noticeDomain);
+		return "/main/view/noticeView";
+	}
+
+	/**
+	 * 공지사항 상세 출력
+	 *
+	 * @param
+	 * @return String
+	 */
+	@RequestMapping(value="/main/noticeDetail")
+	public void noticeDetail(@ModelAttribute NoticeDomain noticeDomain, Model model) {
+		model.addAttribute("noticeDetail", mainService.selectNoticeDetail(noticeDomain));
+	}
+
+	/**
+	 * 이관내역뷰
+	 *
+	 * @param
+	 * @return String
+	 */
+	@RequestMapping(value="/main/view/transfer.view")
+	public String transferView(@ModelAttribute ConsultDetailDomain consultDetailDomain, Model model) {
+		model.addAttribute("transfer", inboundService.selectTransList(consultDetailDomain));
+		model.addAttribute("pageDomain", consultDetailDomain);
+		return "/main/view/transferView";
+	}
+
+	/**
+	 * 예약전화뷰
+	 *
+	 * @param
+	 * @return String
+	 */
+	@RequestMapping(value="/main/view/reserve.view")
+	public String reserveView(@ModelAttribute ConsultDetailDomain consultDetailDomain, Model model) {
+		model.addAttribute("reserve", inboundService.selectRsrvList(consultDetailDomain));
+		model.addAttribute("pageDomain", consultDetailDomain);
+		return "/main/view/reserveView";
+	}
+
+	/**
+	 * <pre>공지사항파일다운로드</pre>
+	 *
+	 * @param request
+	 */
+	@RequestMapping(value="/notice/downloadFile")
+	public void downloadFile(@ModelAttribute NoticeDomain noticeDomain, HttpServletRequest request, HttpServletResponse response) throws Exception{
+		noticeService.downloadFile(noticeDomain, request, response);
+	}
+}

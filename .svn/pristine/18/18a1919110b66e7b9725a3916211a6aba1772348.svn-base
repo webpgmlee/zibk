@@ -1,0 +1,122 @@
+package or.kr.kbiz.bo.main.service.impl;
+
+import java.net.InetAddress;
+import java.net.UnknownHostException;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
+
+import javax.servlet.http.HttpServletRequest;
+import javax.servlet.http.HttpSession;
+
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Qualifier;
+import org.springframework.stereotype.Service;
+import org.springframework.web.bind.annotation.ModelAttribute;
+
+import or.kr.kbiz.bo.admin.controller.UserController;
+import or.kr.kbiz.bo.admin.domain.NoticeDomain;
+import or.kr.kbiz.bo.common.domain.LoginSessDomain;
+import or.kr.kbiz.bo.main.service.MainService;
+import or.kr.kbiz.serv.spring.mvc.BaseDao;
+
+@Service
+public class MainServiceImpl implements MainService {
+
+	private static final Logger logger = LoggerFactory.getLogger(MainService.class);
+
+	@Autowired(required=true)
+	@Qualifier("apBaseDao")
+	private BaseDao baseDao;
+
+	@Autowired(required=true)
+	@Qualifier("recBaseDao1")
+	private BaseDao baseDao3;
+
+	@Autowired(required=true)
+	@Qualifier("recBaseDao2")
+	private BaseDao baseDao4;
+
+	@Override
+	@SuppressWarnings("unchecked")
+	public Map<String, Integer> callCurCount(String userId) {
+		return (Map<String, Integer>)baseDao.getObject("main.callCurCount", userId);
+	}
+
+	@Override
+	public Integer callbackCurCount() {
+		return (Integer)baseDao.getObject("main.callbackCurCount");
+	}
+
+	@Override
+	@SuppressWarnings("unchecked")
+	public List<NoticeDomain> selectNoticeList(NoticeDomain noticeDomain) {
+		noticeDomain.setTotalcnt((Integer) baseDao.getObject("main.selectNoticeTotalCnt"));
+		return baseDao.getList("main.selectNoticeList", noticeDomain);
+	}
+
+	@Override
+	public NoticeDomain selectNoticeDetail(NoticeDomain noticeDomain) {
+		return (NoticeDomain)baseDao.getObject("main.selectNoticeDetail", noticeDomain);
+	}
+
+	@Override
+	@SuppressWarnings("unchecked")
+	public Map<String,Integer> ystdCount(String userId) {
+		return (Map<String,Integer>)baseDao.getObject("main.ystdCount", userId);
+	}
+
+	@Override
+	public void recInitialize(LoginSessDomain lsd) {
+		String userId = lsd.getLoginUserId();
+		baseDao3.update("rec1.recInitialize", userId);
+		baseDao4.update("rec2.recInitialize", userId);
+	}
+
+	@Override
+	public void recUpdate(String groupId, String callTelNum, LoginSessDomain lsd, HttpServletRequest request) {
+		Map<String,String> map = new HashMap<String,String>();
+		InetAddress local;
+		String ip2;
+        //proxy 환경일 경우
+		String ip = request.getHeader("X-Forwarded-For");
+		 if (ip == null || ip.length() == 0 || "unknown".equalsIgnoreCase(ip)) {
+		     ip = request.getHeader("Proxy-Client-IP");
+		 }
+		 if (ip == null || ip.length() == 0 || "unknown".equalsIgnoreCase(ip)) {
+		     ip = request.getHeader("WL-Proxy-Client-IP");
+		 }
+		 if (ip == null || ip.length() == 0 || "unknown".equalsIgnoreCase(ip)) {
+		     ip = request.getHeader("HTTP_CLIENT_IP");
+		 }
+		 if (ip == null || ip.length() == 0 || "unknown".equalsIgnoreCase(ip)) {
+		     ip = request.getHeader("HTTP_X_FORWARDED_FOR");
+		 }
+		 if (ip == null || ip.length() == 0 || "unknown".equalsIgnoreCase(ip)) {
+		     ip = request.getHeader("X-Real-IP");
+		 }
+		 if (ip == null || ip.length() == 0 || "unknown".equalsIgnoreCase(ip)) {
+		     ip = request.getHeader("X-RealIP");
+		 }
+		 if (ip == null || ip.length() == 0 || "unknown".equalsIgnoreCase(ip)) {
+		     ip = request.getRemoteAddr();
+		 }
+		try {
+			local = InetAddress.getLocalHost();
+			ip2 = local.getHostAddress();
+			logger.debug("getHostAddress="+ip);
+			logger.debug("getRemoteAddr="+ip2);
+		} catch (UnknownHostException e) {
+			e.printStackTrace();
+		}
+		map.put("userIp", ip);
+		map.put("groupId", groupId);
+		map.put("callTelNum", callTelNum);
+		map.put("userId", lsd.getLoginUserId());
+		map.put("userNm", lsd.getLoginUserNm());
+		baseDao3.update("rec1.recUpdate", map);
+		baseDao4.update("rec2.recUpdate", map);
+	}
+}

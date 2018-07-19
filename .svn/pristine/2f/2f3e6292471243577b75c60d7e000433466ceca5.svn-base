@@ -1,0 +1,330 @@
+package or.kr.kbiz.bo.inbound.service.impl;
+
+import java.text.SimpleDateFormat;
+import java.util.ArrayList;
+import java.util.Date;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
+
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Qualifier;
+import org.springframework.stereotype.Service;
+
+import or.kr.kbiz.bo.admin.domain.UserDomain;
+import or.kr.kbiz.bo.inbound.domain.CallbackDomain;
+import or.kr.kbiz.bo.inbound.domain.CodeDomain;
+import or.kr.kbiz.bo.inbound.domain.ConsultDetailDomain;
+import or.kr.kbiz.bo.inbound.domain.ConsultDomain;
+import or.kr.kbiz.bo.inbound.domain.CustomerDomain;
+import or.kr.kbiz.bo.inbound.domain.InboundSpecialDomain;
+import or.kr.kbiz.bo.inbound.domain.OrganizationDomain;
+import or.kr.kbiz.bo.inbound.domain.UntyCntrDomain;
+import or.kr.kbiz.bo.inbound.service.InboundService;
+import or.kr.kbiz.serv.spring.mvc.BaseDao;
+
+@Service
+public class InboundServiceImpl implements InboundService {
+
+	@Autowired(required=true)
+	@Qualifier("apBaseDao")
+	private BaseDao baseDao;
+
+	@Autowired(required=true)
+	@Qualifier("kbizBaseDao")
+	private BaseDao baseDao2;
+
+	@Autowired(required=true)
+	@Qualifier("smsBaseDao")
+	private BaseDao baseDao3;
+
+	@Override
+	@SuppressWarnings("unchecked")
+	public List<CodeDomain> selectCustCode() {
+		return baseDao.getList("inbound.selectCustCode");
+	}
+
+	@Override
+	@SuppressWarnings("unchecked")
+	public List<CustomerDomain> selectCsSearch(CustomerDomain custDomain) {
+		//return baseDao.getList("inbound.selectCsSearch", custDomain);
+		List<CustomerDomain> list = baseDao2.getList("kbizinbound.selectCsSearch", custDomain);
+		for(int i=0;i<list.size();i++){
+			if(list.get(i).getCsDscd() != null){
+				if(list.get(i).getCsDscd().equals("01")){
+					list.get(i).setCodeName("개인");
+				}else if(list.get(i).getCsDscd().equals("02")){
+					list.get(i).setCodeName("법인기업");
+				}else if(list.get(i).getCsDscd().equals("03")){
+					list.get(i).setCodeName("개인기업");
+				}else if(list.get(i).getCsDscd().equals("07")){
+					list.get(i).setCodeName("외국인");
+				}
+			}else{
+				list.get(i).setCodeName("개인");
+			}
+		}
+		return list;
+	}
+
+	@Override
+	@SuppressWarnings("unchecked")
+	public List<CustomerDomain> selectCustomerCount(CustomerDomain custDomain) {
+		//return baseDao.getList("inbound.selectCustomerCount", custlDomain);
+		List<CustomerDomain> list = baseDao2.getList("kbizinbound.selectUntyCsno", custDomain);
+		List<CustomerDomain> list2 = new ArrayList<CustomerDomain>();
+		if(list.size() > 1){
+			return list;
+		}else if(list.size() == 1){
+			list = baseDao2.getList("kbizinbound.selectUntyCs", list.get(0));
+			return list;
+		}else{
+			return list2;
+		}
+	}
+
+	@Override
+	public CustomerDomain selectStartCon(CustomerDomain custDomain) {
+		CustomerDomain cd = (CustomerDomain)baseDao2.getObject("kbizinbound.selectUntyCsno", custDomain);
+		if(cd != null){
+			return (CustomerDomain)baseDao2.getObject("kbizinbound.selectUntyCs", cd);
+		}else{
+			return cd;
+		}
+	}
+
+	@Override
+	@SuppressWarnings("unchecked")
+	public List<CustomerDomain> selectCustomer(CustomerDomain custlDomain) {
+		//return baseDao.getList("inbound.selectCustomer", custlDomain);
+		return baseDao2.getList("kbizinbound.selectCustomer", custlDomain);
+	}
+
+	@Override
+	public CustomerDomain selectCustomer2(CustomerDomain custlDomain) {
+		//return baseDao.getList("inbound.selectCustomer2", custlDomain);
+		return (CustomerDomain)baseDao2.getObject("kbizinbound.selectCustomer2", custlDomain);
+	}
+
+	@Override
+	@SuppressWarnings("unchecked")
+	public List<UntyCntrDomain> selectContract(CustomerDomain cntrDomain) {
+		//return baseDao.getList("inbound.selectContract", cntrDomain);
+		return baseDao2.getList("kbizinbound.selectContract", cntrDomain);
+	}
+
+	@Override
+	public CustomerDomain selectCntrDetail(CustomerDomain cntrDomain) {
+		//return (CustomerDomain)baseDao.getObject("inbound.selectCntrDetail", cntrDomain);
+		return (CustomerDomain)baseDao2.getObject("kbizinbound.selectCntrDetail", cntrDomain);
+	}
+
+	@Override
+	public String callbackYn(String seq) {
+		return (String)baseDao.getObject("inbound.callbackYn", seq);
+	}
+
+	@Override
+	public String selectSpclAppvYn(String untyCsno) {
+		return (String)baseDao.getObject("inbound.selectSpclAppvYn", untyCsno);
+	}
+
+	@Override
+	@SuppressWarnings("unchecked")
+	public List<ConsultDetailDomain> selectRsrvList(ConsultDetailDomain consultDetailDomain) {
+		consultDetailDomain.setTotalcnt((Integer)baseDao.getObject("inbound.reserveTotalCount", consultDetailDomain));
+		return baseDao.getList("inbound.selectRsrvList",consultDetailDomain);
+	}
+
+	@Override
+	@SuppressWarnings("unchecked")
+	public List<CodeDomain> selectScript(CodeDomain codeDomain) {
+		codeDomain.setTotalcnt((Integer)baseDao.getObject("inbound.scriptTotalCount", codeDomain));
+		return baseDao.getList("inbound.selectScript",codeDomain);
+	}
+
+	@Override
+	@SuppressWarnings("unchecked")
+	public List<ConsultDomain> selectConsultList(ConsultDomain consultDomain) {
+		return baseDao.getList("inbound.selectConsult",consultDomain);
+	}
+
+	@Override
+	@SuppressWarnings("unchecked")
+	public List<ConsultDetailDomain> selectConsultDetailList(ConsultDetailDomain consultDetailDomain) {
+		return baseDao.getList("inbound.selectConsultDetailList",consultDetailDomain);
+	}
+
+	@Override
+	public ConsultDetailDomain selectConsultInfoDetail(ConsultDetailDomain consultDetailDomain) {
+		return (ConsultDetailDomain)baseDao.getObject("inbound.selectConsultInfoDetail",consultDetailDomain);
+	}
+
+	@Override
+	@SuppressWarnings("unchecked")
+	public List<ConsultDetailDomain> selectConsultSearchList(ConsultDetailDomain consultDetailDomain) {
+		consultDetailDomain.setTotalcnt((Integer)baseDao.getObject("inbound.consultTotalCount", consultDetailDomain));
+		return baseDao.getList("inbound.selectConsultSearch",consultDetailDomain);
+	}
+
+	@Override
+	@SuppressWarnings("unchecked")
+	public List<CallbackDomain> selectCallbackList(CallbackDomain callbackDomain) {
+		callbackDomain.setTotalcnt((Integer)baseDao.getObject("inbound.callbackTotalCount", callbackDomain));
+		return baseDao.getList("inbound.selectCallbackList", callbackDomain);
+	}
+
+	@Override
+	public void callBackProc(CallbackDomain callbackDomain) {
+		baseDao.getList("inbound.callBackProc", callbackDomain);
+	}
+
+	@Override
+	public void changeCallYn(ConsultDetailDomain consultDetailDomain) {
+		baseDao.update("inbound.changeCallYn", consultDetailDomain);
+	}
+
+	@Override
+	public ConsultDetailDomain selectConsultRsrvDetail(ConsultDetailDomain consultDetailDomain) {
+		return (ConsultDetailDomain)baseDao.getObject("inbound.selectConsultRsrvDetail", consultDetailDomain);
+	}
+
+	@Override
+	public CustomerDomain selectConsultRsrvDetail2(ConsultDetailDomain consultDetailDomain) {
+		CustomerDomain cd = (CustomerDomain)baseDao.getObject("inbound.selectConsultRsrvDetail2", consultDetailDomain);
+		return (CustomerDomain)baseDao2.getObject("kbizinbound.selectCntrDetail", cd);
+	}
+
+	@Override
+	public ConsultDetailDomain insertConsult(ConsultDetailDomain consultDetailDomain) {
+		String cnltSeq = "";
+		String tell = consultDetailDomain.getTellNum().replaceAll("-", "");
+		consultDetailDomain.setTellNum(tell);
+		if(consultDetailDomain.getCnltProcCd().equals("02")){
+			consultDetailDomain.setCallYn("N");
+		}else{
+			consultDetailDomain.setCallYn("Y");
+		}
+		if(consultDetailDomain.getCnltSeq() != null && consultDetailDomain.getCnltSeq().length() > 0){
+			consultDetailDomain.setCnltDetailNo(consultDetailDomain.getCnltDetailNo()+1);
+		}else{
+			baseDao.insert("inbound.insertConsult", consultDetailDomain);
+			cnltSeq = (String)baseDao.getObject("inbound.curSeq", consultDetailDomain);
+			SimpleDateFormat sdf = new SimpleDateFormat("yyyyMMdd");
+			String today = sdf.format(new Date());
+			consultDetailDomain.setCnltSeq(today+cnltSeq);
+			consultDetailDomain.setCnltDetailNo(1);
+		}
+
+		baseDao.insert("inbound.insertConsultDetail", consultDetailDomain);
+		baseDao2.insert("kbizinbound.insertConsultDetail2", consultDetailDomain);
+		return consultDetailDomain;
+	}
+
+	@Override
+	public Integer insertRsrv(ConsultDetailDomain consultDetailDomain) {
+		return (Integer)baseDao.insert("inbound.insertRsrv", consultDetailDomain);
+	}
+
+	@Override
+	public Integer insertTran(ConsultDetailDomain consultDetailDomain) {
+		return (Integer)baseDao.insert("inbound.insertTran", consultDetailDomain);
+	}
+
+	@Override
+	@SuppressWarnings("unchecked")
+	public List<ConsultDetailDomain> selectTransList(ConsultDetailDomain consultDetailDomain) {
+		consultDetailDomain.setTotalcnt((Integer)baseDao.getObject("inbound.transferTotalCount", consultDetailDomain));
+		return baseDao.getList("inbound.selectTransList", consultDetailDomain);
+	}
+
+	@Override
+	@SuppressWarnings("unchecked")
+	public List<CodeDomain> selectCode() {
+		return baseDao.getList("inbound.selectCode");
+	}
+
+
+	@Override
+	@SuppressWarnings("unchecked")
+	public List<CodeDomain> selectChCode() {
+		return baseDao.getList("inbound.selectChCode");
+	}
+
+	@Override
+	@SuppressWarnings("unchecked")
+	public List<CodeDomain> selectLcode(CodeDomain codeDomain) {
+		return baseDao.getList("inbound.selectLcode",codeDomain);
+	}
+
+	@Override
+	@SuppressWarnings("unchecked")
+	public List<CodeDomain> selectMcode(CodeDomain codeDomain) {
+		return  baseDao.getList("inbound.selectMcode",codeDomain);
+	}
+
+	@Override
+	@SuppressWarnings("unchecked")
+	public List<CodeDomain> selectScode(CodeDomain codeDomain) {
+		return  baseDao.getList("inbound.selectScode",codeDomain);
+	}
+
+	@Override
+	@SuppressWarnings("unchecked")
+	public List<UserDomain> selectUserList() {
+		return  baseDao.getList("inbound.selectUserList");
+	}
+
+	@Override
+	public void insertSms(Map<String, String> map) {
+		Map<String,String> map2 = new HashMap<String, String>();
+		map2.put("tellNum", map.get("tellNum").replaceAll("-", ""));
+		map2.put("content", map.get("content"));
+		map2.put("userId", map.get("userId"));
+		baseDao.insert("inbound.insertSms", map2);
+	}
+
+	@Override
+	public void sendSms(Map<String, String> map) {
+		baseDao3.insert("smsInterface.sendSms", map);
+	}
+
+	@Override
+	@SuppressWarnings("unchecked")
+	public List<InboundSpecialDomain> selectSpecial(String untyCsno) {
+		return baseDao.getList("inbound.selectSpecial", untyCsno);
+	}
+
+	@Override
+	public void insertSpecial(ConsultDetailDomain consultDetailDomain) {
+		baseDao.insert("inbound.insertSpecial", consultDetailDomain);
+	}
+
+	@Override
+	@SuppressWarnings("unchecked")
+	public List<OrganizationDomain> selectOrganization(OrganizationDomain ornglDomain) {
+		return baseDao.getList("inbound.selectOrganization", ornglDomain);
+	}
+
+	@Override
+	@SuppressWarnings("unchecked")
+	public List<OrganizationDomain> orgnSearch(String kbizNm, String kbizId) {
+		Map<String,String> map = new HashMap<String,String>();
+		map.put("kbizNm", kbizNm);
+		map.put("kbizId", kbizId);
+		return baseDao.getList("inbound.selectOrgn", map);
+	}
+
+	@Override
+	@SuppressWarnings("unchecked")
+	public List<OrganizationDomain> organizationSearch(OrganizationDomain ornglDomain) {
+		List<OrganizationDomain> list = baseDao.getList("inbound.organizationSearch", ornglDomain);
+		return list;
+	}
+
+	@Override
+	@SuppressWarnings("unchecked")
+	public List<OrganizationDomain> selectAdminList() {
+		return baseDao.getList("inbound.selectAdminList");
+	}
+}

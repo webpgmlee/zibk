@@ -1,0 +1,207 @@
+package or.kr.kbiz.bo.inbound.controller;
+
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
+
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.stereotype.Controller;
+import org.springframework.ui.Model;
+import org.springframework.web.bind.annotation.ModelAttribute;
+import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestParam;
+
+import or.kr.kbiz.bo.common.domain.LoginSessDomain;
+import or.kr.kbiz.bo.inbound.domain.CodeDomain;
+import or.kr.kbiz.bo.inbound.domain.CustomerDomain;
+import or.kr.kbiz.bo.inbound.service.InboundService;
+
+@Controller
+@RequestMapping("/inbound/customer")
+public class CustomerController {
+
+	private static final Logger logger = LoggerFactory.getLogger(InboundController.class);
+
+	private static String PREFIX = "inbound/customer";
+
+	@Autowired
+	private InboundService inboundService;
+
+	/**
+	 * 기업/개인 고객
+	 *
+	 * @param
+	 * @return String
+	 */
+	@RequestMapping(value="/custInfo.do")
+	public String custInfo(@RequestParam String chnlCode, @RequestParam String startCon, Model model){
+		if(chnlCode != null && chnlCode.length() > 0){
+			model.addAttribute("chnlCode", chnlCode);
+		}
+		if(startCon != null && startCon.length() > 0){
+			model.addAttribute("startCon", startCon);
+		}
+		return PREFIX+"/custInfo";
+	}
+
+	/**
+	 * 기업/개인 고객 검색
+	 *
+	 * @param
+	 * @return String
+	 */
+	@RequestMapping(value="/csSearch.json")
+	public void csSearch(@ModelAttribute CustomerDomain custDomain, Model model){
+		model.addAttribute("csList",inboundService.selectCsSearch(custDomain));
+	}
+
+	/**
+	 * INBOUND 기업/개인 고객 검색
+	 *
+	 * @param
+	 * @return String
+	 */
+	@RequestMapping(value="/custInbound.json")
+	public void custInbound(@ModelAttribute CustomerDomain custDomain, Model model){
+		model.addAttribute("totList",inboundService.selectCustomerCount(custDomain));
+	}
+
+	/**
+	 * 0,1건 고객 검색 상담시작
+	 *
+	 * @param
+	 * @return String
+	 */
+	@RequestMapping(value="/custSearch.json")
+	public void custSearch(@ModelAttribute CustomerDomain custDomain, Model model){
+		CustomerDomain cd = inboundService.selectStartCon(custDomain);
+		if(cd != null){
+			cd.setSpclAppvYn(inboundService.selectSpclAppvYn(cd.getUntyCsno()));
+		}
+		model.addAttribute("totList", cd);
+	}
+
+	/**
+	 * 기업/개인 고객 검색(inbound팝업)
+	 *
+	 * @param
+	 * @return String
+	 */
+	@RequestMapping(value="/custSearch.do")
+	public String custSearch1(@ModelAttribute CustomerDomain custDomain, @RequestParam String opener, Model model){
+		model.addAttribute("code", inboundService.selectCustCode());
+		model.addAttribute("custList",inboundService.selectCustomer(custDomain));
+		model.addAttribute("opener", opener);
+		return PREFIX+"/custSearch";
+	}
+
+	/**
+	 * 기업/개인 고객 검색(inbound팝업)
+	 *
+	 * @param
+	 * @return String
+	 */
+	@RequestMapping(value="/custSearch2.json")
+	public void custSearch2(@ModelAttribute CustomerDomain custDomain, Model model){
+		CustomerDomain cd = inboundService.selectCustomer2(custDomain);
+		List<CodeDomain> co = inboundService.selectCustCode();
+		for(int i=0; i<co.size(); i++){
+			if(cd.getCsDscd().equals(co.get(i).getMcode())){
+				cd.setCodeName(co.get(i).getCodeName());
+			}
+		}
+		model.addAttribute("custList2", cd);
+	}
+
+	/**
+	 * 기업/개인 고객 검색
+	 *
+	 * @param
+	 * @return String
+	 */
+	@RequestMapping(value="/cntrSearch.json")
+	public void cntrSearch(@ModelAttribute CustomerDomain custDomain, Model model){
+		model.addAttribute("cntrList",inboundService.selectContract(custDomain));
+	}
+
+	/**
+	 * 기업/개인 고객 검색
+	 *
+	 * @param
+	 * @return String
+	 */
+	@RequestMapping(value="/cntrDetail.json")
+	public void cntrDetail(@ModelAttribute CustomerDomain custDomain, Model model){
+		custDomain = inboundService.selectCntrDetail(custDomain);
+		custDomain.setSpclAppvYn(inboundService.selectSpclAppvYn(custDomain.getUntyCsno()));
+		model.addAttribute("cntrDetail", custDomain);
+	}
+
+	/**
+	 * 특이성향 검색 팝업
+	 *
+	 * @param
+	 * @return String
+	 */
+	@RequestMapping(value="/specialPop.do")
+	public String custSpecial(@RequestParam String untyCsno, Model model){
+		model.addAttribute("spec", inboundService.selectSpecial(untyCsno));
+		return PREFIX+"/specialPop";
+	}
+
+	/**
+	 * SMS 팝업
+	 *
+	 * @param
+	 * @return String
+	 */
+	@RequestMapping(value="/smsPop.do")
+	public String smsPop(){
+		return PREFIX+"/smsPop";
+	}
+
+	/**
+	 * SMS 전송
+	 *
+	 * @param
+	 * @return String
+	 */
+	@RequestMapping(value="/smsSend.do")
+	public String smsSend(@RequestParam String [] arr, @RequestParam String content, @ModelAttribute LoginSessDomain lsd){
+		Map<String, String> map;
+		for(int i=0;i<arr.length;i++){
+			map = new HashMap<String, String>();
+			map.put("tellNum", arr[i]);
+			map.put("content", content);
+			map.put("userId", lsd.getLoginUserId());
+			inboundService.insertSms(map);
+			inboundService.sendSms(map);
+		}
+		return PREFIX+"/smsPop";
+	}
+
+	/**
+	 * SMS 전송(2차인증)
+	 *
+	 * @param
+	 * @return String
+	 */
+	@RequestMapping(value="/smsSend2.json")
+	public void smsSend2(@RequestParam String tellNum, @RequestParam String content, @ModelAttribute LoginSessDomain lsd, Model model){
+		Map<String, String> map = new HashMap<String, String>();
+		map.put("tellNum", tellNum);
+		map.put("content", content);
+		map.put("userId", lsd.getLoginUserId());
+		inboundService.insertSms(map);
+		inboundService.sendSms(map);
+		model.addAttribute("ranNum", content);
+	}
+
+	@RequestMapping(value="/testCustomer.do")
+	public String testCustomer(){
+		return PREFIX+"/testCustomer";
+	}
+
+}

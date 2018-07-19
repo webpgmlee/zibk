@@ -1,0 +1,131 @@
+<!doctype html>
+<html lang="ko">
+<head>
+<meta http-equiv="content-type" content="text/html; charset=utf-8">
+<meta http-equiv="X-UA-Compatible" content="IE=edge">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, minimum-scale=1.0, user-scalable=no">
+<meta name="subject" content="KBIZ">
+<meta name="author" content="KBIZ">
+<meta name="keywords" content="KBIZ">
+<meta name="description" content="KBIZ">
+<title>KBIZ</title>
+<script type="text/javascript" src="http://code.jquery.com/jquery-latest.min.js"></script>
+<script type="text/javascript" src="js/common.js"></script>
+<link rel="stylesheet" href="css/reset.css" type="text/css" media="screen" />
+<link rel="stylesheet" href="css/common.css" type="text/css" media="screen" />
+<script type="text/javascript">
+
+</script>
+<style>
+
+</style>
+</head>
+<body>
+<form name="cus_frm" id="cus_frm">
+<div class="brd_top clfix">
+	<!--탭//-->
+	<div class="com_tab db">
+		<ul class="tabs">
+			<li class="active" rel="tab1"><a href="#">점포</a><!--<img name="image1" id="image1" src="./images/tab01_01_ov.gif" border="0" style="cursor:pointer;"  onMouseOut="f_MA_out('1')" onMouseOver="f_MA_over('1')" onClick="JavaScript:m_flag='1';chk_load='1';f_MA_restore();f_chg_layer('1');f_custsearch('1');" >--></li>
+			<li rel="tab2"><a href="#">고객</a><!--<img name="image1" id="image1" src="./images/tab01_02_ov.gif" border="0">--></li>
+		</ul>
+	</div>
+	<!--//탭-->
+	<!--공통버튼//-->
+	<div class="com_btn">
+		<ul>
+			<li><a href="#stop" class="btn small g_green">SMS</a></li>
+			<li><a href="#stop" class="btn small g_green">게시판</a></li>
+			<li><a href="#stop" class="btn small g_green">상담정보관리</a></li>
+			<li><a href="#stop" class="btn small g_blue">고객검색</a></li>
+			<li><a href="#stop" class="btn small g_blue">저장</a></li>
+			<li><a href="#stop" class="btn small g_blue">수정</a></li>
+			<li><a href="#stop" class="btn small g_blue">초기화</a></li>
+            <li><a href="javascript:popUp('popup_01.html', '400', '312');" class="btn small g_blue">팝업01</a></li>
+            <li><a href="javascript:popUp('popup_02.html', '600', '603');" class="btn small g_blue">팝업02</a></li>
+            <li><a href="javascript:popUp('popup_03.html', '800', '554');" class="btn small g_blue">팝업03</a></li>
+		</ul> 
+	</div>
+	<!--//공통버튼-->
+</div>
+<div class="tab_container">
+    <div id="tab1" class="tab_content">
+        <!-- 일반고객영역 -->
+        <table width="100%" border="0"  cellspacing="0" cellpadding="0" class="brd_sch">
+            <colgroup>
+                <col style="width:8%">
+                <col style="width:12%">
+                <col style="width:8%">
+                <col style="width:12%">
+                <col style="width:8%">
+                <col style="width:12%">
+                <col style="width:8%">
+                <col style="width:12%">
+                <col style="width:8%">
+                <col style="width:12%">
+            </colgroup>
+            <tr>
+                <th>고객명</th>
+                <td>홍길동</td>
+                <th>고객성향</th>
+                <td>좋음</td>
+                <th>주소</th>
+                <td colspan="5"><input type="text" name="cust_address1" id="cust_address1" style="width:100%;" value="서울시 광진구 성수동 감나무길 235 대동아파트 1025동 502호" /></td>
+            </tr>
+            <tr>
+                <th>전화번호1</th>
+                <td><input type="text" name="cus_tel_num1" id="cus_tel_num1" style="width:100%;" value="010-2589-6325" /> </td>
+                <th>전화번호2</th>
+                <td><input type="text" name="cus_tel_num2" id="cus_tel_num2" style="width:100%;" value="010-2564-5897" /> </td>
+                <th>전화번호3</th>
+                <td><input type="text" name="cus_tel_num3" id="cus_tel_num3" style="width:100%;" value="010-2314-1245" /></td>
+                <th>전화번호4</th>
+                <td><input type="text" name="cus_tel_num4" id="cus_tel_num4" style="width:100%;" value="010-2369-5214" /></td>
+                <th>이메일</th>
+                <td><input type="text" name="cust_email" id="cust_email" style="width:100%;" value="gildone.hong@naver.com" /> </td>                               
+            </tr>
+        </table>
+        <!-- /일반고객영역 -->
+    </div>
+    <div id="tab2" class="tab_content">
+        <!-- 일반고객영역 -->
+        <table width="100%" border="0"  cellspacing="0" cellpadding="0" class="brd_sch">
+            <colgroup>
+                <col style="width:8%">
+                <col style="width:12%">
+                <col style="width:8%">
+                <col style="width:12%">
+                <col style="width:8%">
+                <col style="width:12%">
+                <col style="width:8%">
+                <col style="width:12%">
+                <col style="width:8%">
+                <col style="width:12%">
+            </colgroup>
+            <tr>
+                <th>고객명1</th>
+                <td>홍길동1</td>
+                <th>고객성향1</th>
+                <td>좋음1</td>
+                <th>주소1</th>
+                <td colspan="5"><input type="text" name="cust_address1" id="cust_address1" style="width:100%;" value="서울시 광진구 성수동 감나무길 235 대동아파트 1025동 502호" /></td>
+            </tr>
+            <tr>
+                <th>전화번호1</th>
+                <td><input type="text" name="cus_tel_num1" id="cus_tel_num1" style="width:100%;" value="010-2589-6325" /> </td>
+                <th>전화번호2</th>
+                <td><input type="text" name="cus_tel_num2" id="cus_tel_num2" style="width:100%;" value="010-2564-5897" /> </td>
+                <th>전화번호3</th>
+                <td><input type="text" name="cus_tel_num3" id="cus_tel_num3" style="width:100%;" value="010-2314-1245" /></td>
+                <th>전화번호4</th>
+                <td><input type="text" name="cus_tel_num4" id="cus_tel_num4" style="width:100%;" value="010-2369-5214" /></td>
+                <th>이메일</th>
+                <td><input type="text" name="cust_email" id="cust_email" style="width:100%;" value="gildone.hong@naver.com" /> </td>                               
+            </tr>
+        </table>
+        <!-- /일반고객영역 -->
+    </div>
+</div>
+</form>
+</body>
+</html>

@@ -1,0 +1,318 @@
+<%--
+ * file name    : notice.jsp
+ * description  : 공지사항
+ * author       : 백소영
+ * initial date : 2017.11.20
+ * history
+  수정일자      수정자     수정내용
+  2017.11.20    백소영     Initialization
+  --%>
+<%@ page language="java" contentType="text/html; charset=UTF-8" pageEncoding="UTF-8"%>
+<%@ taglib prefix="c" uri="/WEB-INF/tld/c.tld" %>
+<%@ taglib prefix="kbiz" uri="/WEB-INF/tld/kbiz.tld" %>
+<!DOCTYPE html>
+<html>
+<head>
+    <meta http-equiv="Content-Type" content="text/html; charset=UTF-8" />
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, minimum-scale=1.0, user-scalable=no">
+    <meta name="subject" content="KBIZ">
+    <meta name="author" content="KBIZ">
+    <meta name="keywords" content="KBIZ">
+    <meta name="description" content="KBIZ">
+    <title>KBIZ</title>
+    <%@ include file="/WEB-INF/jsp/comm_top.jsp"%>
+
+    <script type="text/javascript">
+
+        $(document).ready(function() {
+           //$("#selFromDt").val(KBIZDT.getSettingDate(0,0,0));
+           //$("#selToDt").val(KBIZDT.getSettingDate(0,2,0));
+           var now = new Date();
+           var year= now.getFullYear();
+           var mon = now.getMonth()+1;
+           var day = now.getDate();
+
+           $("#selFromDt").val(KBIZDT.addFormattedDate(year+''+mon+''+day,'d',(1-day)));
+           $("#selToDt").val(KBIZDT.addFormattedDate(year+''+mon+''+day,'m',0));
+           fn_searchClick();
+
+            KBIZDT.setDatepicker("selFromDt");
+            KBIZDT.setDatepicker("selToDt");
+            KBIZDT.setDatepicker("notiDispDate");
+            KBIZDT.datepicker();
+
+            $("#curFile").click(function(){
+                location.href="/admin/notice/downloadFile.do?notiFilename="+encodeURI($("#curFile").text());
+            });
+        });
+        //조회
+        function fn_searchClick(){
+            $("#pageIdx").val("1");
+            fn_submit();
+        }
+
+        function fn_submit() {
+            //날짜검사
+            if($("#selFromDt").val() == ""){
+                alert("날짜를 입력해주세요.");
+                $("#selFromDt").focus();
+                return;
+            }else if($("#selToDt").val() == ""){
+                alert("날짜를 입력해주세요.");
+                $("#selToDt").focus();
+                return;
+            }
+
+           //조회기간이 앞보다 뒤가 작은지 검사
+            if(KBIZDT.getDayInterval($("#selFromDt").val(),$("#selToDt").val()) < 0){
+            	alert("조회날짜가 잘못되었습니다.");
+                return false;
+            }
+            //조회기간 3개월로 기간 제한
+            if(KBIZDT.getDayCheck($("#selFromDt").val(),$("#selToDt").val()) > 93){
+                alert('조회기간은 3개월 이내만 가능합니다. ');
+                return false;
+            }
+
+           if($("#selFromDt").val().length == 10){           //날짜가 정확하게 입력되었는지 검사
+                if($("#selToDt").val().length == 10){
+                    //skip
+                }else{
+                    alert("검색할 날짜를 제대로 설정해주세요.\nex) 2018-01-01");
+                    $("#selToDt").focus();
+                    return;
+                }
+            }else{
+                alert("검색할 날짜를 제대로 설정해주세요.\nex) 2018-01-01");
+                $("#selFromDt").focus();
+                return;
+            }
+
+            KBIZIO.requestViewAjax("noticeSearchForm", "noticeListView", fn_submitCallback);
+        }
+
+        function fn_submitCallback(ret) {
+            fn_init();
+            console.log('------- fn_submitCallback() ---------');
+        }
+
+        //상세보기
+        function fn_detail(seq) {
+           // fn_init();
+            KBIZUI.highlightTrByEvent(window.event);
+            KBIZIO.requestParamAjax("/admin/noticeDetail.json", fn_detailCallback, {params: {notiSeq: seq}});
+        }
+
+        function fn_detailCallback(ret) {
+            var r = ret.result;
+            $("#noticeDetailForm #notiTitle").val(r.notiTitle);
+            $("#noticeDetailForm #notiTypeCd").val(r.notiTypeCd);
+            $("#noticeDetailForm #notiContents").val(r.notiContents);
+            $("#noticeDetailForm #notiDispDate").val(KBIZDT.getFormattedDate(KBIZST.toDefaultString(r.notiDispDate,''), "yyyy-MM-dd"));
+            //$("#noticeDetailForm #regNm").val(r.regNm);
+            //$("#noticeDetailForm #regDate").val(KBIZDT.getFormattedDate(r.regDate, "yyyy-MM-dd HH:mm:ss"));
+            $("#noticeDetailForm #notiSeq").val(r.notiSeq);
+            $("#curFile").text(KBIZST.toDefaultString(r.notiFilename,''));
+            $("#noticeDetailForm #notiFilename").val(r.notiFilename);
+
+            // 수정.삭제여부
+            if(r.authFlag == "true"){
+                $("#btn_save").show();
+                $("#btn_del").show();
+                $("#notiTitle").attr("readonly",false);
+                $("#notiContents").attr("readonly",false);
+                $("#notiTypeCd").attr("disabled",false);
+                $("#notiDispDate").attr("disabled",false);
+            }else{
+                $("#btn_save").hide();
+                $("#btn_del").hide();
+                $("#notiTitle").attr("readonly",true);
+                $("#notiContents").attr("readonly",true);
+                $("#notiTypeCd").attr("disabled",true);
+                $("#notiDispDate").attr("disabled",true);
+            }
+        }
+
+        //저장  or 수정
+         function fn_save() {
+            var $f = $("#noticeDetailForm");
+            if (!KBIZVA.valCheck("notiTitle",true))return;
+
+           if (KBIZVA.isNullOrEmpty($.trim($f.find("#notiTypeCd").val())) == true) {
+                alert($f.find("#notiTypeCd").attr("title") + "은 필수입니다.");
+                $f.find("#notiTypeCd").focus();
+                return;
+            }
+            if (KBIZVA.isNullOrEmpty($.trim($f.find("#notiContents").val())) == true) {
+                 alert($f.find("#notiContents").attr("title") + "은 필수입니다.");
+                 $f.find("#notiContents").focus();
+                 return;
+            }
+
+            if(!confirm("저장하시겠습니까?"))return;
+            //파일확장자 체크
+            if(!KBIZVA.fileExtensionChk("notiFile"))return;
+            var notiTitle = $("#notiTitle").val();
+            var notiTypeCd = $("#notiTypeCd").val();
+            var sesUserId = $("#sesUserId").val();
+            var notiDispDate = $("#notiDispDate").val();
+            var notiContents = $("#notiContents").val();
+            var notiSeq = $("#notiSeq").val();
+            KBIZIO.requestParamAjax("/admin/noticeInsert.json", fn_saveCallback, {
+                 params: {
+                     notiSeq: notiSeq,
+                     notiTitle: notiTitle,
+                     notiTypeCd: notiTypeCd,
+                     notiDispDate: notiDispDate,
+                     notiContents: notiContents}, async: false});
+        }
+
+        function fn_saveCallback() {
+            if($("#notiFile").val() != ""){
+            	 var $f = $("#noticeDetailForm");
+            	 if($("#curFile").text() != ""){
+	                 $f.attr("action","/admin/notice/deleteFile.do?notiFilename="+encodeURI($("#curFile").text()));
+	                 $f.submit();
+            	 }
+                 $f.attr("action","/admin/notice/uploadFile.do?notiSeq="+$("#notiSeq").val());
+                 $f.submit();
+            }
+            //$("#curFile").text('');
+            alert("저장되었습니다.");
+            fn_searchClick();
+        }
+
+       //삭제
+        function fn_delete(){
+            if($("#notiSeq").val() == ""){
+                alert('삭제 할 항목을 선택해주세요.');
+                return;
+            }
+            if(!confirm("삭제하시겠습니까?"))return;
+            var notiSeq = $("#notiSeq").val();
+            KBIZIO.requestParamAjax("/admin/noticeDelete.json", fn_deleteCallback, {
+                 params: { notiSeq: notiSeq}, async: false});
+        }
+
+        function fn_deleteCallback() {
+            var $f = $("#noticeDetailForm");
+            if($("#curFile").text() != ""){
+                $f.attr("action","/admin/notice/deleteFile.do?notiFilename="+encodeURI($("#curFile").text()));
+	            $f.submit();
+            }
+           // $("#curFile").text('');
+            alert("삭제되었습니다.");
+            fn_searchClick();
+        }
+
+        //초기화
+        function fn_init() {
+            $("#btn_save").show();
+            $("#btn_del").hide();
+            $("#notiTitle").attr("readonly",false);
+            $("#notiContents").attr("readonly",false);
+            $("#notiTypeCd").attr("disabled",false);
+            $("#notiDispDate").attr("disabled",false);
+            document.noticeDetailForm.reset();
+            $("#notiSeq").val('');
+            $("#curFile").text('');
+        }
+    </script>
+</head>
+<body>
+<div class="admin_content">
+<div class="template_wrap">
+<form id="noticeSearchForm" name="noticeSearchForm" method="post" action="/admin/noticeList.view" onsubmit="return false;">
+<input type="hidden" id="pageIdx" name="pageIdx" value="1" />
+<input type="hidden" id="rowsPerPage" name="rowsPerPage" value="10" />
+    <div class="section">
+        <h3><span class="sec_tit">공지사항 검색</span></h3>
+        <table width="100%" border="0"  cellspacing="0" cellpadding="0" class="brd_sch">
+            <colgroup>
+                <col style="width:60px">
+                <col style="width:100px">
+                <col style="width:10px">
+                <col style="width:100px">
+                <col style="width:60px">
+                <col style="width:150px">
+                <col style="width:60px">
+                <col style="width:150px">
+                <col style="width:60px">
+                <col style="width:300px">
+                <col style="width:60px">
+            </colgroup>
+            <tr>
+                <th>등록일자</th>
+                <td class="ellips"><input type="text" name="selFromDt" id="selFromDt" value="" /></td>
+                <th>~</th>
+                <td class="ellips"><input type="text" name="selToDt" id="selToDt" value="" /></td>
+                <th>공지구분</th>
+                <td class="ellips"><kbiz:commCodeSelect lcode="004" selectId="selNotiTypeCd" firstOption="ALL" keydown="if(event.keyCode == 13) fn_searchClick();"/></td>
+                <th>등록자</th>
+                <td class="ellips"><input type="text" id="selRegNm" name="selRegNm" value="" onkeydown="if(event.keyCode == 13) fn_searchClick();" /></td>
+                <th>키워드</th>
+                <td><input type="text" id="selKeyword" name="selKeyword" value="" onkeydown="if(event.keyCode == 13) fn_searchClick();"/></td>
+                <td class="ellips ar"><a href="#" class="btn small g_orange" onclick="fn_searchClick();">조회</a></td>
+             </tr>
+        </table>
+    </div>
+</form>
+
+<div class="section">
+    <div id="noticeListView"></div>
+</div>
+<div class="section"><h3><span class="sec_tit">공지사항 상세보기</span></h3></div>
+<div id="noticeDetailJson">
+    <form id="noticeDetailForm" name="noticeDetailForm" enctype="multipart/form-data" method="post" action="" >
+    <input type="hidden" id="notiSeq" name="notiSeq" value="" />
+    <input type="hidden" id="notiFilename" name="notiFilename" value=""/>
+        <table width="100%" border="0"  cellspacing="0" cellpadding="0" class="brd_sch mgb10">
+             <colgroup>
+                <col style="width:100px">
+                <col>
+                <col style="width:100px">
+                <col>
+            </colgroup>
+            <tbody>
+                <tr>
+                   <th scope="row">제목</th>
+                   <td colspan="3"><input type="text" id="notiTitle" name="notiTitle" title="제목" maxlength="150"/></td>
+               </tr>
+               <tr>
+                   <th scope="row">공지구분</th>
+                   <td><kbiz:commCodeSelect lcode="004" selectId="notiTypeCd" firstOption="ALL" title="공지구분"/></td>
+                   <th scope="row">게시일자</th>
+                   <td><input type="text" id="notiDispDate" name="notiDispDate"/></td>
+               </tr>
+               <tr>
+                   <th scope="row">첨부파일</th>
+                   <td colspan="3"><input type="file" id="notiFile" name="notiFile"/> 현재파일 : <a href="#"><span id="curFile"></span></a></td>
+               </tr>
+               <!-- <tr>
+                   <th scope="row">등록일시</th>
+                   <td><input type="text" id="regDate" name="regDate" readonly="readonly"/></td>
+                   <th scope="row">등록자</th>
+                   <td><input type="text" id="regNm" name="regNm"  readonly="readonly"/></td>
+               </tr> -->
+               <tr>
+                    <th scope="row">내용</th>
+                    <td colspan="3">
+                        <textarea rows="6" cols="70" id="notiContents" name="notiContents" title="내용"></textarea>
+                    </td>
+               </tr>
+            </tbody>
+        </table>
+    </form>
+    </div>
+    <div class="btn_area clfix">
+        <div class="fr">
+            <button type="button" class="btn small g_blue" onclick="fn_init();">초기화</button>
+            <button id="btn_save" type="button" class="btn small g_blue" onclick="fn_save();">저장</button>
+            <button id="btn_del" type="button" class="btn small g_red" onclick="fn_delete();">삭제</button>
+        </div>
+    </div>
+</div>
+</div>
+</body>
+</html>

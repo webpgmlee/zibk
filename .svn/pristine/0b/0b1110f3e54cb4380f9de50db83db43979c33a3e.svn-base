@@ -1,0 +1,123 @@
+package or.kr.kbiz.serv.web.tags;
+
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.config.AutowireCapableBeanFactory;
+import org.springframework.web.context.WebApplicationContext;
+import org.springframework.web.servlet.tags.RequestContextAwareTag;
+
+import or.kr.kbiz.bo.common.domain.PageNaviDomain;
+import or.kr.kbiz.bo.common.service.CommonService;
+import or.kr.kbiz.serv.spring.mvc.BaseDomain;
+
+
+/**
+ * <pre>page navigation element 생성 TAG library</pre>
+ * 
+ * @author hyeok
+ * @since 2017.12.05
+ * @version 1.0
+ *
+ */
+public class PageNaviTag extends RequestContextAwareTag {
+
+	private static final long serialVersionUID = -1131086068927100675L;
+
+	private PageNaviDomain pageNaviDomain;
+
+	private static final Logger LOG = LoggerFactory.getLogger(PageNaviTag.class);
+
+	@Override
+    protected int doStartTagInternal() throws Exception {
+		StringBuffer sb = new StringBuffer();
+
+		if (pageNaviDomain != null) {
+			if (pageNaviDomain.getTotalcnt() > 0) {
+				/* make page navigation element */
+				sb.append("<a href=\"#\" class=\"first\"");
+				if (pageNaviDomain.getTotalPageGroup() > 1 && pageNaviDomain.getPageGroupIdx() > 1) {
+					sb.append(makeOnclickEvent(((pageNaviDomain.getPageGroupIdx() - 2) * pageNaviDomain.getPageRange()) + 1));
+				}
+				sb.append(">first</a>");
+				
+				sb.append("<a href=\"#\" class=\"prev\"");
+				if (pageNaviDomain.getTotalPage() > 1 && pageNaviDomain.getPageIdx() > 1) {
+					sb.append(makeOnclickEvent(pageNaviDomain.getPageIdx() - 1));
+				}
+				sb.append(">prev</a>");
+				
+				for (int i = 0, s = pageNaviDomain.getStartPageGroupIdx(); i < pageNaviDomain.getPageRange(); i++, s++) {
+					if (pageNaviDomain.getTotalPage() < s) {
+						break;
+					} else {
+						sb.append("<a href=\"#\"");
+						if (s == pageNaviDomain.getPageIdx()) {
+							sb.append(" class=\"on\"");
+						} else {
+							sb.append(makeOnclickEvent(s));
+						}
+						sb.append(">");
+						sb.append(s);
+						sb.append("</a>");
+					}
+				}
+				
+				sb.append("<a href=\"#\" class=\"next\"");
+				if (pageNaviDomain.getTotalPage() > pageNaviDomain.getPageIdx()) {
+					sb.append(makeOnclickEvent(pageNaviDomain.getPageIdx() + 1));
+				}
+				sb.append(">next</a>");
+				
+				sb.append("<a href=\"#\" class=\"last\"");
+				if (pageNaviDomain.getTotalPageGroup() > pageNaviDomain.getPageGroupIdx()) {
+					sb.append(makeOnclickEvent(((pageNaviDomain.getPageGroupIdx()) * pageNaviDomain.getPageRange()) + 1));
+				}
+				sb.append(">last</a>");
+			} else {
+				sb.append("<div class=\"empty\"> </div>");
+			}
+			
+		} else {
+			sb.append("잘못된 페이지 네비게이션 파라메터!");
+		}
+
+		pageContext.getOut().write(sb.toString());
+        return SKIP_BODY;
+    }
+	
+	public String makeOnclickEvent(int idx) {
+		StringBuffer sb = new StringBuffer();
+		sb.append(" onclick=\"_NARU.io.requestPageIdx('");
+		sb.append(idx);
+		sb.append("', '");
+		sb.append(pageNaviDomain.getSubmitTargetForm());
+		sb.append("', ");
+		sb.append(pageNaviDomain.getExecuteTargetFunction());
+		sb.append(");\"");
+		return sb.toString();
+	}
+	
+	public void setPageDomain(BaseDomain baseDomain) {
+		if (baseDomain != null) {
+			this.pageNaviDomain = new PageNaviDomain(baseDomain);
+		} else {
+			this.pageNaviDomain = new PageNaviDomain();
+		}
+	}
+	
+	public void setExecuteTargetFunction(String executeTargetFunction) {
+		if (this.pageNaviDomain == null) {
+			this.pageNaviDomain = new PageNaviDomain();
+		}
+		this.pageNaviDomain.setExecuteTargetFunction(executeTargetFunction);
+	}
+	
+	public void setSubmitTargetForm(String submitTargetForm) {
+		if (this.pageNaviDomain == null) {
+			this.pageNaviDomain = new PageNaviDomain();
+		}
+		this.pageNaviDomain.setSubmitTargetForm(submitTargetForm);
+	}
+
+}

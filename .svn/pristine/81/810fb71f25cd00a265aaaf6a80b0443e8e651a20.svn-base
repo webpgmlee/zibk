@@ -1,0 +1,223 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<beans xmlns="http://www.springframework.org/schema/beans"
+	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+    xmlns:context="http://www.springframework.org/schema/context"
+	xmlns:tx="http://www.springframework.org/schema/tx"
+	xmlns:aop="http://www.springframework.org/schema/aop"
+	xmlns:mvc="http://www.springframework.org/schema/mvc"
+	xsi:schemaLocation="http://www.springframework.org/schema/mvc http://www.springframework.org/schema/mvc/spring-mvc.xsd
+	   http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans.xsd
+	   http://www.springframework.org/schema/aop http://www.springframework.org/schema/aop/spring-aop-3.2.xsd
+	   http://www.springframework.org/schema/tx http://www.springframework.org/schema/tx/spring-tx-3.2.xsd
+	   http://www.springframework.org/schema/context http://www.springframework.org/schema/context/spring-context.xsd">
+
+	<!-- Root Context: defines shared resources visible to all other web components -->
+
+	<!-- AP DB Connect -->
+    <bean name="apDataSource" class="org.springframework.jdbc.datasource.DriverManagerDataSource">
+        <property name="driverClassName" value="oracle.jdbc.driver.OracleDriver" />
+        <property name="url" value="jdbc:oracle:thin:@172.30.2.44:1521:appdb" />
+        <property name="username" value="naruapp" />
+        <property name="password" value="naruAPP123" />
+    </bean>
+
+    <!-- mybatis -->
+    <bean id="apSqlSessionFactory" class="org.mybatis.spring.SqlSessionFactoryBean">
+        <property name="dataSource" ref="apDataSource" />
+        <property name="mapperLocations" value="classpath:or/kr/kbiz/bo/**/*sqlmap/*Mapper.xml" />
+        <property name="configLocation" value="classpath:config/mybatis/sqlMapConfig.xml" />
+    </bean>
+
+    <bean id="apBaseDao" class="or.kr.kbiz.serv.spring.mvc.BaseDaoIbatis" destroy-method="initDao">
+        <property name="sqlSessionFactory" ref="apSqlSessionFactory" />
+        <qualifier value="apBaseDao" />
+    </bean>
+
+    <!-- KBIZ DB Connect -->
+    <bean name="kbizDataSource" class="org.springframework.jdbc.datasource.DriverManagerDataSource">
+        <property name="driverClassName" value="oracle.jdbc.driver.OracleDriver" />
+        <property name="url" value="jdbc:oracle:thin:@192.1.104.211:2621:KBIZD" />
+        <property name="username" value="kbzcti" />
+        <property name="password" value="kbcti!01" />
+    </bean>
+
+    <!-- mybatis -->
+    <bean id="kbizSqlSessionFactory" class="org.mybatis.spring.SqlSessionFactoryBean">
+        <property name="dataSource" ref="kbizDataSource" />
+        <property name="mapperLocations" value="classpath:or/kr/kbiz/inf/kbiz/sqlmap/*Mapper.xml" />
+        <property name="configLocation" value="classpath:config/mybatis/sqlMapConfig.xml" />
+    </bean>
+
+    <bean id="kbizBaseDao" class="or.kr.kbiz.serv.spring.mvc.BaseDaoIbatis" destroy-method="initDao">
+        <property name="sqlSessionFactory" ref="kbizSqlSessionFactory" />
+        <qualifier value="kbizBaseDao" />
+    </bean>
+
+    <!-- REC1 DB Connect -->
+    <bean name="recDataSource1" class="org.springframework.jdbc.datasource.DriverManagerDataSource">
+        <property name="driverClassName" value="oracle.jdbc.driver.OracleDriver" />
+        <property name="url" value="jdbc:oracle:thin:@172.30.2.44:1521:recdb1" />
+        <property name="username" value="narurec" />
+        <property name="password" value="naruREC123" />
+    </bean>
+
+    <!-- mybatis -->
+    <bean id="recSqlSessionFactory1" class="org.mybatis.spring.SqlSessionFactoryBean">
+        <property name="dataSource" ref="recDataSource1" />
+        <property name="mapperLocations" value="classpath:or/kr/kbiz/inf/rec1/sqlmap/*Mapper.xml" />
+        <property name="configLocation" value="classpath:config/mybatis/sqlMapConfig.xml" />
+    </bean>
+
+    <bean id="recBaseDao1" class="or.kr.kbiz.serv.spring.mvc.BaseDaoIbatis" destroy-method="initDao">
+        <property name="sqlSessionFactory" ref="recSqlSessionFactory1" />
+        <qualifier value="recBaseDao1" />
+    </bean>
+
+    <!-- REC2 DB Connect -->
+    <bean name="recDataSource2" class="org.springframework.jdbc.datasource.DriverManagerDataSource">
+        <property name="driverClassName" value="oracle.jdbc.driver.OracleDriver" />
+        <property name="url" value="jdbc:oracle:thin:@172.30.2.44:1521:recdb2" />
+        <property name="username" value="narurec" />
+        <property name="password" value="naruREC123" />
+    </bean>
+
+    <!-- mybatis -->
+    <bean id="recSqlSessionFactory2" class="org.mybatis.spring.SqlSessionFactoryBean">
+        <property name="dataSource" ref="recDataSource2" />
+        <property name="mapperLocations" value="classpath:or/kr/kbiz/inf/rec2/sqlmap/*Mapper.xml" />
+        <property name="configLocation" value="classpath:config/mybatis/sqlMapConfig.xml" />
+    </bean>
+
+    <bean id="recBaseDao2" class="or.kr.kbiz.serv.spring.mvc.BaseDaoIbatis" destroy-method="initDao">
+        <property name="sqlSessionFactory" ref="recSqlSessionFactory2" />
+        <qualifier value="recBaseDao2" />
+    </bean>
+
+    <!-- ORAINT INFO DB Connect -->
+    <bean name="oraintDataSource" class="org.springframework.jdbc.datasource.DriverManagerDataSource">
+        <property name="driverClassName" value="oracle.jdbc.driver.OracleDriver" />
+        <property name="url" value="jdbc:oracle:thin:@192.1.1.94:1521:ORAINT" />
+        <property name="username" value="kbizvoc" />
+        <property name="password" value="Kbizvoc!23" />
+    </bean>
+
+    <!-- mybatis -->
+    <bean id="oraintSqlSessionFactory" class="org.mybatis.spring.SqlSessionFactoryBean">
+        <property name="dataSource" ref="oraintDataSource" />
+        <property name="mapperLocations" value="classpath:or/kr/kbiz/inf/oraint/sqlmap/*Mapper.xml" />
+        <property name="configLocation" value="classpath:config/mybatis/sqlMapConfig.xml" />
+    </bean>
+
+    <bean id="oraintBaseDao" class="or.kr.kbiz.serv.spring.mvc.BaseDaoIbatis" destroy-method="initDao">
+        <property name="sqlSessionFactory" ref="oraintSqlSessionFactory" />
+        <qualifier value="oraintBaseDao" />
+    </bean>
+
+    <!-- 공통 Exception 처리 -->
+    <bean id="exceptionResolver" class="or.kr.kbiz.serv.spring.exception.BoBaseExceptionResolver"/>
+
+    <!-- Custom JsonHttpMessageConverter -->
+    <bean id="customJsonHttpMessageConverter" class="or.kr.kbiz.serv.web.converter.JsonHttpMessageConverter">
+        <property name="failOnNullForPrimitives" value="false" />
+        <property name="failOnUnknownProperties" value="false" />
+        <property name="identOutput" value="true" />
+        <property name="sortPropertiesAlphabetically" value="true" />
+        <property name="useAnnotations" value="true" />
+        <property name="wrapRootValue" value="false" />
+    </bean>
+
+    <!--     <mvc:interceptors>
+         <bean id="webContentInterceptor" class="org.springframework.web.servlet.mvc.WebContentInterceptor">
+             <property name="cacheSeconds" value="0"/>
+             <property name="useExpiresHeader" value="true"/>
+             <property name="useCacheControlHeader" value="true"/>
+             <property name="useCacheControlNoStore" value="true"/>
+         </bean>
+         <mvc:interceptor>
+             <mvc:mapping path="/admin/**" />
+             <bean class="com.navercorp.pinpoint.web.interceptor.AdminAuthInterceptor" />
+         </mvc:interceptor>
+    </mvc:interceptors> -->
+
+    <!-- RequestMappingHandlerAdapter -->
+    <!-- <bean class="org.springframework.web.servlet.mvc.method.annotation.RequestMappingHandlerAdapter">
+        <property name="webBindingInitializer">
+            <bean class="org.springframework.web.bind.support.ConfigurableWebBindingInitializer" />
+        </property>
+        <property name="messageConverters">
+            <list>
+                <bean class="org.springframework.http.converter.ByteArrayHttpMessageConverter" />
+                <bean class="org.springframework.http.converter.StringHttpMessageConverter" />
+                <bean class="org.springframework.http.converter.FormHttpMessageConverter" />
+                <bean class="org.springframework.http.converter.xml.SourceHttpMessageConverter" />
+                <ref bean="customJsonHttpMessageConverter" />
+            </list>
+        </property>
+        <property name="customArgumentResolvers">
+            <list>
+                 <bean class="or.kr.kbiz.bo.login.resolver.LoginUserInfoArgumentResolver" />
+            </list>
+        </property>
+    </bean> -->
+
+    <!-- View Resolver -->
+    <bean class="org.springframework.web.servlet.view.ContentNegotiatingViewResolver">
+        <property name="mediaTypes">
+            <map>
+                <entry key="html" value="text/html" />
+                <entry key="view" value="text/html" />
+                <entry key="json" value="application/json" />
+                <entry key="xml" value="application/xml" />
+                <entry key="atom" value="application/atom+xml" />
+            </map>
+        </property>
+        <property name="viewResolvers">
+            <list>
+                <bean class="org.springframework.web.servlet.view.BeanNameViewResolver" />
+                <bean id="internalResourceViewResolver" class="org.springframework.web.servlet.view.InternalResourceViewResolver">
+                    <property name="prefix" value="/WEB-INF/jsp/"/>
+                    <property name="suffix" value=".jsp"/>
+                    <property name="order" value="1" />
+                </bean>
+            </list>
+        </property>
+        <property name="defaultViews">
+            <list>
+                <bean id="mappingJacksonJsonView" class="org.springframework.web.servlet.view.json.MappingJacksonJsonView">
+                    <property name="prefixJson" value="false" />
+                </bean>
+            </list>
+        </property>
+    </bean>
+
+	<!-- TransactionManager 설정 -->
+    <bean id="defaultTransactionManager"
+        class="org.springframework.jdbc.datasource.DataSourceTransactionManager">
+        <property name="dataSource" ref="apDataSource" />
+    </bean>
+
+    <tx:annotation-driven transaction-manager="defaultTransactionManager" />
+
+    <!-- Transaction Aop 설정 -->
+    <aop:config>
+        <aop:pointcut expression="execution(* or.kr.kbiz..*ServiceImpl+.*(..))" id="serviceTransactionPointcut" />
+        <aop:advisor advice-ref="serviceTransactionAdvice" pointcut-ref="serviceTransactionPointcut" />
+    </aop:config>
+
+    <!-- serviceTransactionAdvice 설정 -->
+    <tx:advice id="serviceTransactionAdvice" transaction-manager="defaultTransactionManager">
+        <tx:attributes>
+            <!-- 트렌젝션 분리시 사용 -->
+            <tx:method name="exceptionPut" propagation="REQUIRES_NEW" />
+            <!-- 트렌젝션 분리시 사용 -->
+            <tx:method name="select*" propagation="REQUIRED" read-only="true" />
+            <tx:method name="insert*" propagation="REQUIRED"  rollback-for="Exception" />
+            <tx:method name="update*" propagation="REQUIRED" rollback-for="Exception" />
+            <tx:method name="delete*" propagation="REQUIRED" rollback-for="Exception" />
+            <tx:method name="save*" propagation="REQUIRED" rollback-for="Exception" />
+            <!-- aspect용 트랜잭션 -->
+            <tx:method name="logging*" propagation="REQUIRES_NEW" no-rollback-for="Exception" />
+        </tx:attributes>
+    </tx:advice>
+
+</beans>

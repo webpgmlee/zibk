@@ -1,0 +1,372 @@
+<!doctype html>
+<html lang="ko">
+<head>
+<meta http-equiv="content-type" content="text/html; charset=utf-8">
+<meta http-equiv="X-UA-Compatible" content="IE=edge">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, minimum-scale=1.0, user-scalable=no">
+<meta name="subject" content="KBIZ">
+<meta name="author" content="KBIZ">
+<meta name="keywords" content="KBIZ">
+<meta name="description" content="KBIZ">
+<title>KBIZ</title>
+<script type="text/javascript" src="http://code.jquery.com/jquery-latest.min.js"></script>
+<script type="text/javascript" src="js/common.js"></script>
+<link rel="stylesheet" href="css/reset.css" type="text/css" media="screen" />
+<link rel="stylesheet" href="css/common.css" type="text/css" media="screen" />
+<script type="text/javascript">
+
+</script>
+<style>
+
+</style>
+</head>
+<body>
+<form name="frm" id="frm" style="height:100%">
+<input type="hidden" name="from_date" value=""/>
+<input type="hidden" name="to_date" value=""/>
+<input type="hidden" name="ses_userid" id="ses_userid" value=""/>
+<input type="hidden" name="ses_usernm" id="ses_usernm" value=""/> 
+<div class="wrap_index">
+    <div class="container">
+        <table width="100%" height="100%" border="0" cellspacing="0" cellpadding="0" class="frame_wrap">
+            <colgroup>
+                <col style="width:50%">
+                <col style="width:50%">
+            </colgroup>
+            <tbody>
+                <tr>
+                    <td style="height:230px; vertical-align:top">
+                        <div class="frame">                        
+                            <div class="main_today">
+                                <ul>
+                                    <li><span>2017년</span></li>
+                                    <li><span>11월</span></li>
+                                    <li><span>15일</span></li>
+                                    <li><span>수요일</span></li>
+                                </ul>
+                            </div>
+                        </div>
+                    </td>
+                    <td style="height:230px; vertical-align:top">
+                        <div class="frame">
+                        <!--전일상담현황-->
+                        <div class="section pdt00">
+                            <!--<h3><span class="sec_tit">전일상담 현황</span></h3>-->
+                            <div class="main_status">
+                                <ul class="clfix">
+                                    <li><em><strong>112</strong>건</em><span>미처리건수</span></li>
+                                    <li><em><strong>12</strong>건</em><span>상담완료</span></li>
+                                    <li><em><strong>31</strong>건</em><span>이관내역</span></li>
+                                    <li><em><strong>234</strong>건</em><span>예약전화</span></li>
+                                </ul>
+                            </div>
+                        </div>
+                        <!--/전일상담현황-->
+                        </div>
+                    </td>
+                </tr>
+                <tr>
+                    <td style="height:auto; vertical-align:top">
+                        <div class="frame">
+                        <!--공지사항-->
+                        	<div class="section pdt03">
+                            	<h3><span class="sec_tit">공지사항</span></h3>
+    	                    	<div id="tab111">
+                                    <input type="hidden" name="hid_from_date" id="hid_from_date" value=""/>
+                                    <input type="hidden" name="hid_curr_date" id="hid_curr_date" value=""/> 
+                                    <input type="hidden" name="" id="" value=""/>
+                                    <table width="100%" border="0"  cellspacing="0" cellpadding="0" class="brd_list_a hover_action">
+                                        <colgroup>
+                                            <col style="width:30px">
+                                            <col style="width:50px">
+                                            <col>
+                                            <col style="width:70px">
+                                            <col style="width:50px">
+                                        </colgroup>
+                                        <thead>
+                                        <tr>
+                                            <th>NO</th>
+                                            <th>구분</th>
+                                            <th>제목</th>
+                                            <th>공지일시</th>
+                                            <th>등록자</th>
+                                        </tr>
+                                        </thead>
+                                        <tbody>
+                                        <tr onclick="javascrpit:f_selectpopup('');parent.MouseClick(this);">
+                                            <td>1</td>
+                                            <td>구분</td>
+                                            <td class="ellips al">중소기업중앙회 노란공제 일정을 알려드리겠습니다.</td>
+                                            <td>2017/11/16</td>
+                                            <td>홍길동</td>
+                                        </tr>
+                                        <tr onclick="javascrpit:f_selectpopup('');parent.MouseClick(this);">
+                                            <td>1</td>
+                                            <td>구분</td>
+                                            <td class="ellips al">중소기업중앙회 노란공제 일정을 알려드리겠습니다.</td>
+                                            <td>2017/11/16</td>
+                                            <td>홍길동</td>
+                                        </tr>
+                                        <tr onclick="javascrpit:f_selectpopup('');parent.MouseClick(this);">
+                                            <td>1</td>
+                                            <td>구분</td>
+                                            <td class="ellips al">중소기업중앙회 노란공제 일정을 알려드리겠습니다.</td>
+                                            <td>2017/11/16</td>
+                                            <td>홍길동</td>
+                                        </tr>
+                                        <tr onclick="javascrpit:f_selectpopup('');parent.MouseClick(this);">
+                                            <td>1</td>
+                                            <td>구분</td>
+                                            <td class="ellips al">중소기업중앙회 노란공제 일정을 알려드리겠습니다.</td>
+                                            <td>2017/11/16</td>
+                                            <td>홍길동</td>
+                                        </tr>
+                                        <tr onclick="javascrpit:f_selectpopup('');parent.MouseClick(this);">
+                                            <td>1</td>
+                                            <td>구분</td>
+                                            <td class="ellips al">중소기업중앙회 노란공제 일정을 알려드리겠습니다.</td>
+                                            <td>2017/11/16</td>
+                                            <td>홍길동</td>
+                                        </tr>
+                                        </tbody>
+                                        <tfoot>
+                                        <tr>
+                                            <td colspan="5" style="height:50px">조회 결과가 없습니다.</td>
+                                        </tr>
+                                        </tfoot>
+                                    </table>
+                                    <!--/게시판-->
+                                    <table width="100%" border="0"  cellspacing="0" cellpadding="0" class="brd_sch">
+                                        <colgroup>
+                                            <col style="width:80px">
+                                            <col>
+                                            <col style="width:80px">
+                                            <col>
+                                            <col style="width:80px">
+                                            <col>
+                                            <col style="width:80px">
+                                            <col>
+                                        </colgroup>
+                                        <tr>
+                                            <th>상담일시</th>
+                                            <td>2017-10-25</td>
+                                            <th>고객명</th>
+                                            <td>홍길동</td>
+                                            <th>상담사</th>
+                                            <td>김영수</td>
+                                            <th>처리구분</th>
+                                            <td>완료</td>
+                                        </tr>
+                                        <tr>
+                                            <th>내용</th>
+                                            <td colspan="7" align="left"><div style="min-height:150px; overflow-y:auto">처리가 완료되었습니다.</div></td>
+                                        </tr>
+                                    </table>
+                                </div>
+	                        </div>
+                        <!--/공지사항-->
+                        </div>
+                    </td>
+                    <td style="height:auto; vertical-align:top">
+                        <div class="frame">
+                        <!--이관내역//-->
+                        <div class="brd_top clfix">
+                            <!--탭//-->
+                            <div class="com_tab db">
+                                <ul class="tabs color03">
+                                    <li class="active" rel="tab1"><a href="#">이관내역</a><!--<img src="./images/tab03_01_ov.gif" name="image1" id="image1" onMouseOut="f_MA_out('1')" onMouseOver="f_MA_over('1')"  border="0" style="cursor:pointer;" >--></li>
+                                    <li rel="tab2"><a href="#">예약전화</a><!--<img src="./images/tab03_02_off.gif" name="image2" id="image2" onMouseOut="f_MA_out('2')" onMouseOver="f_MA_over('2')"  border="0" style="cursor:pointer;" >--></li>
+                                </ul>
+                            </div>
+                            <!--//탭-->
+                        </div> 
+                        <div class="tab_container">
+                            <!-- cr_LI01 start --> 
+                            <div id="tab1" class="tab_content">
+                                <!--게시판-->
+                                <table width="100%" border="0"  cellspacing="0" cellpadding="0" class="brd_list_a hover_action">
+                                    <colgroup>
+                                        <col style="width:40px">
+                                        <col style="width:80px">
+                                        <col>
+                                        <col style="width:120px">
+                                        <col style="width:50px">
+                                        <col style="width:50px">
+                                    </colgroup>
+                                    <thead>
+                                    <tr>
+                                      <th>No</th>
+                                        <th>상담일시</th>
+                                        <th>인입채널</th>
+                                        <th>계약번호</th>
+                                        <th>고객명</th>
+                                        <th>이관자</th>
+                                    </tr>
+                                    </thead>
+                                    <tbody>
+                                    <tr>
+                                      <td>1</td>
+                                        <td>2017/11/02</td>
+                                        <td class="ellips al">노란우산공제</td>
+                                        <td>1923847-192834</td>
+                                        <td>김대준</td>
+                                        <td>홍길동</td>
+                                      </tr>
+                                    <tr>
+                                      <td>2</td>
+                                        <td>2017/11/02</td>
+                                        <td class="ellips al">공제기금</td>
+                                        <td>1923847-192834</td>
+                                        <td>김대준</td>
+                                        <td>홍길동</td>
+                                      </tr>
+                                    <tr>
+                                      <td>3</td>
+                                        <td>2017/11/02</td>
+                                        <td class="ellips al">노란우산공제</td>
+                                        <td>1923847-192834</td>
+                                        <td>김대준</td>
+                                        <td>홍길동</td>
+                                      </tr>
+                                    <tr>
+                                      <td>4</td>
+                                        <td>2017/11/02</td>
+                                        <td class="ellips al">노란우산공제</td>
+                                        <td>1923847-192834</td>
+                                        <td>김대준</td>
+                                        <td>홍길동</td>
+                                      </tr>
+                                    <tr>
+                                      <td>5</td>
+                                        <td>2017/11/02</td>
+                                        <td class="ellips al">노란우산공제</td>
+                                        <td>1923847-192834</td>
+                                        <td>김대준</td>
+                                        <td>홍길동</td>
+                                      </tr>
+                                    </tbody>
+                                    <tfoot>
+                                    <tr>
+                                        <td colspan="6" style="height:50px;">조회 결과가 없습니다.</td>
+                                    </tr>
+                                    </tfoot>
+                                </table>
+                                <!--/게시판-->
+                                <table width="100%" border="0"  cellspacing="0" cellpadding="0" class="brd_sch">
+                                    <colgroup>
+                                        <col style="width:80px">
+                                        <col>
+                                        <col style="width:80px">
+                                        <col>
+                                        <col style="width:80px">
+                                        <col>
+                                        <col style="width:80px">
+                                        <col>
+                                    </colgroup>
+                                    <tr>
+                                        <th>상담일시</th>
+                                        <td>2017-10-25</td>
+                                        <th>고객명</th>
+                                        <td>홍길동</td>
+                                        <th>상담사</th>
+                                        <td>김영수</td>
+                                        <th>처리구분</th>
+                                        <td>완료</td>
+                                    </tr>
+                                    <tr>
+                                        <th>내용</th>
+                                        <td colspan="7" align="left"><div style="min-height:150px; overflow-y:auto">처리가 완료되었습니다.</div></td>
+                                    </tr>
+                                </table>
+                            </div>
+                            <!-- cr_LI01 end -->
+                            <!-- cr_LI02 start -->
+                          <div id="tab2" class="tab_content">
+                                <table width="100%" border="0"  cellspacing="0" cellpadding="0" class="brd_sch mgb10">
+                                    <colgroup>
+                                        <col style="width:80px">
+                                        <col>
+                                        <col style="width:70px">
+                                    </colgroup>
+                                    <tr>
+                                        <th>상담구분</th>
+                                        <td><select id="cnsl_tp" name="cnsl_tp"><option value="">전체</option><option value=""></option></select></td>
+                                        <td class="ar"><a href="#" class="btn small g_orange">조회</a><!--<img src="./images/btn_select01.gif" border="0" onClick="JavaScript:f_loadList('0')" style="cursor:pointer;" />--></td>
+                                    </tr>
+                                </table>
+                                <!--게시판-->
+                                <table width="100%" border="0"  cellspacing="0" cellpadding="0" class="brd_list_a hover_action">
+                                    <colgroup>
+                                        <col style="width:20%">
+                                        <col style="width:20%">
+                                        <col style="width:20%">
+                                        <col style="width:20%">
+                                        <col style="width:20%">
+                                    </colgroup>
+                                    <thead>
+                                    <tr>
+                                        <th>일시</th>
+                                        <th>상담구분</th>
+                                        <th>전화번호</th>
+                                        <th>처리구분</th>
+                                        <th>처리자명</th>
+                                    </tr>
+                                    </thead>
+                                    <tbody>
+                                    <tr>
+                                        <td>2017/11/02</td>
+                                        <td>대출안내</td>
+                                        <td>010-1245-5896</td>
+                                        <td>완료</td>
+                                        <td>홍길동</td>
+                                    </tr>
+                                    <tr>
+                                        <td>2017/11/02</td>
+                                        <td>대출안내</td>
+                                        <td>010-1245-5896</td>
+                                        <td>완료</td>
+                                        <td>홍길동</td>
+                                    </tr>
+                                    <tr>
+                                        <td>2017/11/02</td>
+                                        <td>대출안내</td>
+                                        <td>010-1245-5896</td>
+                                        <td>완료</td>
+                                        <td>홍길동</td>
+                                    </tr>
+                                    <tr>
+                                        <td>2017/11/02</td>
+                                        <td>대출안내</td>
+                                        <td>010-1245-5896</td>
+                                        <td>완료</td>
+                                        <td>홍길동</td>
+                                    </tr>
+                                    <tr>
+                                        <td>2017/11/02</td>
+                                        <td>대출안내</td>
+                                        <td>010-1245-5896</td>
+                                        <td>완료</td>
+                                        <td>홍길동</td>
+                                    </tr>
+                                    </tbody>
+                                    <tfoot>
+                                    <tr>
+                                        <td colspan="5" style="height:50px;">조회 결과가 없습니다.</td>
+                                    </tr>
+                                    </tfoot>
+                                </table>
+                                <!--/게시판-->
+                            </div>
+                            <!-- cr_LI02 end -->
+                        </div>
+                        <!--//이관내역-->
+                        </div>
+                    </td>
+                </tr>
+            </tbody>
+        </table>
+    </div>
+</div>
+</form>
+</body>
+</html>

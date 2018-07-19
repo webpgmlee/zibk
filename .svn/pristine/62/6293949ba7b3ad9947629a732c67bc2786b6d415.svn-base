@@ -1,0 +1,35 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper
+  PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+  "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="kbizinbound">
+	<!-- 상담내용 저장2(차세대) -->
+	<insert id="insertConsultDetail2" parameterType="ConsultDetailDomain">
+			INSERT INTO TB_CM_CSCOT_M
+			(
+				CSL_SEQNO, CSL_DETL_SN, CSL_PRCS_DSCD,
+				CSL_DTM, UNTY_CSNO, CS_KRN_NM,
+				UNTY_CNTR_NO, CNTR_NO, CSL_BGN_DTM,
+				CSL_END_DTM, CSL_TLNO, TECO_YN,
+				CSL_INBN_OTBN_DSCD, VRC_URL_ADR, VRC_NO,
+				CSL_DCTNS, CSL_ANSW_DCTNS, CSLER_NM,
+				CSL_CHNL_DSCD, SCL_DSCD, MCL_DSCD,
+				LCL_DSCD, TRNSF_PRCS_CHRPN_NM, RSRVT_DTM,
+				RSRVT_TLNO, FRST_REGPN_ID, FRST_REG_DTM,
+				FNL_UDTPN_ID, FNL_UDT_DTM
+			)
+			VALUES
+			(
+				#{cnltSeq}, #{cnltDetailNo}, #{cnltProcCd},
+				TO_DATE(#{cnltDate},'YYYY-MM-DD HH24:MI:SS'), #{custNo, jdbcType=VARCHAR}, #{custNm, jdbcType=VARCHAR},
+				#{untyCntrNo, jdbcType=VARCHAR}, #{cntrNo, jdbcType=VARCHAR}, TO_DATE(#{callStartDate},'YYYY-MM-DD HH24:MI:SS'),
+				TO_DATE(#{callEndDate},'YYYY-MM-DD HH24:MI:SS'), #{tellNum}, 'Y',
+				'I', #{recUrl, jdbcType=VARCHAR}, #{recKey, jdbcType=VARCHAR},
+				#{recvNote}, #{procNote}, #{userNm, jdbcType=VARCHAR},
+				#{chnlCode}, #{scode}, #{mcode},
+				#{lcode}, #{tranId, jdbcType=VARCHAR}, TO_DATE(#{rsrvDate, jdbcType=VARCHAR},'YYYY-MM-DD HH24:MI:SS'),
+				#{rsrvTellNum, jdbcType=VARCHAR}, #{regId}, sysdate,
+				#{modId}, sysdate
+			)
+	</insert>
+</mapper>

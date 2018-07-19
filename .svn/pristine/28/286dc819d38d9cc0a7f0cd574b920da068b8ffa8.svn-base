@@ -1,0 +1,131 @@
+package or.kr.kbiz.bo.admin.controller;
+
+import java.text.SimpleDateFormat;
+import java.util.Date;
+import java.util.List;
+
+import javax.servlet.http.HttpServletResponse;
+
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.stereotype.Controller;
+import org.springframework.ui.Model;
+import org.springframework.web.bind.annotation.ModelAttribute;
+import org.springframework.web.bind.annotation.RequestMapping;
+
+import or.kr.kbiz.bo.admin.domain.ConsultHistDomain;
+import or.kr.kbiz.bo.admin.service.ConsultHistService;
+import or.kr.kbiz.serv.util.WriteListToExcelFile;
+/**
+ * <pre>ConsultHistController</pre>
+ *
+ * @author bsy
+ * @since 2017.11.20
+ * @version 1.0
+ */
+@Controller
+@RequestMapping(value="/admin")
+public class ConsultHistController {
+
+	private static final Logger logger = LoggerFactory.getLogger(ConsultHistController.class);
+
+	private static String PREFIX = "admin";
+
+	@Autowired
+	private ConsultHistService consultHistService;
+	/**
+	 * <pre>상담이력 화면 호출</pre>
+	 *
+	 * @param consultHistInit 템플릿 도메인
+	 * @param model Model 객체
+	 * @return String 요청화면 url
+	 */
+	@RequestMapping(value="/consultHist")
+	public String consultHistInit(@ModelAttribute ConsultHistDomain consultHistDomain, Model model) {
+		model.addAttribute("resultList", consultHistService.selectConsultHistList(consultHistDomain));
+		//인입채널코드 조회
+		model.addAttribute("selChCode", consultHistService.selectChCodeList(consultHistDomain));
+		//model.addAttribute("chCode", consultHistService.selectChCodeList(consultHistDomain));
+		return PREFIX + "/consultHist";
+	}
+	/**
+	 * <pre>상담이력 목록  호출</pre>
+	 *
+	 * @param consultHistList 템플릿 도메인
+	 * @param model Model 객체
+	 * @return String 요청화면 url
+	 */
+	@RequestMapping(value="/consultHistList", produces="text/html")
+	public String consultHistList(@ModelAttribute ConsultHistDomain consultHistDomain, Model model) {
+		model.addAttribute("pageDomain", consultHistDomain);
+		model.addAttribute("resultList", consultHistService.selectConsultHistList(consultHistDomain));
+		return PREFIX + "/view/consultHistList";
+	}
+
+	/**
+	 * <pre>상담이력  상세 조회</pre>
+	 *
+	 * @param consultHistDetail 템플릿 도메인
+	 * @param model Model 객체
+	 */
+	@RequestMapping(value="/consultHistDetail")
+	public void consultHistDetail(@ModelAttribute ConsultHistDomain consultHistDomain, Model model) {
+		model.addAttribute("result", consultHistService.selectConsultHistDetail(consultHistDomain));
+	}
+
+	/**
+	 * <pre>대분류 조회</pre>
+	 *
+	 * @param consultLcode 템플릿 도메인
+	 * @param model Model 객체
+	 * @return String 요청화면 url
+	 */
+	@RequestMapping(value="/consultLcode")
+	public void consultLcode(@ModelAttribute ConsultHistDomain consultHistDomain, Model model) {
+		model.addAttribute("result", consultHistService.selectconsultLcodeList(consultHistDomain));
+	}
+
+	/**
+	 * <pre>중분류 조회</pre>
+	 *
+	 * @param consultMcode 템플릿 도메인
+	 * @param model Model 객체
+	 * @return String 요청화면 url
+	 */
+	@RequestMapping(value="/consultMcode")
+	public void consultMcode(@ModelAttribute ConsultHistDomain consultHistDomain, Model model) {
+		model.addAttribute("result", consultHistService.selectconsultMcodeList(consultHistDomain));
+	}
+
+	/**
+	 * <pre>소분류 조회</pre>
+	 *
+	 * @param consultScode 템플릿 도메인
+	 * @param model Model 객체
+	 * @return String 요청화면 url
+	 */
+	@RequestMapping(value="/consultScode")
+	public void consultScode(@ModelAttribute ConsultHistDomain consultHistDomain, Model model) {
+		model.addAttribute("result", consultHistService.selectconsultScodeList(consultHistDomain));
+	}
+
+	/**
+	 * Excel Down
+	 *
+	 * @param
+	 * @return
+	 */
+	@RequestMapping(value="/consultHist/excel")
+	public void excelDown(@ModelAttribute ConsultHistDomain consultHistDomain, HttpServletResponse response, Model model){
+		List<ConsultHistDomain> consultHistList = consultHistService.selectConsultHistExcelList(consultHistDomain);
+		SimpleDateFormat sdf = new SimpleDateFormat("yyyyMMdd");
+		String today = sdf.format(new Date());
+		String fileName = "상담이력_"+today;
+		try {
+			WriteListToExcelFile.writeConsultHIstListToFile(fileName+".xls", consultHistList, response);
+		} catch (Exception e) {
+			e.printStackTrace();
+		}
+	}
+}

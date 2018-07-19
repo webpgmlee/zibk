@@ -1,0 +1,159 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper
+  PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+  "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="code">
+
+    <!-- [공통코드] 목록 조회 -->
+	<select id="select" resultType="AdminCodeDomain" parameterType="AdminCodeDomain">
+	       SELECT LCODE
+	                  , LCODE_NAME
+	                  , MCODE
+	                  , MCODE_NAME
+	                  , USE_YN
+	                  , SORT_IDX
+	                  , REG_NM
+	                  , CODE_DESC
+                      , RNUM
+            FROM (
+                SELECT
+                    LCODE
+                  , LCODE_NAME
+                  , MCODE
+                  , MCODE_NAME
+                  , USE_YN
+                  , SORT_IDX
+                  , REG_NM
+                  , CODE_DESC
+                 , ROWNUM AS RNUM
+                    FROM (
+				       SELECT TC.LCODE
+								, (SELECT CODE_NAME FROM TH_CODE WHERE  LCODE=TC.LCODE  AND LCODE <![CDATA[<>]]> '00' AND MCODE='00' ) AS LCODE_NAME
+								, TC.MCODE
+								, (SELECT CODE_NAME FROM TH_CODE WHERE  LCODE=TC.LCODE AND MCODE=TC.MCODE AND MCODE <![CDATA[<>]]> '00' ) AS MCODE_NAME
+								, TC.USE_YN
+								, TC.SORT_IDX
+			                    , (SELECT USER_NM FROM IF_CO_USER_MA WHERE USER_ID = TC.REG_ID) AS REG_NM
+			                    , CODE_DESC
+						FROM TH_CODE TC
+				      WHERE 1=1
+			              <if test="selLcode != null and selLcode != '' and selLcode != '000'" >
+			              AND TC.LCODE = #{selLcode}
+			              </if>
+			              <if test="selMcode != null and selMcode != ''and selMcode != '000'">
+			              AND TC.MCODE  = #{selMcode}
+			              </if>
+			              <if test="selUseYn != null and selUseYn != ''">
+			              AND TC.USE_YN  = #{selUseYn}
+			              </if>
+			 	      ORDER BY TC.LCODE, TC.MCODE
+                           )
+                 )
+         WHERE RNUM BETWEEN #{fromRowPerPage} AND #{toRowPerPage}
+	</select>
+
+    <!--[공통코드] 페이징  -->
+    <select id="selectCodeTotalCount" resultType="int">
+        SELECT
+            COUNT(*) AS TOTALCNT
+          FROM TH_CODE TC
+          WHERE 1=1
+           <if test="selLcode != null and selLcode != '' and selLcode != '000'" >
+           AND TC.LCODE = #{selLcode}
+           </if>
+           <if test="selMcode != null and selMcode != ''and selMcode != '000'">
+           AND TC.MCODE  = #{selMcode}
+           </if>
+           <if test="selUseYn != null and selUseYn != ''">
+           AND TC.USE_YN  = #{selUseYn}
+           </if>
+    </select>
+
+    <!-- [공통코드] 상세목록 조회 -->
+     <select id="selectDetail" resultType="AdminCodeDomain" parameterType="AdminCodeDomain">
+           SELECT LCODE
+                    , MCODE
+                    , CODE_NAME
+                    , SORT_IDX
+                    , USE_YN
+                    , (SELECT USER_NM FROM IF_CO_USER_MA WHERE USER_ID = A.REG_ID) AS REG_NM
+                    , REG_DATE
+                    , CODE_DESC
+            FROM TH_CODE  A
+          WHERE 1=1
+               AND LCODE = #{lcode}
+               AND MCODE = #{mcode}
+    </select>
+
+    <!-- [인입채널코드] 중복 조회 -->
+    <select id="selectCheck" resultType="AdminCodeDomain" parameterType="AdminCodeDomain">
+        SELECT COUNT(*) AS OVERLAP_CNT
+            FROM TH_CODE
+          WHERE 1=1
+               AND LCODE = #{lcode}
+               AND MCODE = #{mcode}
+    </select>
+
+   <!--  [인입채널코드] 저장 -->
+    <insert id="insertCode" parameterType="AdminCodeDomain">
+           INSERT INTO TH_CODE(
+                LCODE
+				,MCODE
+				,CODE_NAME
+				,SORT_IDX
+				,USE_YN
+				,CODE_DESC
+				,REG_ID
+				,REG_DATE
+				,MOD_ID
+				,MOD_DATE
+           )VALUES(
+                #{lcode}
+                ,#{mcode}
+                ,#{codeName}
+                ,#{sortIdx}
+                ,#{useYn}
+                ,#{codeDesc}
+                ,#{loginUserId}
+                ,sysdate
+                ,#{loginUserId}
+                ,sysdate
+           )
+    </insert>
+
+    <!-- [인입채널코드] 수정 -->
+    <update id="updateCode" parameterType="AdminCodeDomain">
+        UPDATE TH_CODE
+             SET USE_YN = #{useYn},
+                    SORT_IDX = #{sortIdx},
+                    CODE_DESC = #{codeDesc},
+                    MOD_ID = #{loginUserId},
+                    MOD_DATE = sysdate
+          WHERE LCODE = #{lcode}
+              AND MCODE = #{mcode}
+
+    </update>
+    <!-- [공통코드] 대분류 조회 -->
+    <select id="selectLcode" resultType="AdminCodeDomain" parameterType="AdminCodeDomain">
+           SELECT LCODE
+                    , CODE_NAME
+            FROM TH_CODE
+          WHERE 1=1
+              AND LCODE!='000'
+              AND MCODE='00'
+ ORDER BY SORT_IDX ASC
+    </select>
+
+    <!--  [공통코드] 중분류 조회-->
+    <select id="selectMcode" resultType="AdminCodeDomain" parameterType="AdminCodeDomain">
+           SELECT MCODE
+                    , CODE_NAME
+            FROM TH_CODE
+          WHERE 1=1
+             <if test="lcode != null and lcode != ''">
+              AND LCODE = #{lcode}
+              AND MCODE!='00'
+              </if>
+ ORDER BY SORT_IDX ASC
+    </select>
+</mapper>

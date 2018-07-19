@@ -1,0 +1,70 @@
+<%@ page language="java" contentType="text/html; charset=UTF-8" pageEncoding="UTF-8"%>
+<%@ taglib prefix="fmt" uri="/WEB-INF/tld/fmt.tld" %>
+<%@ taglib prefix="kbiz" uri="/WEB-INF/tld/kbiz.tld" %>
+<!doctype html>
+<html lang="ko">
+<head>
+<meta http-equiv="content-type" content="text/html; charset=utf-8">
+<meta http-equiv="X-UA-Compatible" content="IE=edge">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, minimum-scale=1.0, user-scalable=no">
+<meta name="subject" content="KBIZ">
+<meta name="author" content="KBIZ">
+<meta name="keywords" content="KBIZ">
+<meta name="description" content="KBIZ">
+<jsp:include page="/WEB-INF/jsp/comm_top.jsp"/>
+<title>KBIZ</title>
+<script type="text/javascript">
+$(function(){
+	$("#nFile").click(function(){
+		location.href="/notice/downloadFile.do?notiFilename="+encodeURI($("#nFile").text());
+	});
+});
+</script>
+</head>
+<body>
+<div class="popup-wrap">
+    <div class="popup-layer">
+        <div class="popup-container">
+            <div class="popup-conts">
+                <!--content //-->
+				<div class="boardListWrap mgb" style="width:100%;">
+					<table border="0" cellspacing="0" cellpadding="0" class="brd_sch mgt20">
+						<colgroup>
+							<col style="width:80px">
+							<col style="width:120px">
+                            <col style="width:80px">
+							<col style="width:160px">
+                            <col style="width:90px">
+							<col style="width:90px">
+							<col style="width:90px">
+							<col style="width:40px">
+						</colgroup>
+						<tr>
+						  <th>제목</th>
+						  <td colspan="5" class="pdl10">${noticeDetail.notiTitle}</td>
+						  <th>공지구분</th>
+							<td class="pdl10"><img src="/img/notice_icon${noticeDetail.notiTypeCd}.png"></td>
+						</tr>
+						<tr>
+						  <th>작성자</th>
+						  <td class="pdl10">${noticeDetail.modNm}</td>
+						  <th>작성일</th>
+						  <td class="pdl10">${kbiz:getDate(noticeDetail.regDate)}</td>
+						  <th>첨부파일</th>
+						  <td class="pdl10" colspan="3"><a href="#"><span id="nFile">${noticeDetail.notiFilename}</span></a></td>
+						</tr>
+						<tr>
+							<th>내용</th>
+						    <td colspan="7"><div name="textarea" id="textarea" style="height:200px">${noticeDetail.notiContents}</div></td>
+					    </tr>
+					</table>
+				</div>
+            </div>
+        </div>
+		<div class="popup-footer">
+			<a href="#stop" class="btn small g_lightgray clostBtn" onClick="javascript:window.close();"><span class="buttonStyleText">닫기</span></a>
+		</div>
+    </div>
+</div>
+</body>
+</html>

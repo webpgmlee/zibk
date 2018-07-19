@@ -1,0 +1,12 @@
+#NOTE: This is an Aether internal implementation file, its format can be changed without prior notice.
+#Tue Nov 14 01:10:27 KST 2017
+https\://maven.oracle.com/.error=Could not transfer artifact ojdbc\:ojdbc\:jar\:sources\:11.2 from/to maven.oracle.com (https\://maven.oracle.com)\: Access denied to https\://maven.oracle.com/ojdbc/ojdbc/11.2/ojdbc-11.2-sources.jar. Error code 401, Authorization Required
+http\://mesir.googlecode.com/svn/trunk/mavenrepo/.error=
+http\://central.maven.org/maven2/.lastUpdated=1510589422926
+http\://mesir.googlecode.com/svn/trunk/mavenrepo/.lastUpdated=1510589423165
+https\://repo.maven.apache.org/maven2/.lastUpdated=1510589427575
+https\://repo.maven.apache.org/maven2/.error=
+http\://repo1.maven.org/maven2/.lastUpdated=1510589422470
+http\://repo1.maven.org/maven2/.error=
+@default-maven.oracle.com-https\://maven.oracle.com/.lastUpdated=1510589426143
+http\://central.maven.org/maven2/.error=

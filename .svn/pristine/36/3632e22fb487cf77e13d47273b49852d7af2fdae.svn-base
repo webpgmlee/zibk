@@ -1,0 +1,81 @@
+package or.kr.kbiz.bo.admin.service;
+
+import java.util.List;
+
+import javax.servlet.http.HttpServletRequest;
+import javax.servlet.http.HttpServletResponse;
+
+import or.kr.kbiz.bo.admin.domain.ChannelCodeDomain;
+/**
+ * <pre>ScriptService</pre>
+ *
+ * @author bsy
+ * @since 2017.11.20
+ * @version 1.0
+ */
+public interface ScriptService {
+
+	/**
+	 * 목록 조회 템플릿
+	 *
+	 * @param param
+	 * @return List<ChannelCodeDomain>
+	 */
+	abstract List<ChannelCodeDomain> selectScriptList(ChannelCodeDomain param);
+
+	/**
+	 * 상세목록 조회 템플릿
+	 *
+	 * @param param
+	 * @return ChannelCodeDomain
+	 */
+	abstract ChannelCodeDomain selectScriptDetail(ChannelCodeDomain param);
+
+	/**
+	 * 수정 템플릿
+	 *
+	 * @param param
+	 * @return ChannelCodeDomain
+	 */
+	abstract void sciptUpdate(ChannelCodeDomain param);
+
+	/**
+	 * 대분류코드 템플릿
+	 *
+	 * @param param
+	 * @return ChannelCodeDomain
+	 */
+	abstract  List<ChannelCodeDomain> selectscriptLcodeList(ChannelCodeDomain param);
+
+	/**
+	 * 중분류코드 템플릿
+	 *
+	 * @param param
+	 * @return ChannelCodeDomain
+	 */
+	abstract List<ChannelCodeDomain> selectscriptMcodeList(ChannelCodeDomain param);
+
+	/**
+	 * 파일업로드
+	 *
+	 * @param param
+	 */
+	abstract void uploadFile(String hidChnlCode, String hidLcode, String hidMcode, String hidScode,HttpServletRequest request);
+
+	/**
+	 * 파일다운로드
+	 *
+	 * @param param
+	 * @return ChannelCodeDomain
+	 */
+	abstract void downloadFile(ChannelCodeDomain param, HttpServletRequest request, HttpServletResponse response)  throws Exception;
+
+	/**
+	 * 삭제 템플릿
+	 *
+	 * @param seq
+	 * @return NoticeDomain
+	 */
+	abstract void deleteFile(ChannelCodeDomain param);
+
+}

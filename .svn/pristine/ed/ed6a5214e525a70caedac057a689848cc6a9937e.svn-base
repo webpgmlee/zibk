@@ -1,0 +1,318 @@
+<%--
+ * file name : custInfo.jsp
+ * description : 기업/개인 고객정보 조회, SMS2차인증, SMS, 고객검색
+ * author : H.K.Lee
+ * initial date : 2017.11.01
+ * history
+  --%>
+<%@ taglib prefix="c" uri="/WEB-INF/tld/c.tld" %>
+<%@ page language="java" contentType="text/html; charset=UTF-8" pageEncoding="UTF-8"%>
+<jsp:include page="/WEB-INF/jsp/comm_top.jsp"/>
+<!doctype html>
+<html lang="ko">
+<head>
+<meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
+<meta http-equiv="X-UA-Compatible" content="IE=edge">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, minimum-scale=1.0, user-scalable=no">
+<meta name="subject" content="KBIZ">
+<meta name="author" content="KBIZ">
+<meta name="keywords" content="KBIZ">
+<meta name="description" content="KBIZ">
+<title>KBIZ</title>
+<title>고객입력</title>
+<script type="text/javascript">
+var spec;
+var ranNum;
+$(function () {
+	$("#custSpecial").hide();
+	if($("#ctiYn",parent.parent.topFrame.document).val() != "Y"){
+		$("#identify").hide();
+		$("#violent").hide();
+	}
+	var CallWait = false;
+	var startCon = $("#startCon").val();
+	var tlno = $("#tellNum",parent.parent.topFrame.document).val();
+	if(startCon == "Y"){
+		KBIZIO.requestParamAjax("/inbound/customer/custSearch.json", fn_CustCallback, {params: {tlno: tlno}});
+	}else if(startCon == "N"){
+		$("#custNm1").val("미확인");
+		$("#custNm2").val("미확인");
+	}
+	// 탭 이동 스크립트
+    $(".tab_content").hide();
+    $(".tab_content:first").show();
+
+    $("ul.tabs li").click(function () {
+        $("ul.tabs li").removeClass("active");
+        $(this).addClass("active");
+        $(".tab_content").hide();
+        var activeTab = $(this).attr("rel");
+        $("#" + activeTab).fadeIn(0);
+    });
+
+    // 특이성향일 경우에만 사용
+
+    var top = screen.availHeight;
+    var left = screen.availWidth;
+
+    // 고객 검색 팝업
+    $("#custSearch").click(function(){
+    	window.open('/inbound/customer/custSearch.do?opener=custInfo','custSearch','width=1000,height=700,resizable=no,scrollbars=no,toolbar=no');
+    });
+    // 특이성향 팝업
+	$("#custSpecial").click(function(){
+		clearInterval(spec);
+		window.open('/inbound/customer/specialPop.do?untyCsno='+$("#custId").val(),'custSpecial','width=800,height=500,resizable=no,toolbar=no');
+	});
+    // SMS발송 팝업
+    $("#sendSms").click(function(){
+    	var tlno = $("#tellNum", parent.parent.topFrame.document).val();
+    	window.open('/inbound/customer/smsPop.do?tlno='+tlno,'sendSms','width=350,height=550,resizable=no,toolbar=no');
+    });
+    // SMS 2차인증
+    $("#identify").click(function(){
+    	var con = confirm("SMS 2차인증 문자를 보내시겠습니까?");
+    	var complete = false;
+    	if(con){
+    		generateRandom(1000,10000);
+    	}
+    });
+
+    $("#violent").click(function(){
+    	var con = confirm("폭언전환 하시겠습니까? 통화가 종료됩니다.");
+    	if(con){
+    		parent.parent.topFrame.SCall.Destination("1201"); // 전환할 내선번호
+		 	var nRet = parent.parent.topFrame.SCall.CtiTransferEx();
+		 	if(nRet == 0){
+		 		alert("폭언전환 되었습니다.");
+		 		parent.parent.topFrame.call_end();
+		 	}
+    	}
+    });
+});
+
+function fn_CustCallback(ret){
+	var r = ret.totList;
+	inbound(r);
+};
+
+/* 인바운드 고객정보 세팅 */
+function inbound(r){
+	var stat = 0;
+	$(".init").val("");
+	if(r != null){
+		if(r.spclAppvYn == 'Y'){
+			console.log(r.spclAppvYn);
+			$("#custSpecial").show();
+			fn_special();
+		}
+		if(r.csDscd == "02" || r.csDscd == "03"){ // 기업고객
+			stat = 1;
+			$(".tabs li").removeClass("active");
+			$(".tabs li").eq(0).addClass("active");
+			$(".tab_content").hide();
+			var activeTab = $(".tabs li").eq(0).attr("rel");
+			$("#" + activeTab).fadeIn(1);
+			$("#custId"+stat).val(r.bzplUntyCsno);
+			$("#custNm"+stat).val(r.rlCsKrnNm);
+			$("#storeNm"+stat).val(r.csKrnNm);
+			if(r.csCnplDscd == "50"){
+				$("#cellTell"+stat).val(r.tlno);
+			}else{
+				$("#storeTell"+stat).val(r.tlno);
+			}
+			$("#cntrNo"+stat).val(r.untyCntrNo);
+			if(r.abndYn == "Y"){
+				$("#cntrSta"+stat).val("해지");
+			}else{
+				$("#cntrSta"+stat).val("계약");
+			}
+			$("#smsYn"+stat).val(r.smsYn);
+			$("#addr"+stat).val(r.addr);
+			$("#custId").val(r.bzplUntyCsno);
+			$("#untyCsno", parent.conInfoFrame.document).val(r.bzplUntyCsno);
+			parent.conInfoFrame.fn_searchConsult2();
+		}else if(r.csDscd == "01" || r.csDscd == "07"){ // 개인고객
+			stat = 2;
+			$(".tabs li").removeClass("active");
+			$(".tabs li").eq(1).addClass("active");
+			$(".tab_content").hide();
+			var activeTab = $(".tabs li").eq(1).attr("rel");
+			$("#" + activeTab).fadeIn(0);
+			$("#custId"+stat).val(r.dlgtUntyCsno);
+			$("#custNm"+stat).val(r.csKrnNm);
+			$("#cellTell"+stat).val(r.tlno);
+			$("#cntrNo"+stat).val(r.untyCntrNo);
+			if(r.abndYn == "Y"){
+				$("#cntrSta"+stat).val("해지");
+			}else{
+				$("#cntrSta"+stat).val("계약");
+			}
+			$("#smsYn"+stat).val(r.smsYn);
+			$("#addr"+stat).val(r.addr);
+			$("#custId").val(r.dlgtUntyCsno);
+			$("#untyCsno", parent.conInfoFrame.document).val(r.dlgtUntyCsno);
+			parent.conInfoFrame.fn_searchConsult2();
+		}else{
+			stat = 2;
+			$(".tabs li").removeClass("active");
+			$(".tabs li").eq(1).addClass("active");
+			$(".tab_content").hide();
+			var activeTab = $(".tabs li").eq(1).attr("rel");
+			$("#" + activeTab).fadeIn(0);
+			$("#custId"+stat).val(r.dlgtUntyCsno);
+			$("#custNm"+stat).val(r.csKrnNm);
+			$("#cellTell"+stat).val(r.tlno);
+			$("#cntrNo"+stat ).val(r.untyCntrNo);
+			if(r.abndYn == "Y"){
+				$("#cntrSta"+stat).val("해지");
+			}else{
+				$("#cntrSta"+stat).val("계약");
+			}
+			$("#smsYn"+stat).val(r.smsYn);
+			$("#addr"+stat).val(r.addr);
+			$("#custId").val(r.dlgtUntyCsno);
+			$("#untyCsno", parent.conInfoFrame.document).val(r.dlgtUntyCsno);
+			parent.conInfoFrame.fn_searchConsult2();
+		}
+	}
+};
+function generateRandom(min, max) {
+	   ranNum = Math.floor(Math.random()*(max-min+1)) + min;
+	   KBIZIO.requestParamAjax("/inbound/customer/smsSend2.json", "", {params: {tellNum: $("#tellNum",parent.parent.topFrame.document).val(), content: ranNum}});
+	   var con = confirm("고객이 SMS를 받으면 확인을 눌러주세요.");
+	   if(con){
+		   parent.parent.topFrame.SCall.CtiSetPassword();
+	   }
+};
+
+function fn_special(){
+ 	var special = true;
+	spec = setInterval(function(){
+		if(special){
+			$("#custSpecial").attr("class","btn small g_green");
+			special = false;
+		}else{
+			$("#custSpecial").attr("class","btn small g_red");
+			special = true;
+		}
+	},500);
+};
+
+function smsIdentify(num){
+	if(num == ranNum){
+		alert("인증번호가 일치합니다.");
+	}else{
+		alert("인증번호가 일치하지 않습니다.");
+	}
+};
+</script>
+</head>
+<body>
+<input type="hidden" id="startCon" value="${startCon}" disabled="disabled"/>
+<input type="hidden" id="custId" value=""/>
+<form name="cus_frm" id="cus_frm">
+<div class="brd_top clfix">
+	<!--탭//-->
+	<div class="com_tab db">
+		<ul class="tabs">
+			<li class="active" rel="tab1"><a href="#">기업고객</a></li>
+			<li rel="tab2"><a href="#">개인고객</a></li>
+		</ul>
+	</div>
+	<!--//탭-->
+	<!--공통버튼//-->
+	<div class="com_btn">
+		<ul>
+			<li><a href="#" id="sendSms" class="btn small g_green">SMS</a></li>
+			<li><a href="#" id="custSearch" class="btn small g_green">고객조회</a></li>
+            <li><a href="#" id="custSpecial" class="btn small g_green">특이성향</a></li>
+            <li><a href="#" id="violent" class="btn small g_green">폭언전환</a></li>
+			<li><a href="#" id="identify" class="btn small g_green">SMS2차인증</a></li>
+		</ul>
+	</div>
+	<!--//공통버튼-->
+</div>
+<div class="tab_container">
+	<div id="tab1" class="tab_content">
+		 <table width="100%" border="0"  cellspacing="0" cellpadding="0" class="brd_sch">
+            <colgroup>
+                <col style="width:8%">
+                <col style="width:10%">
+                <col style="width:8%">
+                <col style="width:13%">
+                <col style="width:8%">
+                <col style="width:13%">
+                <col style="width:8%">
+                <col style="width:12%">
+                <col style="width:8%">
+                <col style="width:12%">
+            </colgroup>
+	            <tr>
+	            	<th>고객번호</th>
+	            	<td><input type="text" name="custId" id="custId1" class="init" style="width:100%;" value="" readonly="readonly"></td>
+	                <th>고객명</th>
+	                <td><input type="text" name="custNm" id="custNm1" class="init" style="width:100%;" value="" readonly="readonly"></td>
+	                <th>계약번호</th>
+	                <td><input type="text" name="cntrNo" id="cntrNo1" class="init" style="width:100%;" value="" readonly="readonly"/></td>
+	               	<th>계약상태</th>
+	                <td><input type="text" name="cntrSta" id="cntrSta1" class="init" style="width:100%;" value="" readonly="readonly"/></td>
+	                <th>사업장명</th>
+	                <td><input type="text" name="storeNm" id="storeNm1" class="init" style="width:100%;" value="" readonly="readonly"/></td>
+	            </tr>
+	            <tr>
+	            	<th>SMS수신동의여부</th>
+	                <td><input type="text" name="smsYn" id="smsYn1" class="init" style="width:100%;" value="" readonly="readonly"/></td>
+	            	<th>주소</th>
+	                <td colspan="3"><input type="text" name="addr" id="addr1" class="init" style="width:100%;" value="" readonly="readonly"/></td>
+	                <th>전화번호</th>
+	                <td><input type="text" name="cellTell" id="cellTell1" class="init" style="width:100%;" value="" readonly="readonly"/> </td>
+	                <th>사업장번호</th>
+	                <td><input type="text" name="storeTell" id="storeTell1" class="init" style="width:100%;" value="" readonly="readonly"/> </td>
+	            </tr>
+        </table>
+	</div>
+    <div id="tab2" class="tab_content">
+        <!-- 일반고객영역 -->
+        <table width="100%" border="0"  cellspacing="0" cellpadding="0" class="brd_sch">
+            <colgroup>
+        	    <col style="width:8%">
+                <col style="width:10%">
+                <col style="width:8%">
+                <col style="width:13%">
+                <col style="width:8%">
+                <col style="width:13%">
+                <col style="width:8%">
+                <col style="width:12%">
+                <col style="width:8%">
+                <col style="width:12%">
+            </colgroup>
+            <tr>
+            	<th>고객번호</th>
+            	<td><input type="text" name="custId" id="custId2" class="init" style="width:100%;" value="" readonly="readonly"></td>
+                <th>고객명</th>
+                <td><input type="text" name="custNm" id="custNm2" class="init" style="width:100%;" value="" readonly="readonly"></td>
+                <th>계약번호</th>
+                <td><input type="text" name="cntrNo" id="cntrNo2" class="init" style="width:100%;" value="" readonly="readonly"/></td>
+               	<th>계약상태</th>
+                <td><input type="text" name="cntrSta" id="cntrSta2" class="init" style="width:100%;" value="" readonly="readonly"/></td>
+                <th>사업장명</th>
+                <td><input type="text" name="storeNm" id="storeNm2" class="init" style="width:100%;" value="" readonly="readonly"/></td>
+            </tr>
+            <tr>
+            	<th>SMS수신동의여부</th>
+                <td><input type="text" name="smsYn" id="smsYn2" class="init" style="width:100%;" value="" readonly="readonly"/></td>
+            	<th>주소</th>
+                <td colspan="3"><input type="text" name="addr" class="init" id="addr2" style="width:100%;" value="" readonly="readonly"/></td>
+                <th>전화번호</th>
+                <td><input type="text" name="cellTell" id="cellTell2" class="init" style="width:100%;" value="" readonly="readonly"/> </td>
+                <th>사업장번호</th>
+                <td><input type="text" name="storeTell" id="storeTell2" class="init" style="width:100%;" value="" readonly="readonly"/> </td>
+            </tr>
+        </table>
+        <!-- /일반고객영역 -->
+    </div>
+</div>
+</form>
+</body>
+</html>

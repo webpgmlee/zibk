@@ -1,0 +1,221 @@
+/**
+ * date.js
+ */
+(function() {
+    var _DATESEPERATOR = "-";
+    var _TARGETIDS = new Array();
+    var _OPTIONS = {
+            dateFormat: 'yy-mm-dd',
+            closeText: '닫기',
+            prevText: '이전달',
+            nextText: '다음달',
+            currentText: '오늘',
+            monthNames : ['1월','2월','3월','4월','5월','6월','7월','8월','9월','10월','11월','12월'],
+            monthNamesShort: ['1월','2월','3월','4월','5월','6월','7월','8월','9월','10월','11월','12월'],
+            dayNames: ['일','월','화','수','목','금','토'],
+            dayNamesShort: ['일','월','화','수','목','금','토'],
+            dayNamesMin: ['일','월','화','수','목','금','토'],
+            showMonthAfterYear: true,
+            weekHeader: 'Wk',
+            firstDay: 0,
+            isRTL: false,
+            changeMonth: true,
+            changeYear: true,
+            yesrSuffix: '년'
+        };
+
+    function applyDatepicker() {
+        $.datepicker.setDefaults($.datepicker.regional['ko']);
+        $(_TARGETIDS).each(function (i, e) {
+            this.datepicker(_OPTIONS);
+        });
+    }
+
+    function getServerDateTime(format) {
+        return _NARU.io.requestParamAjax("/common/getServerDateTime.json", null, {async: false, params: {format: format || "yyyyMMddHHmmss"}});
+    };
+
+    _NARU.date.setDatepicker = function(targetId) {
+        _TARGETIDS.push($('#' + targetId));
+    };
+
+    _NARU.date.datepicker = function(options) {
+        applyDatepicker(options || _OPTIONS);
+    };
+
+    _NARU.date.getServerDateTime = function() {
+        return getServerDateTime("yyyyMMddHHmmss");
+    };
+
+    _NARU.date.getServerDate = function() {
+        return getServerDateTime("yyyyMMdd");
+    };
+
+    _NARU.date.getServerTime = function() {
+        return getServerDateTime("HHmmss");
+    };
+
+    _NARU.date.getFormattedServerDateTime = function() {
+        return getServerDateTime("yyyy" + _DATESEPERATOR + "MM" + _DATESEPERATOR + "dd HH:mm:ss");
+    };
+
+    _NARU.date.getFormattedServerDate = function() {
+        return getServerDateTime("yyyy" + _DATESEPERATOR + "MM" + _DATESEPERATOR + "dd");
+    };
+
+    _NARU.date.getFormattedServerTime = function() {
+        return getServerDateTime("HH:mm:ss");
+    };
+
+    /**
+     * 일자/일시/시간 Date 변환
+     *
+     * @param dateStr 일자/일시/시간 문자
+     * @return Date
+     */
+    _NARU.date.parseDate = function(dateStr) {
+        var ufDate = _NARU.stringUtil.removeNotNumber(dateStr);
+        if (ufDate.length >= 14) {
+            /* date time */
+            ufDate = ufDate.substr(0, 14);
+            return new Date(ufDate.substr(0, 4), parseInt(ufDate.substr(4, 2)) - 1, ufDate.substr(6, 2), ufDate.substr(8, 2), ufDate.substr(10, 2), ufDate.substr(12));
+        } else if (ufDate.length == 8) {
+            /* date */
+            return new Date(ufDate.substr(0, 4), parseInt(ufDate.substr(4, 2)) - 1, ufDate.substr(6));
+        } else if (ufDate.length == 6) {
+            /* time */
+            var nDate = new Date();
+            return new Date(nDate.getFullYear(), nDate.getMonth(), nDate.getDate(), ufDate.substr(0, 2), ufDate.substr(2, 2), ufDate.substr(4));
+        } else {
+            return new Date();
+        }
+    };
+
+    /**
+     * 일자/일시/시간 format 적용
+     *
+     * @param dateStr 일자/일시/시간 문자
+     * @return String formatted date 문자
+     */
+    _NARU.date.getFormattedDate = function(dateStr, format) {
+        if (dateStr == null || dateStr == undefined || dateStr.length == 0) {
+            return '';
+        }
+    	var ufDate;
+    	if (typeof(dateStr) == 'string') {
+    		ufDate = _NARU.stringUtil.removeNotNumber(dateStr);
+    	}
+        var pDate;
+        if (ufDate.length >= 14 || ufDate.length == 8 || ufDate.length == 7 || ufDate.length == 6) {
+            pDate = this.parseDate(dateStr);
+        } else {
+            return dateStr;
+        }
+        format = format || "yyyy" + _DATESEPERATOR + "MM" + _DATESEPERATOR + "dd";
+
+        return format.replace("yyyy", pDate.getFullYear())
+                    .replace("MM", pDate.getMonth() < 10 ? "0" + (pDate.getMonth() + 1) : (pDate.getMonth() + 1))
+                        .replace("dd", pDate.getDate() < 10 ? "0" + pDate.getDate() : pDate.getDate())
+                            .replace("HH", pDate.getHours() < 10 ? "0" + pDate.getHours() : pDate.getHours())
+                                .replace("mm", pDate.getMinutes() < 10 ? "0" + pDate.getMinutes() : pDate.getMinutes())
+                                    .replace("ss", pDate.getSeconds() < 10 ? "0" + pDate.getSeconds() : pDate.getSeconds());
+    };
+
+    /**
+     * 주어진 일자에 년/월/일을 더하여 돌려줍니다.
+     *
+     * @param dateStr
+     * @param typeStr 'y', 'M', 'd'
+     * @param addInt
+     */
+    _NARU.date.addFormattedDate = function(dateStr, typeStr, addInt) {
+        var ufDate = this.parseDate(dateStr);
+        var y = ufDate.getFullYear(), m = ufDate.getMonth(), d = ufDate.getDate();
+        if(typeStr == 'y'){
+        	y += addInt;
+    	}else if(typeStr == 'm'){
+    		m += addInt;
+    	}else if(typeStr == 'd'){
+    		d += addInt;
+    	} else {
+    		return dateStr;
+    	}
+        var r = new Date(y, m, d);
+        if((r.getMonth() + 1) < 10){
+			m = "0" + (r.getMonth()+1);
+		}else{
+			m = r.getMonth()+1;
+		}
+        if(r.getDate()  < 10){
+			d = "0" + r.getDate();
+		}else{
+			d = r.getDate();
+		}
+        return this.getFormattedDate(''+r.getFullYear() + m + d, "yyyy" + _DATESEPERATOR +"MM" + _DATESEPERATOR + "dd");
+    };
+
+    /**
+     * 년/월/일 셋팅
+     *
+     * @param int strY 년
+     * @param int strM 월
+     * @param int strD 일
+     * @return String dateSet 년/월/일
+     */
+    _NARU.date.getSettingDate = function(strY, strM, strD) {
+    	var now = new Date();
+        var year= (now.getFullYear()+strY);
+        var fromMon = (now.getMonth()+1)>9 ? ''+(now.getMonth()+strM) : '0'+(now.getMonth()+strM);
+        var day = now.getDate()>9 ? ''+now.getDate()+strD : '0'+(now.getDate()+strD);
+
+        return this.getFormattedDate(year+'-'+ fromMon+'-'+ day);
+    };
+
+    /**
+     * 조회기간이 앞보다 뒤가 작은지 검사
+     *
+     * @param String date1 앞 조회날짜
+     * @param String date2 뒤 조회날짜
+     */
+    _NARU.date.getDayInterval = function(date1, date2) {
+
+    	if (date1 == null || date1 == undefined || date1 == "" || date2 == null || date2 == undefined || date2 == "") {
+    		alert("날짜를 선택해주세요.")
+            return false;
+        }
+    	date1 = date1.substr(0,4) + date1.substr(5,2) + date1.substr(8,2);
+    	date2 = date2.substr(0,4) + date2.substr(5,2) + date2.substr(8,2);
+    	var result = date2-date1;
+
+    	return result;
+    };
+
+    /**
+     * 조회기간 3개월로 기간 제한
+     *
+     * @param String date1 앞 조회날짜
+     * @param String date2 뒤 조회날짜
+     */
+    _NARU.date.getDayCheck = function(date1, date2) {
+
+    	if (date1 == null || date1 == undefined || date1 == "" || date2 == null || date2 == undefined || date2 == "") {
+    		alert("날짜를 선택해주세요.")
+            return false;
+        }
+    	var year_fr = date1.substr(0,4);
+    	var month_fr = date1.substr(5,2);
+    	var day_fr = date1.substr(8,2);
+    	var date_fr = new Date(year_fr,month_fr,day_fr);
+
+    	var year_to = date2.substr(0,4);
+    	var month_to = date2.substr(5,2);
+    	var day_to = date2.substr(8,2);
+    	var date_to = new Date(year_to,month_to,day_to);
+    	//console.log(year_fr+month_fr+day_fr);
+    	//console.log(year_to+month_to+day_to);
+
+    	var result = (Date.parse(date_to)-Date.parse(date_fr)) / (1000*60*60*24);
+    	//console.log(result);
+    	return result;
+    };
+})();

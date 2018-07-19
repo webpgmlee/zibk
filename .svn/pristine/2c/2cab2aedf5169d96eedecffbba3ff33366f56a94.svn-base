@@ -1,0 +1,94 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper
+  PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+  "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="common">
+
+    <!-- 서버(DB) 일시 조회 -->
+    <select id="selectServerDateTime" resultType="java.sql.Timestamp">
+        SELECT SYSDATE FROM DUAL
+    </select>
+
+    <!-- 대분류별 공통코드 목록 조회 -->
+    <select id="selectCommonCodeList" resultType="CommonCodeDomain">
+        SELECT
+            LCODE
+            , MCODE
+            , CODE_NAME
+          FROM TH_CODE
+         WHERE LCODE = #{lcode} /* P: 대분류코드 */
+           AND USE_YN = 'Y'
+           AND MCODE <![CDATA[<>]]> '00'
+           <if test="remk1 != null and remk1 != ''">
+                AND REMK1 = #{remk1} /* DP: 비고1 */
+           </if>
+           <if test="remk2 != null and remk2 != ''">
+                AND REMK2 = #{remk2} /* DP: 비고2 */
+           </if>
+         ORDER BY SORT_IDX
+    </select>
+
+    <!-- 공통코드 단건 조회 -->
+    <select id="selectCommonCodeOne" resultType="CommonCodeDomain">
+        SELECT
+            LCODE
+            , MCODE
+            , CODE_NAME
+          FROM TH_CODE
+         WHERE LCODE = #{lcode} /* P: 대분류코드 */
+           AND MCODE = #{mcode} /* P: 중분류코드 */
+           AND USE_YN = 'Y'
+         ORDER BY SORT_IDX
+    </select>
+
+    <!-- 관리자 상단 메뉴 목록 조회 -->
+    <select id="selectFirstMngtMenu" resultType="CommonMngtMenuDomain">
+        SELECT
+            FRST_MENU_CODE
+            , SECD_MENU_CODE
+            , MENU_NAME
+            , MENU_VIEW_NAME
+            , MENU_SORT_IDX
+            , MENU_AUTH_ROLE_CD
+            , REMK1
+            , REMK2
+          FROM TH_MNGT_MENU
+         WHERE SECD_MENU_CODE = '00'
+          AND USE_YN = 'Y'
+        ORDER BY MENU_SORT_IDX
+    </select>
+
+    <!-- 관리자 좌측 메뉴 목록 조회 -->
+    <select id="selectSecondMngtMenu" resultType="CommonMngtMenuDomain">
+        SELECT
+            FRST_MENU_CODE
+            , SECD_MENU_CODE
+            , MENU_NAME
+            , MENU_VIEW_NAME
+            , MENU_SORT_IDX
+            , MENU_AUTH_ROLE_CD
+            , REMK1
+            , REMK2
+          FROM TH_MNGT_MENU
+         WHERE SECD_MENU_CODE <![CDATA[<>]]> '00'
+          AND USE_YN = 'Y'
+        ORDER BY MENU_SORT_IDX
+    </select>
+
+    <!-- 배치로그 저장 -->
+    <insert id="insertBatchLog" parameterType="BatchLogDomain">
+        INSERT INTO TH_BATCH_LOG
+            (
+                BATCH_LOG_SEQ
+                , BATCH_JOB_ID
+                , BATCH_EXEC_DATE
+                , BATCH_RESULT
+            ) VALUES (
+                SEQ_TH_BATCH_LOG.NEXTVAL
+                , #{batchJobId}
+                , SYSDATE
+                , #{batchResult}
+            )
+    </insert>
+
+</mapper>

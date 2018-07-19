@@ -1,0 +1,17 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper
+  PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+  "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="rec1">
+	<!-- REC 초기화 -->
+	<update id="recInitialize" parameterType="java.lang.String">
+		UPDATE TB_REC_DEVICE_INFO SET AGENTNAME = '', AGENTID = '', GROUPDN = '', AGENTIP = ''
+		WHERE AGENTID = #{userId}
+	</update>
+
+	<!-- REC 업데이트 -->
+	<update id="recUpdate" parameterType="java.util.Map">
+		UPDATE TB_REC_DEVICE_INFO SET AGENTNAME = #{userNm}, AGENTID = #{userId}, GROUPDN = #{groupId}, AGENTIP = #{userIp}
+		WHERE TEL_EXT = #{callTelNum}
+	</update>
+</mapper>

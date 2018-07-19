@@ -1,0 +1,170 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+
+<taglib xmlns="http://java.sun.com/xml/ns/javaee"
+    xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+    xsi:schemaLocation="http://java.sun.com/xml/ns/javaee http://java.sun.com/xml/ns/javaee/web-jsptaglibrary_2_1.xsd"
+    version="2.1">
+
+    <description>KBIZ Tag Library</description>
+    <display-name>KBIZ</display-name>
+    <tlib-version>1.0</tlib-version>
+    <short-name>kbiz</short-name>
+    <uri>/WEB-INF/tld</uri>
+
+    <!-- 페이지 네비게이션 -->
+    <tag>
+        <name>pageNavi</name>
+        <tag-class>or.kr.kbiz.serv.web.tags.PageNaviTag</tag-class>
+        <body-content>empty</body-content>
+        <attribute>
+            <name>pageDomain</name>
+            <required>true</required>
+            <rtexprvalue>true</rtexprvalue>
+            <type>or.kr.kbiz.serv.spring.mvc.BaseDomain</type>
+        </attribute>
+        <attribute>
+            <name>executeTargetFunction</name>
+            <required>true</required>
+            <rtexprvalue>true</rtexprvalue>
+        </attribute>
+        <attribute>
+            <name>submitTargetForm</name>
+            <required>true</required>
+            <rtexprvalue>true</rtexprvalue>
+        </attribute>
+    </tag>
+
+    <!-- 공통코드 select -->
+    <tag>
+        <name>commCodeSelect</name>
+        <tag-class>or.kr.kbiz.serv.web.tags.CommCodeSelectTag</tag-class>
+        <body-content>empty</body-content>
+        <attribute>
+            <name>lcode</name>
+            <required>true</required>
+            <rtexprvalue>true</rtexprvalue>
+        </attribute>
+        <attribute>
+            <name>remk1</name>
+            <required>false</required>
+            <rtexprvalue>true</rtexprvalue>
+        </attribute>
+        <attribute>
+            <name>remk2</name>
+            <required>false</required>
+            <rtexprvalue>true</rtexprvalue>
+        </attribute>
+        <attribute>
+            <name>firstOption</name>
+            <required>false</required>
+            <rtexprvalue>true</rtexprvalue>
+        </attribute>
+        <attribute>
+            <name>selectId</name>
+            <required>true</required>
+            <rtexprvalue>true</rtexprvalue>
+        </attribute>
+        <attribute>
+            <name>selectName</name>
+            <required>false</required>
+            <rtexprvalue>true</rtexprvalue>
+        </attribute>
+        <attribute>
+            <name>selectClass</name>
+            <required>false</required>
+            <rtexprvalue>true</rtexprvalue>
+        </attribute>
+        <attribute>
+            <name>title</name>
+            <required>false</required>
+            <rtexprvalue>true</rtexprvalue>
+        </attribute>
+    </tag>
+
+
+ <!-- 숫자에 천단위마다 콤마 넣기
+  	   ex) toNumFormat(1500) => 1,500 -->
+	<function>
+		<description>Number Format</description>
+		<name>toNumFormat</name>
+		<function-class>or.kr.kbiz.serv.web.tags.StringTag</function-class>
+		<function-signature>String toNumFormat(java.lang.Long)</function-signature>
+		<example>
+		    ${akm:toNumFormat(1500)}
+		</example>
+	</function>
+
+    <!-- 전화번호 '-' 변환 -->
+    <function>
+		<description>
+		    Tell Format
+		</description>
+		<name>getTellNumber</name>
+		<function-class>or.kr.kbiz.serv.web.tags.ElTag</function-class>
+		<function-signature>String getTellNumber(java.lang.String)</function-signature>
+		<example>
+		    ${kbiz:getTellNumber("01012345678")}
+		</example>
+    </function>
+
+    <!-- 날짜형식 변환(yyyy-MM-dd) -->
+    <function>
+		<description>
+		    Date Format
+		</description>
+		<name>getDate</name>
+		<function-class>or.kr.kbiz.serv.web.tags.ElTag</function-class>
+		<function-signature>String getDate(java.lang.String)</function-signature>
+		<example>
+		    ${kbiz:getDate("2017-11-23 13:53:36.0")}
+		</example>
+    </function>
+	<!-- 날짜형식 변환2(HH:mm:ss) -->
+    <function>
+		<description>
+		    Date Format
+		</description>
+		<name>getTime</name>
+		<function-class>or.kr.kbiz.serv.web.tags.ElTag</function-class>
+		<function-signature>String getTime(java.lang.String)</function-signature>
+		<example>
+		    ${kbiz:getTime("2017-11-23 13:53:36.0")}
+		</example>
+    </function>
+     <!-- 날짜형식 변환(yyyy-MM-dd HH:mm:ss) -->
+    <function>
+		<description>
+		    Time Format
+		</description>
+		<name>getDateTime</name>
+		<function-class>or.kr.kbiz.serv.web.tags.ElTag</function-class>
+		<function-signature>String getDateTime(java.lang.String)</function-signature>
+		<example>
+		    ${kbiz:getDateTime("2017-11-23 13:53:36.0")}
+		</example>
+    </function>
+
+	<function>
+        <description>
+            Rec Split
+        </description>
+        <name>getRecSplit</name>
+        <function-class>or.kr.kbiz.serv.web.tags.ElTag</function-class>
+        <function-signature>String getRecSplit(java.lang.String)</function-signature>
+        <example>
+            ${kbiz:getRecSplit("recUrl")}
+        </example>
+    </function>
+    <!-- 제한된 길이를 초과하면 "..." 으로 대치 -->
+    <function>
+        <description>
+            Context Format
+        </description>
+        <name>getMaxString</name>
+        <function-class>or.kr.kbiz.serv.web.tags.StringTag</function-class>
+        <function-signature>String getMaxString(java.lang.String, java.lang.Integer)</function-signature>
+        <example>
+            ${kbiz:getMaxString("context",10)}
+        </example>
+    </function>
+</taglib>

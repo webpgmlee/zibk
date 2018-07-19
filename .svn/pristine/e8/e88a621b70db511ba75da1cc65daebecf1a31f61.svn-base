@@ -1,0 +1,291 @@
+package or.kr.kbiz.bo.inbound.controller;
+
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.stereotype.Controller;
+import org.springframework.ui.Model;
+import org.springframework.web.bind.annotation.ModelAttribute;
+import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestParam;
+
+import or.kr.kbiz.bo.common.domain.LoginSessDomain;
+import or.kr.kbiz.bo.inbound.domain.CallbackDomain;
+import or.kr.kbiz.bo.inbound.domain.CodeDomain;
+import or.kr.kbiz.bo.inbound.domain.ConsultDetailDomain;
+import or.kr.kbiz.bo.inbound.domain.OrganizationDomain;
+import or.kr.kbiz.bo.inbound.service.InboundService;
+
+@Controller
+@RequestMapping(value="/inbound/consult")
+public class ConsultController {
+
+	private static final Logger logger = LoggerFactory.getLogger(InboundController.class);
+
+	private static String PREFIX = "inbound/consult";
+
+	@Autowired
+	private InboundService inboundService;
+
+	/**
+	 * 상담입력
+	 *
+	 * @param CodeDomain
+	 * @return String
+	 */
+	@RequestMapping(value="/consult.do")
+	public String consult(@ModelAttribute LoginSessDomain lsd, @RequestParam String chnlCode, @RequestParam String startCon, Model model){
+		model.addAttribute("code", inboundService.selectCode());
+		model.addAttribute("chCode", inboundService.selectChCode());
+		// 상담원, 관리자 케이스 분리 해서 이관자 이름,ID조회(로그인세션)
+
+		//
+		if(chnlCode != null && chnlCode.length() > 0){
+			model.addAttribute("chnlCode", chnlCode);
+		}
+		if(startCon != null && startCon.length() > 0){
+			model.addAttribute("startCon", startCon);
+		}
+		model.addAttribute("LoginUserNm", lsd.getLoginUserNm());
+		model.addAttribute("LoginUserId", lsd.getLoginUserId());
+		model.addAttribute("userList", inboundService.selectUserList());
+		model.addAttribute("adminList", inboundService.selectAdminList());
+		return PREFIX+"/consult";
+	}
+
+	/**
+	 * 상담내용 저장
+	 *
+	 * @param ConsultDetailDomain
+	 * @return String
+	 */
+	@RequestMapping(value="/consultDetailInsert.do")
+	public void consultDetailInsert(@ModelAttribute ConsultDetailDomain cdd, Model model){
+		if(cdd.getCnltProcCd().equals("04")){
+			cdd.setTranId("VOC");
+		}
+		cdd = inboundService.insertConsult(cdd);
+		if(cdd.getCnltProcCd().equals("02")){
+			inboundService.insertRsrv(cdd);
+		}
+		if("03,04".indexOf(cdd.getCnltProcCd()) != -1){
+			inboundService.insertTran(cdd);
+		}
+		if(cdd.getSpclCont() != null && cdd.getSpclCont().length() > 0){
+			inboundService.insertSpecial(cdd);
+		}
+		model.addAttribute("cDetail", cdd);
+	}
+
+	/**
+	 * 대분류조회
+	 *
+	 * @param CodeDomain
+	 * @return
+	 */
+	@RequestMapping(value="/selectLcode.json")
+	public void selectLcode(@ModelAttribute CodeDomain codeDomain, Model model){
+		model.addAttribute("lcode", inboundService.selectLcode(codeDomain));
+	}
+
+	/**
+	 * 중분류조회
+	 *
+	 * @param CodeDomain
+	 * @return
+	 */
+	@RequestMapping(value="/selectMcode.json")
+	public void selectMcode(@ModelAttribute CodeDomain codeDomain, Model model){
+		model.addAttribute("mcode", inboundService.selectMcode(codeDomain));
+	}
+
+	/**
+	 * 소분류조회
+	 *
+	 * @param CodeDomain
+	 * @return
+	 */
+	@RequestMapping(value="/selectScode.json")
+	public void selectScode(@ModelAttribute CodeDomain codeDomain, Model model){
+		model.addAttribute("scode", inboundService.selectScode(codeDomain));
+	}
+
+	/**
+	 * 상담이력, CallBack, 예약전화, 이관내역
+	 *
+	 * @param CodeDomain
+	 * @return String
+	 */
+	@RequestMapping(value="/consultInfo.do")
+	public String consultInfo(Model model){
+		model.addAttribute("code", inboundService.selectCode());
+		return PREFIX+"/consultInfo";
+	}
+
+	/**
+	 * 상담이력뷰/검색
+	 *
+	 * @param ConsultDetailDomain
+	 * @return String
+	 */
+	@RequestMapping(value="/view/consultInfo.view")
+	public String consultInfoSearch(@ModelAttribute ConsultDetailDomain consultDetailDomain, Model model){
+		model.addAttribute("cnltList", inboundService.selectConsultSearchList(consultDetailDomain));
+		model.addAttribute("pageDomain", consultDetailDomain);
+		return PREFIX+"/view/consultInfoView";
+	}
+
+	/**
+	 * 콜백뷰
+	 *
+	 * @param CallbackDomain
+	 * @return String
+	 */
+	@RequestMapping(value="/view/callbackList.view")
+	public String callbackList(@ModelAttribute CallbackDomain callbackDomain, Model model){
+		model.addAttribute("callback",inboundService.selectCallbackList(callbackDomain));
+		model.addAttribute("pageDomain", callbackDomain);
+		return PREFIX+"/view/callbackView";
+	}
+
+	/**
+	 * 예약전화뷰
+	 *
+	 * @param ConsultDetailDomain
+	 * @return String
+	 */
+	@RequestMapping(value="/view/reserveList.view")
+	public String reserveList(@ModelAttribute ConsultDetailDomain consultDetailDomain, Model model){
+		model.addAttribute("reserve", inboundService.selectRsrvList(consultDetailDomain));
+		model.addAttribute("pageDomain", consultDetailDomain);
+		return PREFIX+"/view/reserveView";
+	}
+
+	/**
+	 * 이관내역뷰
+	 *
+	 * @param ConsultDetailDomain
+	 * @return String
+	 */
+	@RequestMapping(value="/view/transferList.view")
+	public String transferList(@ModelAttribute ConsultDetailDomain consultDetailDomain, Model model){
+		model.addAttribute("transfer", inboundService.selectTransList(consultDetailDomain));
+		model.addAttribute("pageDomain", consultDetailDomain);
+		return PREFIX+"/view/transferView";
+	}
+
+	/**
+	 * 상담이력 상세 조회
+	 *
+	 * @param ConsultDetailDomain
+	 * @return String
+	 */
+	@RequestMapping(value="/consultInfoDetail.do")
+	public String consultInfoDetail(@ModelAttribute ConsultDetailDomain consultDetailDomain,Model model){
+		model.addAttribute("cDetail", inboundService.selectConsultInfoDetail(consultDetailDomain));
+		model.addAttribute("tranId", consultDetailDomain.getTranId());
+		return PREFIX+"/consultInfoDetail";
+	}
+
+	/**
+	 * 상담이력 상세 조회
+	 *
+	 * @param ConsultDetailDomain
+	 * @return String
+	 */
+	@RequestMapping(value="/consultInfoDetail2.json")
+	public void consultInfoDetail2(@ModelAttribute ConsultDetailDomain consultDetailDomain,Model model){
+		model.addAttribute("cDetail", inboundService.selectConsultInfoDetail(consultDetailDomain));
+	}
+
+	/**
+	 * VOC이관 팝업
+	 *
+	 * @param ConsultDetailDomain
+	 * @return String
+	 */
+	@RequestMapping(value="/vocPop.do")
+	public String vocPop(Model model){
+		model.addAttribute("code", inboundService.selectCode());
+		return PREFIX+"/vocPop";
+	}
+
+	/**
+	 * 예약전화 상세조회(상담정보)
+	 *
+	 * @param ConsultDetailDomain
+	 * @return String
+	 */
+	@RequestMapping(value="/changeCallYn.json")
+	public void changeCallYn(@ModelAttribute ConsultDetailDomain consultDetailDomain){
+		inboundService.changeCallYn(consultDetailDomain);
+	}
+
+
+	/**
+	 * 예약전화 상세조회(상담정보)
+	 *
+	 * @param ConsultDetailDomain
+	 * @return String
+	 */
+	@RequestMapping(value="/consultRsrvDetail.json")
+	public void consultRsrvDetail(@ModelAttribute ConsultDetailDomain consultDetailDomain, Model model){
+		model.addAttribute("rsrvd", inboundService.selectConsultRsrvDetail(consultDetailDomain));
+	}
+
+	/**
+	 * 예약전화 상세조회(고객정보)
+	 *
+	 * @param ConsultDetailDomain
+	 * @return String
+	 */
+	@RequestMapping(value="/consultRsrvDetail2.json")
+	public void consultRsrvDetail2(@ModelAttribute ConsultDetailDomain consultDetailDomain, Model model){
+		model.addAttribute("rsrvd", inboundService.selectConsultRsrvDetail2(consultDetailDomain));
+	}
+
+	/**
+	 * CallBack 상세조회
+	 *
+	 * @param ConsultDetailDomain
+	 * @return String
+	 */
+	@RequestMapping(value="/callbackProc.json")
+	public void consultCallbackDetail(@ModelAttribute CallbackDomain callbackDomain, Model model){
+		inboundService.callBackProc(callbackDomain);
+	}
+
+	/**
+	 * 조직도조회
+	 *
+	 * @param ConsultDetailDomain
+	 * @return String
+	 */
+	@RequestMapping(value="/organization.do")
+	public String organization(@ModelAttribute OrganizationDomain orngDomain, Model model){
+		model.addAttribute("orng", inboundService.selectOrganization(orngDomain));
+		return PREFIX+"/organization";
+	}
+
+	/**
+	 * 부서원조회
+	 *
+	 * @param ConsultDetailDomain
+	 * @return String
+	 */
+	@RequestMapping(value="/organizationSearch.json")
+	public void organizationSearch(@ModelAttribute OrganizationDomain orngDomain, Model model){
+		model.addAttribute("orSrch", inboundService.organizationSearch(orngDomain));
+	}
+
+	/**
+	 * 조건조회
+	 *
+	 * @param ConsultDetailDomain
+	 * @return String
+	 */
+	@RequestMapping(value="/orgnSearch.json")
+	public void orgnSearch(@RequestParam String kbizNm, @RequestParam String kbizId, Model model){
+		model.addAttribute("orSrch", inboundService.orgnSearch(kbizNm, kbizId));
+	}
+}

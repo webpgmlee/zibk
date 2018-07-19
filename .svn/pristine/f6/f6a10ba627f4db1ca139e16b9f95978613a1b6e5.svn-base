@@ -1,0 +1,149 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper
+  PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+  "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="main">
+	<!-- 상담원 당일통화, 이관건 -->
+	<select id="callCurCount" resultType="java.util.Map" parameterType="java.lang.String">
+	SELECT
+		(SELECT COUNT(*)
+		FROM TH_CONSULT_DETAIL
+		WHERE
+		REG_DATE BETWEEN TO_DATE(TO_CHAR(SYSDATE,'YYYY-MM-DD'),'YYYY-MM-DD')
+		AND TO_DATE(TO_CHAR(SYSDATE+1,'YYYY-MM-DD'),'YYYY-MM-DD')
+		AND USER_ID = #{userId}) AS CCC,
+		(SELECT COUNT(*)
+		FROM TH_CONSULT_DETAIL
+		WHERE CNLT_PROC_CD IN('03','04')
+		AND REG_DATE BETWEEN TO_DATE(TO_CHAR(SYSDATE,'YYYY-MM-DD'),'YYYY-MM-DD')
+		AND TO_DATE(TO_CHAR(SYSDATE+1,'YYYY-MM-DD'),'YYYY-MM-DD')
+		AND USER_ID = #{userId}) AS TCC
+	FROM DUAL
+	</select>
+
+	<!-- 당일 전체 콜백개수(선점제외) -->
+	<select id="callbackCurCount" resultType="java.lang.Integer">
+		SELECT
+			COUNT(*)
+		FROM TH_CALLBACK
+		WHERE CALLBACK_DATE
+		BETWEEN TO_DATE(TO_CHAR(SYSDATE,'YYYY-MM-DD'),'YYYY-MM-DD')
+		AND TO_DATE(TO_CHAR(SYSDATE+1,'YYYY-MM-DD'),'YYYY-MM-DD')
+		AND PROC_YN = 'N'
+	</select>
+
+	<!-- 메인 공지사항 리스트 -->
+	<select id="selectNoticeList" parameterType="NoticeDomain" resultType="NoticeDomain">
+		SELECT * FROM(
+			SELECT
+				A.*,
+				(SELECT USER_NM FROM IF_CO_USER_MA WHERE USER_ID = A.REG_ID) AS REG_NM,
+				ROWNUM AS RNUM FROM
+				(
+				SELECT *
+				FROM TH_NOTICE
+				WHERE
+		        (TO_DATE(TO_CHAR(NOTI_DISP_DATE,'YYYY-MM-DD'),'YYYY-MM-DD')
+		        >= TO_DATE(TO_CHAR(SYSDATE,'YYYY-MM-DD'),'YYYY-MM-DD') OR NOTI_DISP_DATE is null)
+		        <if test=" selKeyword != null and selKeyword !='' ">
+		        	AND
+		        	(
+			        	(NOTI_TITLE LIKE '%' || #{selKeyword} || '%'
+			        	<if test=" notiTypeCd != null and notiTypeCd !='' ">
+			        	AND NOTI_TYPE_CD = #{notiTypeCd}
+			        	</if>
+			        	) OR
+			        	(NOTI_CONTENTS LIKE '%' || #{selKeyword} || '%'
+						<if test=" notiTypeCd != null and notiTypeCd !='' ">
+			        	AND NOTI_TYPE_CD = #{notiTypeCd}
+			        	</if>
+			        	)
+		        	)
+		        </if>
+		        <if test=" selKeyword == null or selKeyword =='' ">
+		        	<if test=" notiTypeCd != null and notiTypeCd !='' ">
+			        	AND NOTI_TYPE_CD = #{notiTypeCd}
+			        </if>
+		        </if>
+				ORDER BY REG_DATE DESC
+				) A
+		)WHERE RNUM BETWEEN #{fromRowPerPage} AND #{toRowPerPage}
+	</select>
+
+	<select id="selectNoticeTotalCnt" resultType="java.lang.Integer">
+		SELECT
+            COUNT(*)
+        FROM TH_NOTICE
+        WHERE
+        (TO_DATE(TO_CHAR(NOTI_DISP_DATE,'YYYY-MM-DD'),'YYYY-MM-DD')
+        >= TO_DATE(TO_CHAR(SYSDATE,'YYYY-MM-DD'),'YYYY-MM-DD') OR NOTI_DISP_DATE is null)
+        <if test=" selKeyword != null and selKeyword !='' ">
+        	AND
+        	(
+	        	(NOTI_TITLE LIKE '%' || #{selKeyword} || '%'
+	        	<if test=" notiTypeCd != null and notiTypeCd !='' ">
+	        	AND NOTI_TYPE_CD = #{notiTypeCd}
+	        	</if>
+	        	)OR
+	        	(NOTI_CONTENTS LIKE '%' || #{selKeyword} || '%'
+				<if test=" notiTypeCd != null and notiTypeCd !='' ">
+	        	AND NOTI_TYPE_CD = #{notiTypeCd}
+	        	</if>
+	        	)
+        	)
+        </if>
+        <if test=" selKeyword == null or selKeyword =='' ">
+        	<if test=" notiTypeCd != null and notiTypeCd !='' ">
+	        	AND NOTI_TYPE_CD = #{notiTypeCd}
+	        </if>
+        </if>
+	</select>
+
+	<!-- 메인 공지사항 상세 -->
+	<select id="selectNoticeDetail" resultType="NoticeDomain" parameterType="NoticeDomain">
+		SELECT NOTI_SEQ
+                  , NOTI_TITLE
+                  , NOTI_TYPE_CD
+                  , NOTI_CONTENTS
+                  , NOTI_FILENAME
+                  , REG_DATE
+                  , (SELECT USER_NM FROM IF_CO_USER_MA WHERE USER_ID = A.REG_ID) AS REG_NM
+                  , MOD_DATE
+                  , (SELECT USER_NM FROM IF_CO_USER_MA WHERE USER_ID = A.MOD_ID) AS MOD_NM
+                  , MOD_ID
+         FROM TH_NOTICE A
+         WHERE 1=1
+             AND NOTI_SEQ = #{notiSeq}
+	</select>
+
+	<!-- 상담원 전일 상담,상담완료,이관,예약 건수 -->
+	<select id="ystdCount" resultType="java.util.Map" parameterType="java.lang.String">
+		SELECT
+			(SELECT COUNT(*)
+			FROM TH_CONSULT_DETAIL
+			WHERE
+			REG_DATE BETWEEN TO_DATE(TO_CHAR(SYSDATE-1,'YYYY-MM-DD'),'YYYY-MM-DD')
+			AND TO_DATE(TO_CHAR(SYSDATE,'YYYY-MM-DD'),'YYYY-MM-DD')
+			AND USER_ID = #{userId}) AS CONCOUNT,
+			(SELECT COUNT(*)
+			FROM TH_CONSULT_DETAIL
+			WHERE CNLT_PROC_CD IN('01','05','06')
+			AND REG_DATE BETWEEN TO_DATE(TO_CHAR(SYSDATE-1,'YYYY-MM-DD'),'YYYY-MM-DD')
+			AND TO_DATE(TO_CHAR(SYSDATE,'YYYY-MM-DD'),'YYYY-MM-DD')
+			AND USER_ID = #{userId}) AS COMCOUNT,
+			(SELECT COUNT(*)
+			FROM TH_CONSULT_DETAIL
+			WHERE CNLT_PROC_CD IN('03','04')
+			AND REG_DATE BETWEEN TO_DATE(TO_CHAR(SYSDATE-1,'YYYY-MM-DD'),'YYYY-MM-DD')
+			AND TO_DATE(TO_CHAR(SYSDATE,'YYYY-MM-DD'),'YYYY-MM-DD')
+			AND USER_ID = #{userId}) AS TRANSCOUNT,
+			(SELECT COUNT(*)
+			FROM TH_CONSULT_DETAIL
+			WHERE CNLT_PROC_CD = '02'
+			AND REG_DATE BETWEEN TO_DATE(TO_CHAR(SYSDATE-1,'YYYY-MM-DD'),'YYYY-MM-DD')
+			AND TO_DATE(TO_CHAR(SYSDATE,'YYYY-MM-DD'),'YYYY-MM-DD')
+			AND USER_ID = #{userId}) AS RSRVCOUNT
+		FROM DUAL
+	</select>
+
+</mapper>

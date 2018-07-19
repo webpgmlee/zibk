@@ -1,0 +1,79 @@
+<%--
+ * file name    : top_status
+ * description  : 상담현황
+ * author       : HeeJ
+ * initial date : 2012.01.03
+ * history
+  수정일자      수정자 수정내용
+  2011.12.28    신원재 Initialization
+  --%>
+<%@ page language="java" contentType="text/html; charset=UTF-8" pageEncoding="UTF-8"%>
+<!DOCTYPE HTML>
+<html lang="ko">
+<head>
+<meta http-equiv="content-type" content="text/html; charset=utf-8">
+<meta http-equiv="X-UA-Compatible" content="IE=edge">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, minimum-scale=1.0, user-scalable=no">
+<meta name="subject" content="KBIZ">
+<meta name="author" content="KBIZ">
+<meta name="keywords" content="KBIZ">
+<meta name="description" content="KBIZ">
+<title>KBIZ</title>
+<jsp:include page="/WEB-INF/jsp/comm_top.jsp"/>
+<script type="text/javascript">
+var hh = 0;
+var mm = 0;
+var ss = 0;
+var callInterval;
+function call_start(){
+	callInterval = setInterval("timer_script()",1000);
+};
+function call_end(){
+	clearInterval(callInterval);
+	$("#CallTime").text("00:00:00");
+};
+function timer_script(){
+	ss+=1;
+	var curTime = "";
+	if(ss==60){
+		mm+=1;
+		ss=0;
+	}
+	if(ss<10){
+		if(mm<10){
+			curTime = "0"+hh+":0"+mm+":0"+ss;
+		}else{
+			curTime = "0"+hh+":"+mm+":0"+ss;
+		}
+	}else{
+		if(mm<10){
+			curTime = "0"+hh+":0"+mm+":"+ss;
+		}else{
+			curTime = "0"+hh+":"+mm+":"+ss;
+		}
+	}
+	$("#CallTime").text(curTime);
+}
+</script>
+</head>
+<body>
+<form id="custfrm" name="custfrm">
+<div class="status_wrap clfix">
+    <ul class="tel_sch fl clfix">
+        <li><strong>전화번호</strong></li>
+        <li><input type="text" name="tellNum" id="tellNum" value="" style="width:120px;" /></li>
+        <li><a href="#" class="btn_sch">검색</a></li>
+    </ul>
+    <ul class="status fl clfix">
+        <li><span>통화시간</span><strong id="CallTime">00:00:00</strong></li>
+        <li><span>일통화건</span><strong>0</strong></li>
+        <li><span>당일응대율</span><strong>0%</strong></li>
+        <li><span>대기콜</span><strong>0</strong></li>
+        <li><span>CallBack</span><strong>0</strong></li>
+        <li><span>이관건수</span><strong>0</strong></li>
+        <li><span>미처리건</span><strong>0</strong></li>
+    </ul>
+</div>
+</form>
+</body>
+</html>

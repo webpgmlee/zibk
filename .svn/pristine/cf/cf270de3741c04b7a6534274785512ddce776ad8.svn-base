@@ -1,0 +1,310 @@
+package or.kr.kbiz.serv.web.tags;
+
+import java.text.DecimalFormat;
+
+
+/**
+ * 이메일 Preview Util Class
+ * 이메일 미리보기를 위한 Util Class
+ *
+ * @version 1.0
+ */
+public class StringTag {
+
+	/**
+	 * Logging을 위한 Logger
+	 */
+//	private static final Logger LOG = LoggerFactory.getLogger(StringTag.class);
+
+	/**
+	 * 숫자에 천단위마다 콤마 넣기
+	 * @param int
+	 * @return String
+	 */
+	public static String toNumFormat(Long num) {
+		DecimalFormat df = new DecimalFormat("###,###,###,###");
+		return df.format(num);
+	}
+
+	/**
+	 * 주어진 double형 숫자의 소숫점 아래 자리를 floor 처리하여 천단위 표기하여 리턴한다.
+	 *
+	 * @param num 표기할 double형 숫자
+	 * @return floor 처리 후 천단위로 표기한 문자열
+	 */
+	public static String floorNumber(Double num) {
+		return toNumFormat((long) Math.floor(num));
+	}
+
+	/**
+	 * 태그 잘라내기
+	 * @param String
+	 * @return String
+	 */
+	public static String removeTags(String src) {
+	    String tags[] = {"!--", "!DOCTYPE", "A", "ABBR", "ACRONYM",
+	                   "ADDRESS", "APPLET", "AREA", "B", "BASE",
+	                   "BASEFONT", "BDO", "BGSOUND", "BIG", "BLINK",
+	                   "BLOCKQUOTE", "BODY", "BR", "BUTTON", "CAPTION",
+	                   "CENTER", "CITE", "CODE", "COL", "COLGROUP",
+	                   "COMMENT", "DD", "DEL", "DFN", "DIR",
+	                   "DIV", "DL", "DT", "EM", "EMBED", "FIELDSET",
+	                   "FONT", "FORM", "FRAME", "FRAMESET",
+	                   "H", "H1", "H2", "H3", "H4", "H5", "H6", "HEAD",
+	                   "HR", "HTML", "I", "IFRAME", "ILAYER", "IMG",
+	                   "INPUT", "INS", "ISINDEX", "KBD", "KEYGEN",
+	                   "LABEL", "LAYER", "LEGEND", "LH", "LI", "LINK",
+	                   "LISTING", "MAP", "MARQUEE", "MENU", "META",
+	                   "MULTICOL", "NEXTID", "NOBR", "NOEMBED", "NOFRAME",
+	                   "NOLAYER", "NOSCRIPT", "OBJECT", "OL", "OPTGROUP",
+	                   "OPTION", "P", "PARAM", "PLAINTEXT", "PRE", "Q",
+	                   "RB", "RP", "RT", "RUBY", "S", "SAMP", "SCRIPT",
+	                   "SELECT", "SERVER", "SMALL", "SPACER", "SPAN",
+	                   "STRIKE", "STRONG", "STYLE", "SUB", "SUP", "TABLE",
+	                   "TBODY", "TD", "TEXTAREA", "TFOOT", "TH", "THEAD",
+	                   "TITLE", "TR", "TT", "U", "UL", "VAR", "WBR", "XMP"};
+
+	    for(int i = 0 ; i < tags.length ; i++) {
+	        src = removeTag(src, tags[i]);
+	    }
+	    return src;
+	}
+
+	public static String removeTag(String src, String tag) {
+	    String copy = null;
+	    String mid = null;
+	    int op = 0;
+	    int tp = 0;
+	    int cp = 0;
+
+	    copy = src;
+	    src = src.toUpperCase();
+
+	    while(( op = src.indexOf("<" + tag, op) ) != -1) {
+	        mid = src.substring(op + 1 + tag.length(), op + 1 + tag.length() + 1);
+
+	        if("0123456789abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ".indexOf(mid) != -1) {
+	            op = op + 1 + tag.length() + 1;
+	            continue;
+	        }
+
+	        if(( cp = src.indexOf("</" + tag + ">", op)) == -1) {
+	            tp = src.indexOf(">", op);
+	            if (tp == -1) {
+	                src = src.substring(0, op);
+	                copy = copy.substring(0, op);
+	            } else {
+	                src = src.substring(0, op) + src.substring(tp+1, src.length());
+	                copy = copy.substring(0, op) + copy.substring(tp+1, copy.length());
+	            }
+	        } else {
+	            if( tag.equals("SCRIPT") || tag.equals("STYLE") || tag.equals("OBJECT") ){
+	                tp = src.indexOf(">",op);
+	                src = src.substring(0, op) + src.substring(cp + tag.length()+ 3, src.length());
+	                copy = copy.substring(0, op) + copy.substring(cp + tag.length() + 3, copy.length());
+	            } else {
+	                tp = src.indexOf(">", op);
+	                src = src.substring(0, op) + src.substring(tp+1, cp) + src.substring(cp + tag.length() + 3, src.length());
+	                copy = copy.substring(0, op) + copy.substring(tp+1, cp) + copy.substring(cp + tag.length() + 3, copy.length());
+	            }
+	        }
+	    }
+	    return copy;
+	}
+
+	/**
+	 * 사이트별 서버URL을 return
+	 *
+	 * @Param siteId 사이트ID
+	 * @return 서버 URL
+	 */
+	public static String getServerUrl(String siteId) {
+		String serverUrl = "" ;
+
+		if("1".equals(siteId)) {
+			serverUrl = "http://www.akmall.com" ;
+		}
+		else if ("2".equals(siteId)) {
+			serverUrl = "http://www.akfamily.com" ;
+		}
+
+		return serverUrl ;
+	}
+
+	/**
+	 * 사이트별 이미지URL을 return
+	 *
+	 * @Param siteId 사이트ID
+	 * @return 서버 URL
+	 */
+	public static String getImageUrl(String siteId) {
+		String serverUrl = "" ;
+
+		if("1".equals(siteId)) {
+			serverUrl = "http://photo.akmall.com" ;
+		}
+		else if ("2".equals(siteId)) {
+			serverUrl = "http://photo.akmall.com" ;
+		}
+
+		return serverUrl ;
+	}
+
+	/**
+	 * 상품ID와 크기, 이미지 Seq를 입력받아 추가등록 이미지를 조회한다.
+	 * 추가등록 이미지는 500X500, 350X350, 50X50 만 존재한다.
+	 *
+	 * @Param imgSize 이미지 크기
+	 * @param goodsId 상품ID
+	 * @param imgSeq 관련이미지의 Sequence
+	 * @return 전체 이미지 경로 Full URL
+	 */
+	public static String getAddImagePath(String imgSize, Long goodsId, Long imgSeq) {
+		return getCommonImagePath(imgSize, goodsId) + "_" + lpad(String.valueOf(imgSeq), '0', 2) + "_" + imgSize + ".jpg";
+	}
+
+	/**
+	 * 상품ID 기반으로 주어진 크기의 메인 이미지를 전체 URL 경로를 받아온다.
+	 *
+	 * @param imgSize 이미지 크기
+	 * @param goodsId 상품ID
+	 * @return Host명을 포함한 전체 이미지 경로 Full URL
+	 */
+	public static String getImagePath(String imgSize, Long goodsId, String buyAgeCode) {
+		// http://photoHost/prefix/상품ID1/상품ID2/상품ID3/상품ID4/상품ID_M_이미지크기.jpg
+		// TODO 서버경로 처리필요
+		if ("19".equals(buyAgeCode))
+			return "/resource/front/images/content/adult_" + imgSize + ".gif";
+		return getCommonImagePath(imgSize, goodsId) + "_M_" + imgSize + ".jpg";
+	}
+
+	/**
+	 * 상품ID 기반으로 주어진 크기 이미지의 전체 경로를 가져오는 공통함수
+	 * http://photoHost/prefix/상품ID1/상품ID2/상품ID3/상품ID4/상품ID 까지 생성하여 리턴하고
+	 * 용도에 따라 메인/추가 이미지를 뒤에 붙인다.
+	 *
+	 * @param imgSize 이미지 크기
+	 * @param goodsId 상품ID
+	 * @return Host명을 포함한 전체 이미지 경로 Full URL(완성된 URL은 아님)
+	 */
+	private static String getCommonImagePath(String imgSize, Long goodsId) {
+		String photoHost = "photo.akmall.com" ;
+		// TODO 현재 테스트중은 goods_test이고 최종적으로는 goods로 변경예정
+		// 20140903 김현학 goods로 경로변경
+		String pathPrefix = "/image" + (goodsId % 5) + "/goods/";
+
+		// 경로생성
+		String goodsIdStr = lpad(String.valueOf(goodsId), '0', 8);
+		goodsIdStr = goodsIdStr.substring(goodsIdStr.length() - 8);
+		String pathStr = String.format("%s/%s/%s/%s/", goodsIdStr.substring(0, 2), goodsIdStr.substring(2, 4),
+				goodsIdStr.substring(4, 6), goodsIdStr.substring(6, 8));
+
+		// http://photoHost/prefix/상품ID1/상품ID2/상품ID3/상품ID4/상품ID 까지 리턴
+		return "http://" + photoHost + pathPrefix + pathStr + goodsId;
+	}
+
+	/**
+	* 주어진 문자열을 일정한 길이만큼 잘라준다.
+	* @param str		문자열
+	* @param maxSize	화면에 보여줄 문자열 길이
+	* @return 잘려진 문자열
+	*/
+    public static String getMaxString(String str, Integer maxSize) {
+        if(getByteLength(str) > maxSize) {
+            str = "<font title='" + str + "'>" + getByteLengthString(str, maxSize) + "...</font>";
+        }
+        return str;
+    }
+
+    public static int getByteLength(String strText) {
+        byte[] byteArray = strText.getBytes();
+        return byteArray.length;
+    }
+
+    public static String getByteLengthString(String str, int byteLength) {
+    	if(getByteLength(str) > byteLength)
+    		return getByteLengthString(str.substring(0, str.length()-1), byteLength);
+    	return str;
+    }
+
+    /**
+     * 주어진 pad 문자를 문자열 앞에 붙여서 총 size 길이의 문자열을 만든다.
+     * str 길이가 size보다 크거나 pad가 0 이면 원래 문자열 그대로 리턴한다.
+     *
+     * @param str
+     * @param pad
+     * @return
+     */
+    public static String lpad(String str, char pad, int size) {
+    	if (str == null || str.length() > size || pad == 0)
+    		return str;
+
+    	StringBuilder sb = new StringBuilder(size);
+    	for (int i = str.length(); i < size; i++)
+    		sb.append(pad);
+    	sb.append(str);
+
+    	return sb.toString();
+    }
+
+	/**
+	 * 입력받은 숫자를 주어진 자리수에 대해 버림 처리하여 리턴한다.
+	 *
+	 * @param val 버림할 숫자
+	 * @param digit 버림할 위치(0 : 1자리, 1 : 2자리, ~~)
+	 * @return 버림한 결과
+	 */
+	public static Number trunc(Number val, Number digit) {
+		long pow = (long) Math.pow(10, digit.doubleValue());
+		return (long) Math.floor(val.doubleValue() / pow) * pow;
+	}
+
+	/**
+	 * 숫자만으로 구성된 전화번호를 "-"를 붙여서 화면표시용으로 재조합한다.
+	 * ${akm:toTelFormat("023123456")} => 02-312-3456
+	 * ${akm:toTelFormat("01034567890")} => 010-3456-7890
+	 *
+	 * @param telno 숫자로 구성된 전화번호
+	 * @return
+	 */
+	public static String toTelFormat(String telNo) {
+		// 비정상적 포맷 제거
+		try {
+			if (telNo == null || telNo.length() < 6 || Long.parseLong(telNo) < 0)
+				return "";
+		} catch (NumberFormatException nfe) {
+			// do nothing
+		}
+
+		StringBuilder sb = new StringBuilder();
+		int pos = 0;
+		// 02(서울 전화국번)만 앞이 두 자리이고 나머지는 모두 3자리임.
+		if (telNo.startsWith("02"))
+			pos = 2;
+		else
+			pos = 3;
+		sb.append(telNo.substring(0, pos)).append("-");
+
+		// 뒷 4자리 국번을 제외한 숫자를 더한다.
+		sb.append(telNo.substring(pos, telNo.length() - 4)).append("-");
+		// 마지막 4자리를 더한다.
+		sb.append(telNo.substring(telNo.length() - 4));
+
+		return sb.toString();
+	}
+
+	/**
+	 * DB에서 조회한 8자리 날짜(예 : 20140128)을 화면표시용 날짜 포맷(2014-01-28)로 변환하여 리턴한다.
+	 *
+	 * @param str 변환대상 날짜 문자열
+	 * @return 변환 후 문자열
+	 */
+	public static String toDashDate(String str) {
+		if (str == null)
+			return "";
+		if (str.length() != 8)
+			return str;
+		return str.substring(0, 4) + "-" + str.substring(4, 6) + "-" + str.substring(6);
+	}
+
+}

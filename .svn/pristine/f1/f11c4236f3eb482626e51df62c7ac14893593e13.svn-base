@@ -1,0 +1,95 @@
+package or.kr.kbiz.bo.admin.controller;
+
+import java.text.SimpleDateFormat;
+import java.util.Date;
+import java.util.List;
+
+import javax.servlet.http.HttpServletResponse;
+
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.stereotype.Controller;
+import org.springframework.ui.Model;
+import org.springframework.web.bind.annotation.ModelAttribute;
+import org.springframework.web.bind.annotation.RequestMapping;
+
+import or.kr.kbiz.bo.admin.domain.ReserveCallDomain;
+import or.kr.kbiz.bo.admin.service.ReserveCallService;
+import or.kr.kbiz.serv.util.WriteListToExcelFile;
+/**
+ * <pre>ReserveCallController</pre>
+ *
+ * @author bsy
+ * @since 2017.11.20
+ * @version 1.0
+ */
+@Controller
+@RequestMapping(value="/admin")
+public class ReserveCallController {
+
+	private static final Logger logger = LoggerFactory.getLogger(ReserveCallController.class);
+
+	private static String PREFIX = "admin";
+	/**
+	 * 예약내역 서비스
+	 */
+	@Autowired
+	private ReserveCallService reserverCallService;
+	/**
+	 * <pre>예약내역 화면 호출</pre>
+	 *
+	 * @param reserveCallInit 템플릿 도메인
+	 * @param model Model 객체
+	 * @return String 요청화면 url
+	 */
+	@RequestMapping(value="/reserveCall")
+	public String reserveCallInit(@ModelAttribute ReserveCallDomain reserveCallDomain, Model model) {
+		model.addAttribute("resultList", reserverCallService.selectReserveCallList(reserveCallDomain));
+		return PREFIX + "/reserveCall";
+	}
+
+	/**
+	 * <pre>예약내역 화면 호출</pre>
+	 *
+	 * @param reserveCallList  템플릿 도메인
+	 * @param model Model 객체
+	 * @return String 요청화면 url
+	 */
+	@RequestMapping(value="/reserveCallList", produces="text/html")
+	public String reserveCallList(@ModelAttribute ReserveCallDomain reserveCallDomain, Model model) {
+		model.addAttribute("pageDomain", reserveCallDomain);
+		model.addAttribute("resultList", reserverCallService.selectReserveCallList(reserveCallDomain));
+		return PREFIX + "/view/reserveCallList";
+	}
+
+	/**
+	 * <pre>예약내역  상세 조회</pre>
+	 *
+	 * @param reserveCallDetail 템플릿 도메인
+	 * @param model Model 객체
+	 */
+	@RequestMapping(value="/reserveCallDetail")
+	public void reserveCallDetail(@ModelAttribute ReserveCallDomain reserveCallDomain, Model model) {
+		model.addAttribute("result", reserverCallService.selectReserveCallDetail(reserveCallDomain));
+	}
+
+	/**
+	 * Excel Down
+	 *
+	 * @param
+	 * @return
+	 */
+	@RequestMapping(value="/reserveCall/excel")
+	public void excelDown(@ModelAttribute ReserveCallDomain reserveCallDomain, HttpServletResponse response, Model model){
+		List<ReserveCallDomain> reserverCallList = reserverCallService.selectReserveCallExcelList(reserveCallDomain);
+		SimpleDateFormat sdf = new SimpleDateFormat("yyyyMMdd");
+		String today = sdf.format(new Date());
+		String fileName = "예약내역_"+today;
+		try {
+			WriteListToExcelFile.writeReserverCallListToFile(fileName+".xls", reserverCallList, response);
+		} catch (Exception e) {
+			e.printStackTrace();
+		}
+	}
+}

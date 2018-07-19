@@ -1,0 +1,78 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper
+  PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+  "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="sms">
+
+    <!-- [SMS] 목록 조회 -->
+	<select id="select" resultType="SmsSendDomain" parameterType="SmsSendDomain">
+        SELECT SEND_SMS_SEQ
+                     ,TELL_NUM
+                     ,SMS_CONTENT
+                     ,SEND_SMS_DATE
+                     ,SEND_USER_NM
+                    , RNUM
+            FROM (
+                SELECT
+                      SEND_SMS_SEQ
+                     ,TELL_NUM
+                     ,SMS_CONTENT
+                     ,SEND_SMS_DATE
+                     ,SEND_USER_NM
+                    , ROWNUM AS RNUM
+                    FROM (
+					       SELECT A.SEND_SMS_SEQ
+									 ,A.TELL_NUM
+									 ,A.SMS_CONTENT
+									 ,A.SEND_SMS_DATE
+                                    , B.USER_NM AS SEND_USER_NM
+								  FROM TH_SEND_SMS A, IF_CO_USER_MA B
+							     WHERE 1=1
+							        AND A.SEND_USER_ID = B.USER_ID
+			                         <if test="loginCallApGrade == '03'">
+			                         AND A.SEND_USER_ID = #{loginUserId}
+			                         </if>
+				                    <if test="selTellNum != null and selTellNum != ''">
+				                    AND A.TELL_NUM LIKE '%'|| #{selTellNum} ||'%'
+				                    </if>
+									<if test="selFromDt != null and selFromDt != ''">
+									AND A.SEND_SMS_DATE  BETWEEN TO_DATE(#{selFromDt},'YYYY-MM-DD') AND (TO_DATE(#{selToDt},'YYYY-MM-DD') +1)
+									</if>
+                          ORDER BY A.SEND_SMS_DATE DESC
+                           )
+                 )
+         WHERE RNUM BETWEEN #{fromRowPerPage} AND #{toRowPerPage}
+	</select>
+
+	<!--[SMS] 페이징  -->
+    <select id="selectSmsSendTotalCount" resultType="int">
+        SELECT
+            COUNT(*) AS TOTALCNT
+         FROM TH_SEND_SMS A, IF_CO_USER_MA B
+        WHERE 1=1
+           AND A.SEND_USER_ID = B.USER_ID
+           <if test="loginCallApGrade == '03'">
+           AND A.SEND_USER_ID = #{loginUserId}
+           </if>
+           <if test="selTellNum != null and selTellNum != ''">
+           AND A.TELL_NUM LIKE '%'|| #{selTellNum} ||'%'
+           </if>
+           <if test="selFromDt != null and selFromDt != ''">
+           AND A.SEND_SMS_DATE  BETWEEN TO_DATE(#{selFromDt},'YYYY-MM-DD') AND (TO_DATE(#{selToDt},'YYYY-MM-DD') +1)
+           </if>
+    </select>
+
+    <!-- [SMS] 상세목록 조회 -->
+    <select id="selectDetail" resultType="SmsSendDomain" parameterType="SmsSendDomain">
+        SELECT A.TELL_NUM
+                  ,A.SMS_CONTENT
+                  ,A.SEND_SMS_DATE
+                 , B.USER_NM AS SEND_USER_NM
+                 , A.SMS_CONTENT
+                 , A.SMS_TITLE
+         FROM TH_SEND_SMS A, IF_CO_USER_MA B
+         WHERE 1=1
+             AND A.SEND_USER_ID = B.USER_ID
+             AND A.SEND_SMS_SEQ = #{sendSmsSeq}
+    </select>
+</mapper>

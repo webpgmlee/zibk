@@ -1,0 +1,355 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper
+  PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+  "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="consultHist">
+
+    <!-- [상담이력] 목록 조회 -->
+	<select id="select" resultType="ConsultHistDomain" parameterType="ConsultHistDomain">
+	       SELECT CNLT_SEQ
+                    , CNLT_DETAIL_NO
+                    , CNLT_PROC_CD
+                    , CNLT_PROC_NM
+                    , CNLT_DATE
+                    , TELL_NUM
+                    , USER_NM
+                    , CHNL_CODE
+                    , CHNL_CODE_NAME
+                    , LCODE
+                    , LCODE_NAME
+                    , MCODE
+                    , MCODE_NAME
+                    , SCODE
+                    , SCODE_NAME
+                    , REG_DATE
+                    , CUST_NM
+                    , RSRV_DATE
+                    , REC_URL
+                    , IO_TYPE
+                    , TARGET_TB
+                    , RNUM
+            FROM (
+                SELECT
+                      CNLT_SEQ
+                    , CNLT_DETAIL_NO
+                    , CNLT_PROC_CD
+                    , CNLT_PROC_NM
+                    , CNLT_DATE
+                    , TELL_NUM
+                    , USER_NM
+                    , CHNL_CODE
+                    , CHNL_CODE_NAME
+                    , LCODE
+                    , LCODE_NAME
+                    , MCODE
+                    , MCODE_NAME
+                    , SCODE
+                    , SCODE_NAME
+                    , REG_DATE
+                    , CUST_NM
+                    , RSRV_DATE
+                    , REC_URL
+                    , IO_TYPE
+                    ,TARGET_TB
+                    , ROWNUM AS RNUM
+                    FROM (
+				       SELECT A.CNLT_SEQ
+			                    , A.CNLT_DETAIL_NO
+			                    , A.CNLT_PROC_CD
+			                    , (SELECT CODE_NAME FROM TH_CODE WHERE LCODE='001' AND MCODE=A.CNLT_PROC_CD) AS CNLT_PROC_NM
+			                    , A.CNLT_DATE
+			                    , A.TELL_NUM
+	                            , C.USER_NM AS USER_NM
+			                    , A.CHNL_CODE
+			                    , (SELECT CODE_NAME FROM TH_CONSULT_CODE WHERE CHNL_CODE = A.CHNL_CODE AND LCODE='00' AND MCODE='00' AND SCODE='00') AS CHNL_CODE_NAME
+			                    , A.LCODE
+			                    , (SELECT CODE_NAME FROM TH_CONSULT_CODE WHERE CHNL_CODE = A.CHNL_CODE AND LCODE=A.LCODE AND LCODE <![CDATA[<>]]> '00' AND MCODE='00' AND SCODE='00') AS LCODE_NAME
+			                    , A.MCODE
+			                    , (SELECT CODE_NAME FROM TH_CONSULT_CODE WHERE CHNL_CODE = A.CHNL_CODE AND LCODE=A.LCODE AND MCODE=A.MCODE AND MCODE <![CDATA[<>]]> '00' AND SCODE='00') AS MCODE_NAME
+			                    , A.SCODE
+			                    , (SELECT CODE_NAME FROM TH_CONSULT_CODE WHERE CHNL_CODE = A.CHNL_CODE AND LCODE=A.LCODE AND MCODE=A.MCODE AND SCODE=A.SCODE AND SCODE <![CDATA[<>]]> '00') AS SCODE_NAME
+			                    , A.REG_DATE
+			                    , B.CUST_NM
+			                    , A.RSRV_DATE
+			                    , A.REC_URL
+	                            , A.IO_TYPE
+	                            , A.TARGET_TB
+					    FROM
+	                        (SELECT A1.*, 'ORG' AS TARGET_TB FROM TH_CONSULT_DETAIL A1
+	                        UNION ALL
+	                        SELECT A2.*, 'HIST' AS TARGET_TB FROM TH_CONSULT_DETAIL_HIST A2) A ,
+	                        (SELECT B1.* FROM TH_CONSULT B1
+	                        UNION ALL
+	                        SELECT B2.* FROM TH_CONSULT_HIST B2) B ,IF_CO_USER_MA C
+				      WHERE 1=1
+						  AND A.CNLT_SEQ = B.CNLT_SEQ
+	                         AND A.USER_ID = C.USER_ID
+						         <if test="selCustNm != null and selCustNm != ''">
+						         AND B.CUST_NM LIKE '%'|| #{selCustNm} ||'%'
+			                     </if>
+			                     <if test="selTellNum != null and selTellNum != ''">
+			                     AND A.TELL_NUM  LIKE '%'|| #{selTellNum} ||'%'
+			                     </if>
+			                     <if test="selUserNm != null and selUserNm != ''">
+			                     AND C.USER_NM LIKE '%'|| #{selUserNm} ||'%'
+			                     </if>
+			                      <if test="selChnlCode != null and selChnlCode != '' and selChnlCode != '00'">
+			                     AND A.CHNL_CODE =  #{selChnlCode}
+			                     </if>
+			                     <if test="selLcode != null and selLcode != '' and selLcode != '00'">
+			                     AND A.LCODE =  #{selLcode}
+			                     </if>
+			                      <if test="selMcode != null and selMcode != ''and selMcode != '00'">
+			                     AND A.MCODE =  #{selMcode}
+			                     </if>
+			                      <if test="selScode != null and selScode != ''and selScode != '00'">
+			                     AND A.SCODE =  #{selScode}
+			                     </if>
+			                     <if test="selCnltProcCd != null and selCnltProcCd != ''">
+			                     AND A.CNLT_PROC_CD =  #{selCnltProcCd}
+			                     </if>
+                                 <if test="selFromDt != null and selFromDt != ''">
+                                 AND A.CNLT_DATE  BETWEEN TO_DATE(#{selFromDt},'YYYY-MM-DD') AND (TO_DATE(#{selToDt},'YYYY-MM-DD') +1)
+                                 </if>
+			              ORDER BY A.CNLT_DATE DESC
+                           )
+                 )
+         WHERE RNUM BETWEEN #{fromRowPerPage} AND #{toRowPerPage}
+	</select>
+
+	<!--[상담이력] 페이징  -->
+    <select id="selectConsultHistTotalCount" resultType="int">
+        SELECT
+            COUNT(*) AS TOTALCNT
+          FROM
+          (SELECT * FROM TH_CONSULT_DETAIL
+          UNION ALL
+          SELECT * FROM TH_CONSULT_DETAIL_HIST)  A ,
+           (SELECT * FROM TH_CONSULT
+           UNION ALL
+           SELECT * FROM TH_CONSULT_HIST) B, IF_CO_USER_MA C
+        WHERE 1=1
+            AND A.CNLT_SEQ = B.CNLT_SEQ
+            AND A.USER_ID = C.USER_ID
+                   <if test="selCustNm != null and selCustNm != ''">
+                   AND B.CUST_NM LIKE '%'|| #{selCustNm} ||'%'
+                   </if>
+                   <if test="selTellNum != null and selTellNum != ''">
+                   AND A.TELL_NUM  LIKE '%'|| #{selTellNum} ||'%'
+                   </if>
+                   <if test="selUserNm != null and selUserNm != ''">
+                   AND C.USER_NM LIKE '%'|| #{selUserNm} ||'%'
+                   </if>
+                    <if test="selChnlCode != null and selChnlCode != '' and selChnlCode != '00'">
+                   AND A.CHNL_CODE =  #{selChnlCode}
+                   </if>
+                   <if test="selLcode != null and selLcode != '' and selLcode != '00'">
+                   AND A.LCODE =  #{selLcode}
+                   </if>
+                    <if test="selMcode != null and selMcode != ''and selMcode != '00'">
+                   AND A.MCODE =  #{selMcode}
+                   </if>
+                    <if test="selScode != null and selScode != ''and selScode != '00'">
+                   AND A.SCODE =  #{selScode}
+                   </if>
+                   <if test="selCnltProcCd != null and selCnltProcCd != ''">
+                   AND A.CNLT_PROC_CD =  #{selCnltProcCd}
+                   </if>
+                   <if test="selFromDt != null and selFromDt != ''">
+                   AND A.CNLT_DATE  BETWEEN TO_DATE(#{selFromDt},'YYYY-MM-DD') AND (TO_DATE(#{selToDt},'YYYY-MM-DD') +1)
+                   </if>
+    </select>
+
+	<!-- [상담이력] 상세목록 조회 -->
+    <select id="selectDetail" resultType="ConsultHistDomain" parameterType="ConsultHistDomain">
+    <if test="targetTb == 'ORG'.toString()">
+        SELECT A.CNLT_SEQ
+                 , A.CNLT_DETAIL_NO
+                 , A.CNLT_PROC_CD
+                 , (SELECT CODE_NAME FROM TH_CODE WHERE LCODE='001' AND MCODE=A.CNLT_PROC_CD) AS CNLT_PROC_NM
+                 , A.CNLT_DATE
+                 , A.TELL_NUM
+                 , C.USER_NM AS USER_NM
+                 , A.REG_DATE
+                 , A.RECV_NOTE
+                 , A.PROC_NOTE
+                 , A.RSRV_DATE
+                 , A.TRAN_ID
+                 , (SELECT USER_NM FROM IF_CO_USER_MA WHERE USER_ID = A.TRAN_ID) AS TRAN_NM
+                 , A.CNTR_NO
+                 , CHNL_CODE
+                 , (SELECT CODE_NAME FROM TH_CONSULT_CODE WHERE CHNL_CODE = A.CHNL_CODE AND LCODE='00' AND MCODE='00' AND SCODE='00') AS CHNL_CODE_NAME
+                 , LCODE
+                 , (SELECT CODE_NAME FROM TH_CONSULT_CODE WHERE CHNL_CODE = A.CHNL_CODE AND LCODE=A.LCODE AND LCODE <![CDATA[<>]]> '00' AND MCODE='00' AND SCODE='00') AS LCODE_NAME
+                 , MCODE
+                 , (SELECT CODE_NAME FROM TH_CONSULT_CODE WHERE CHNL_CODE = A.CHNL_CODE AND LCODE=A.LCODE AND MCODE=A.MCODE AND MCODE <![CDATA[<>]]> '00' AND SCODE='00') AS MCODE_NAME
+                 , SCODE
+                 , (SELECT CODE_NAME FROM TH_CONSULT_CODE WHERE CHNL_CODE = A.CHNL_CODE AND LCODE=A.LCODE AND MCODE=A.MCODE AND SCODE=A.SCODE AND SCODE <![CDATA[<>]]> '00') AS SCODE_NAME
+                 , B.CUST_NM
+                 , A.REC_URL
+          FROM TH_CONSULT_DETAIL  A , TH_CONSULT B, IF_CO_USER_MA C
+        WHERE 1=1
+            AND A.CNLT_SEQ = B.CNLT_SEQ
+            AND A.USER_ID = C.USER_ID
+             AND A.CNLT_SEQ = #{cnltSeq}
+             AND A.CNLT_DETAIL_NO = #{cnltDetailNo}
+    </if>
+    <if test="targetTb == 'HIST'.toString()">
+        SELECT A.CNLT_SEQ
+                 , A.CNLT_DETAIL_NO
+                 , A.CNLT_PROC_CD
+                 , (SELECT CODE_NAME FROM TH_CODE WHERE LCODE='001' AND MCODE=A.CNLT_PROC_CD) AS CNLT_PROC_NM
+                 , A.CNLT_DATE
+                 , A.TELL_NUM
+                 , C.USER_NM AS USER_NM
+                 , A.REG_DATE
+                 , A.RECV_NOTE
+                 , A.PROC_NOTE
+                 , A.RSRV_DATE
+                 , A.TRAN_ID
+                 , (SELECT USER_NM FROM IF_CO_USER_MA WHERE USER_ID = A.TRAN_ID) AS TRAN_NM
+                 , A.CNTR_NO
+                 , CHNL_CODE
+                 , (SELECT CODE_NAME FROM TH_CONSULT_CODE WHERE CHNL_CODE = A.CHNL_CODE AND LCODE='00' AND MCODE='00' AND SCODE='00') AS CHNL_CODE_NAME
+                 , LCODE
+                 , (SELECT CODE_NAME FROM TH_CONSULT_CODE WHERE CHNL_CODE = A.CHNL_CODE AND LCODE=A.LCODE AND LCODE <![CDATA[<>]]> '00' AND MCODE='00' AND SCODE='00') AS LCODE_NAME
+                 , MCODE
+                 , (SELECT CODE_NAME FROM TH_CONSULT_CODE WHERE CHNL_CODE = A.CHNL_CODE AND LCODE=A.LCODE AND MCODE=A.MCODE AND MCODE <![CDATA[<>]]> '00' AND SCODE='00') AS MCODE_NAME
+                 , SCODE
+                 , (SELECT CODE_NAME FROM TH_CONSULT_CODE WHERE CHNL_CODE = A.CHNL_CODE AND LCODE=A.LCODE AND MCODE=A.MCODE AND SCODE=A.SCODE AND SCODE <![CDATA[<>]]> '00') AS SCODE_NAME
+                 , B.CUST_NM
+                 , A.REC_URL
+          FROM TH_CONSULT_DETAIL_HIST  A , TH_CONSULT_HIST B, IF_CO_USER_MA C
+        WHERE 1=1
+            AND A.CNLT_SEQ = B.CNLT_SEQ
+            AND A.USER_ID = C.USER_ID
+             AND A.CNLT_SEQ = #{cnltSeq}
+             AND A.CNLT_DETAIL_NO = #{cnltDetailNo}
+        </if>
+    </select>
+    <!--[상담]인입채널 조회  -->
+    <select id="selectChCodeList" resultType="ConsultHistDomain">
+        SELECT CHNL_CODE,CODE_NAME FROM TH_CONSULT_CODE
+            WHERE LCODE = '00'
+                AND MCODE = '00'
+                AND SCODE = '00'
+                AND USE_YN ='Y'
+  ORDER BY CHNL_CODE ASC
+    </select>
+
+    <!-- [상담] 대분류 조회 -->
+    <select id="selectLcode" resultType="ConsultHistDomain" parameterType="ConsultHistDomain">
+           SELECT LCODE
+                    , CODE_NAME
+            FROM TH_CONSULT_CODE
+          WHERE 1=1
+             <if test="chnlCode != null and chnlCode != ''">
+              AND CHNL_CODE =  #{chnlCode}
+              AND LCODE<![CDATA[<>]]>'00'
+              AND MCODE='00'
+              AND SCODE='00'
+              AND USE_YN ='Y'
+              </if>
+ ORDER BY LCODE ASC
+    </select>
+
+    <!-- [상담] 중분류 조회 -->
+    <select id="selectMcode" resultType="ConsultHistDomain" parameterType="ConsultHistDomain">
+           SELECT MCODE
+                    , CODE_NAME
+            FROM TH_CONSULT_CODE
+          WHERE 1=1
+             <if test="chnlCode != null and chnlCode != ''">
+              AND CHNL_CODE =  #{chnlCode}
+              AND LCODE = #{lcode}
+              AND MCODE<![CDATA[<>]]>'00'
+              AND SCODE='00'
+              AND USE_YN ='Y'
+              </if>
+ ORDER BY MCODE ASC
+
+    </select>
+
+    <!-- [상담] 소분류 조회 -->
+    <select id="selectScode" resultType="ConsultHistDomain" parameterType="ConsultHistDomain">
+           SELECT SCODE
+                    , CODE_NAME
+            FROM TH_CONSULT_CODE
+          WHERE 1=1
+             <if test="chnlCode != null and chnlCode != ''">
+              AND CHNL_CODE =  #{chnlCode}
+              AND LCODE = #{lcode}
+              AND MCODE= #{mcode}
+              AND SCODE<![CDATA[<>]]>'00'
+              AND USE_YN ='Y'
+              </if>
+ ORDER BY SCODE ASC
+
+    </select>
+
+    <!-- [상담이력 엑셀] 목록 조회 -->
+    <select id="selectExcel" resultType="ConsultHistDomain" parameterType="ConsultHistDomain">
+	    SELECT A.CNLT_SEQ
+	             , A.CNLT_DETAIL_NO
+	             , A.CNLT_PROC_CD
+	             , (SELECT CODE_NAME FROM TH_CODE WHERE LCODE='001' AND MCODE=A.CNLT_PROC_CD) AS CNLT_PROC_NM
+	             , A.CNLT_DATE
+	             , A.TELL_NUM
+                 , C.USER_NM AS USER_NM
+	             , A.CHNL_CODE
+	             , (SELECT CODE_NAME FROM TH_CONSULT_CODE WHERE CHNL_CODE = A.CHNL_CODE AND LCODE='00' AND MCODE='00' AND SCODE='00') AS CHNL_CODE_NAME
+	             , A.LCODE
+	             , (SELECT CODE_NAME FROM TH_CONSULT_CODE WHERE CHNL_CODE = A.CHNL_CODE AND LCODE=A.LCODE AND LCODE <![CDATA[<>]]> '00' AND MCODE='00' AND SCODE='00') AS LCODE_NAME
+	             , A.MCODE
+	             , (SELECT CODE_NAME FROM TH_CONSULT_CODE WHERE CHNL_CODE = A.CHNL_CODE AND LCODE=A.LCODE AND MCODE=A.MCODE AND MCODE <![CDATA[<>]]> '00' AND SCODE='00') AS MCODE_NAME
+	             , A.SCODE
+	             , (SELECT CODE_NAME FROM TH_CONSULT_CODE WHERE CHNL_CODE = A.CHNL_CODE AND LCODE=A.LCODE AND MCODE=A.MCODE AND SCODE=A.SCODE AND SCODE <![CDATA[<>]]> '00') AS SCODE_NAME
+	             , A.REG_DATE
+	             , B.CUST_NM
+	             , A.RSRV_DATE
+                 , A.RECV_NOTE
+                 , A.PROC_NOTE
+                 , A.TRAN_ID
+                 , (SELECT USER_NM FROM IF_CO_USER_MA WHERE USER_ID = A.TRAN_ID) AS TRAN_NM
+                 , A.CNTR_NO
+                 , A.IO_TYPE
+          FROM
+               (SELECT A1.*, 'ORG' AS TARGET_TB FROM TH_CONSULT_DETAIL A1
+               UNION ALL
+               SELECT A2.*, 'HIST' AS TARGET_TB FROM TH_CONSULT_DETAIL_HIST A2) A ,
+               (SELECT B1.* FROM TH_CONSULT B1
+               UNION ALL
+               SELECT B2.* FROM TH_CONSULT_HIST B2) B ,IF_CO_USER_MA C
+         WHERE 1=1
+            AND A.CNLT_SEQ = B.CNLT_SEQ
+            AND A.USER_ID = C.USER_ID
+                   <if test="selCustNm != null and selCustNm != ''">
+                   AND B.CUST_NM LIKE '%'|| #{selCustNm} ||'%'
+                   </if>
+                   <if test="selTellNum != null and selTellNum != ''">
+                   AND A.TELL_NUM  LIKE '%'|| #{selTellNum} ||'%'
+                   </if>
+                   <if test="selUserNm != null and selUserNm != ''">
+                   AND C.USER_NM LIKE '%'|| #{selUserNm} ||'%'
+                   </if>
+                    <if test="selChnlCode != null and selChnlCode != '' and selChnlCode != '00'">
+                   AND A.CHNL_CODE =  #{selChnlCode}
+                   </if>
+                   <if test="selLcode != null and selLcode != '' and selLcode != '00'">
+                   AND A.LCODE =  #{selLcode}
+                   </if>
+                    <if test="selMcode != null and selMcode != ''and selMcode != '00'">
+                   AND A.MCODE =  #{selMcode}
+                   </if>
+                    <if test="selScode != null and selScode != ''and selScode != '00'">
+                   AND A.SCODE =  #{selScode}
+                   </if>
+                   <if test="selCnltProcCd != null and selCnltProcCd != ''">
+                   AND A.CNLT_PROC_CD =  #{selCnltProcCd}
+                   </if>
+                   <if test="selFromDt != null and selFromDt != ''">
+                   AND A.CNLT_DATE  BETWEEN TO_DATE(#{selFromDt},'YYYY-MM-DD') AND (TO_DATE(#{selToDt},'YYYY-MM-DD') +1)
+                   </if>
+	       ORDER BY A.CNLT_DATE DESC
+    </select>
+</mapper>

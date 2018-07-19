@@ -1,0 +1,94 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper
+  PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+  "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="kbizUntyInterface">
+
+	<!-- 차세대 통합계약 테이블 배치 대상 데이터 조회 -->
+	<select id="selectIfCaUntycntrList" resultType="RenewIfCaUntycntrDomain" parameterType="Integer">
+		SELECT
+            UNTY_CNTR_NO
+            , DDCT_BIZ_DSCD
+            , CNTR_NO
+            , PRD_CD
+            , NREG_BZPN_YN
+            , CNTR_BGN_DT
+            , CNTR_END_DT
+            , ABND_YN
+            , POST_TRSPL_DSCD
+            , DLGT_UNTY_CSNO
+            , BZPL_UNTY_CSNO
+            , BZEN_CHRPN_NM
+            , SMS_YN
+            , TO_CHAR(FNL_UDT_DTM, 'YYYYMMDDHH24MISS') AS FNL_UDT_DTM
+          FROM VW_CM_UNTYCNTR_M_01
+         WHERE FNL_UDT_DTM BETWEEN TO_DATE(TO_CHAR(SYSDATE - #{value}, 'YYYYMMDD') || '000000', 'YYYYMMDDHH24MISS')
+                                               AND TO_DATE(TO_CHAR(SYSDATE - 1, 'YYYYMMDD') || '235959', 'YYYYMMDDHH24MISS')
+	</select>
+
+	<!-- 차세대 통합고객 테이블 배치 대상 데이터 조회 -->
+	<select id="selectIfCmUntycsList" resultType="RenewIfCmUntycsDomain" parameterType="Integer">
+		SELECT
+            UNTY_CSNO
+            , CS_SRCH_NO
+            , CS_DSCD
+            , CS_KRN_NM
+            , CS_SRCH_KWRD_NM
+            , RL_CS_KRN_NM
+            , TO_CHAR(FNL_UDT_DTM, 'YYYYMMDDHH24MISS') AS FNL_UDT_DTM
+          FROM VW_CM_UNTYCS_M_01
+         WHERE FNL_UDT_DTM BETWEEN TO_DATE(TO_CHAR(SYSDATE - #{value}, 'YYYYMMDD') || '000000', 'YYYYMMDDHH24MISS')
+                                               AND TO_DATE(TO_CHAR(SYSDATE - 1, 'YYYYMMDD') || '235959', 'YYYYMMDDHH24MISS')
+	</select>
+
+	<!-- 차세대 고객이메일 테이블 배치 대상 데이터 조회 -->
+	<select id="selectIfCmEmailList" resultType="RenewIfCmEmailDomain" parameterType="Integer">
+		SELECT
+            UNTY_CSNO
+            , EMAIL_SEQNO
+            , UNTY_CNTR_NO
+            , EMAIL_RL_DSCD
+            , EMAIL
+            , ERR_YN
+            , USAG_YN
+            , TO_CHAR(FNL_UDT_DTM, 'YYYYMMDDHH24MISS') AS FNL_UDT_DTM
+          FROM VW_CM_EMAIL_M_01
+         WHERE FNL_UDT_DTM BETWEEN TO_DATE(TO_CHAR(SYSDATE - #{value}, 'YYYYMMDD') || '000000', 'YYYYMMDDHH24MISS')
+                                               AND TO_DATE(TO_CHAR(SYSDATE - 1, 'YYYYMMDD') || '235959', 'YYYYMMDDHH24MISS')
+	</select>
+
+	<!-- 차세대 연락처 테이블 조회 -->
+	<select id="selectIfCmCnplList" resultType="RenewIfCmCnplDomain" parameterType="Integer">
+		SELECT
+            UNTY_CSNO
+            , CNPL_SEQNO
+            , UNTY_CNTR_NO
+            , CS_CNPL_DSCD
+            , TLNO
+            , ERR_YN
+            , USAG_YN
+            , TO_CHAR(FNL_UDT_DTM, 'YYYYMMDDHH24MISS') AS FNL_UDT_DTM
+          FROM VW_CM_CNPL_M_01
+         WHERE FNL_UDT_DTM BETWEEN TO_DATE(TO_CHAR(SYSDATE - #{value}, 'YYYYMMDD') || '000000', 'YYYYMMDDHH24MISS')
+                                               AND TO_DATE(TO_CHAR(SYSDATE - 1, 'YYYYMMDD') || '235959', 'YYYYMMDDHH24MISS')
+	</select>
+
+	<!-- 차세대 주소 테이블 조회 -->
+	<select id="selectIfCmAdrList" resultType="RenewIfCmAdrDomain" parameterType="Integer">
+		SELECT
+            UNTY_CSNO
+            , ADR_SEQNO
+            , UNTY_CNTR_NO
+            , CS_ADR_POST_TRSPL_DSCD
+            , ZIP
+            , BADR
+            , DADR
+            , ERR_YN
+            , USAG_YN
+            , TO_CHAR(FNL_UDT_DTM, 'YYYYMMDDHH24MISS') AS FNL_UDT_DTM
+          FROM VW_CM_ADR_M_01
+         WHERE FNL_UDT_DTM BETWEEN TO_DATE(TO_CHAR(SYSDATE - #{value}, 'YYYYMMDD') || '000000', 'YYYYMMDDHH24MISS')
+                                               AND TO_DATE(TO_CHAR(SYSDATE - 1, 'YYYYMMDD') || '235959', 'YYYYMMDDHH24MISS')
+	</select>
+
+</mapper>

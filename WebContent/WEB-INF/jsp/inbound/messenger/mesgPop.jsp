@@ -1,0 +1,281 @@
+<%--
+ * file name : mesgPop.jsp
+ * description : 메신저
+ * author : bsy
+ * initial date : 2018.01.03
+ * history
+  --%>
+<%@ page language="java" contentType="text/html; charset=UTF-8" pageEncoding="UTF-8"%>
+<%@ taglib prefix="c" uri="/WEB-INF/tld/c.tld" %>
+<%@ taglib prefix="kbiz" uri="/WEB-INF/tld/kbiz.tld" %>
+<!doctype html>
+<html lang="ko">
+<head>
+<meta http-equiv="content-type" content="text/html; charset=utf-8">
+<meta http-equiv="X-UA-Compatible" content="IE=edge">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, minimum-scale=1.0, user-scalable=no">
+<meta name="subject" content="KBIZ">
+<meta name="author" content="KBIZ">
+<meta name="keywords" content="KBIZ">
+<meta name="description" content="KBIZ">
+<jsp:include page="/WEB-INF/jsp/comm_top.jsp"/>
+<title>조직도</title>
+<script src="/js/jquery.cookie.js" type="text/javascript"></script>
+<script src="/js/jquery.treeview.js" type="text/javascript"></script>
+<script type="text/javascript">
+$(function(){
+    $("#tree").treeview({
+        collapsed: true,
+        animated: "fast",
+        control:"#sidetreecontrol",
+        persist: "location",
+        toggle: function() {
+            window.console && console.log("%o was toggled", this);
+        }
+    });
+    $(".folder").click(function(){
+        var dept = $(this).attr("class");
+        dept = dept.substring(7,15);
+        KBIZIO.requestParamAjax("/inbound/consult/organizationSearch.json", fn_orgnCalllback, {params: {deptCd: dept}});
+    });
+});
+
+function fn_search(){
+    var kbizNm = $("#kbizNm").val();
+    var kbizId = $("#kbizId").val();
+    if(kbizNm.length>0 || kbizId.length>0){
+        KBIZIO.requestParamAjax("/inbound/consult/orgnSearch.json", fn_orgnCalllback, {params: {kbizNm: kbizNm, kbizId: kbizId}});
+    }else{
+        alert("이름 또는 아이디를 입력해주세요.");
+        return false;
+    }
+}
+
+function fn_search2(){
+    if(event.keyCode == "13"){
+        var kbizNm = $("#kbizNm").val();
+        var kbizId = $("#kbizId").val();
+        if(kbizNm.length>0 || kbizId.length>0){
+            KBIZIO.requestParamAjax("/inbound/consult/orgnSearch.json", fn_orgnCalllback, {params: {kbizNm: kbizNm, kbizId: kbizId}});
+        }else{
+            alert("이름 또는 아이디를 입력해주세요.");
+            return false;
+        }
+    }
+}
+
+function fn_orgnCalllback(ret){
+	$("#tranId").val("");
+    document.mesgDetailForm.reset();
+    var r = ret.orSrch;
+    var temp = "";
+    if(r.length > 0 && r != null){
+        for(var i=0; i<r.length; i++){
+            temp += "<tr onclick=\"userSelect('"+r[i].userId+"','"+r[i].userNm+"')\">"
+            temp += "<td>"+r[i].userNm+"</td>";
+            temp += "<td>"+r[i].userId+"</td>";
+            temp += "<td>"+r[i].ofrmTelNo+"</td>";
+            temp += "<td>"+r[i].emailAdr+"</td>";
+            temp += "</tr>";
+        }
+    }else{
+        temp += "<tr>";
+        temp += "<td colspan='4' style='height: 50px;'>조회 결과가 없습니다.</td>";
+        temp += "</tr>";
+    }
+    $("#deptResult").html(temp);
+};
+
+function userSelect(userId, userNm){
+    KBIZUI.highlightTrByEvent(window.event);
+    $("#tranId").val(userId);
+    $("#tranNm").val(userNm);
+};
+
+//메신저전송
+function fn_mesgSend(){
+    //유효값검사
+    if (KBIZVA.isNullOrEmpty($("#tranId").val())){
+    	alert('받는사람을 선택해주세요.');
+    	return;
+    }
+    if (!KBIZVA.valCheck("mesgTitle",true))return;
+    if (!KBIZVA.valCheck("mesgContent",true))return;
+    if(!confirm("전송하시겠습니까?"))return;
+    KBIZIO.requestJsonAjax("mesgDetailForm", fn_mesgSendCallback);
+}
+
+function fn_mesgSendCallback(ret){
+    alert('전송되었습니다.');
+    window.close();
+}
+
+</script>
+<style type="text/css">
+.treeview, .treeview ul { padding: 0;margin: 0;list-style: none; display:block}
+.treeview ul {background-color: white;margin-top: 5px;}
+.treeview .hitarea {background: url('/images/tree/treeview-default.gif') -64px -25px no-repeat;height: 16px;width: 16px;margin-left: -16px;float: left;cursor: pointer;}
+/* fix for IE6 */
+* html .hitarea {display: inline;float:none;}
+.treeview li { margin: 0;padding: 7px 0px 7px 16px; display:block}
+.treeview a.selected {color:#F60; font-weight:bold}
+#treecontrol { margin: 1em 0; display: none; }
+.treeview .hover { color: red; cursor: pointer; }
+.treeview li { background: url('/images/tree/treeview-default-line.gif') 0 0 no-repeat; }
+.treeview li.collapsable, .treeview li.expandable { background-position: 0 -176px; }
+.treeview .expandable-hitarea { background-position: -80px -3px; }
+.treeview li.last { background-position: 0 -1766px }
+.treeview li.lastCollapsable, .treeview li.lastExpandable { background-image: url('/images/tree/treeview-default.gif'); }
+.treeview li.lastCollapsable { background-position: 0 -109px }
+.treeview li.lastExpandable { background-position: -32px -65px }
+.treeview div.lastCollapsable-hitarea, .treeview div.lastExpandable-hitarea { background-position: 0px; }
+.treeview-red li { background-image: url('/images/tree/treeview-red-line.gif'); }
+.treeview-red .hitarea, .treeview-red li.lastCollapsable, .treeview-red li.lastExpandable { background-image: url('/images/tree/treeview-red.gif'); }
+.treeview-black li { background-image: url('/images/tree/treeview-black-line.gif'); }
+.treeview-black .hitarea, .treeview-black li.lastCollapsable, .treeview-black li.lastExpandable { background-image: url('/images/tree/treeview-black.gif'); }
+.treeview-gray li { background-image: url('/images/tree/treeview-gray-line.gif'); }
+.treeview-gray .hitarea, .treeview-gray li.lastCollapsable, .treeview-gray li.lastExpandable { background-image: url('/images/tree/treeview-gray.gif'); }
+.treeview-famfamfam li { background-image: url('/images/tree/treeview-famfamfam-line.gif'); }
+.treeview-famfamfam .hitarea, .treeview-famfamfam li.lastCollapsable, .treeview-famfamfam li.lastExpandable { background-image: url('/images/tree/treeview-famfamfam.gif'); }
+.treeview .placeholder {background: url('/images/tree/ajax-loader.gif') 0 0 no-repeat;height: 16px;width: 16px;display: block;}
+.filetree li { padding: 5px 0 5px 16px; }
+.filetree span.folder, .filetree span.file { padding: 1px 0 1px 16px; display: block; }
+.filetree span.folder { background: url('/images/tree/folder.gif') 0 -1px no-repeat; }
+.filetree li.expandable span.folder { background: url('/images/tree/folder-closed.gif') 0 -1px no-repeat; }
+.filetree span.file { background: url('/images/tree/file.gif') 0 0 no-repeat; }
+.orgBox{display:block;border:1px solid #CCC}
+.orgBox .listHeader{display:block; height:36px; overflow:hidden}
+.orgBox .listHeader.open{ text-align:right; padding-right:10px; border-bottom:1px solid #d9d9d9; background:#fafafa; line-height:32px; border-top:2px solid #000}
+.orgBox .listBox{display:block; height:420px; overflow-y:scroll}
+.orgBox2{display:block;border:1px solid #CCC}
+.orgBox2 .listHeader{display:block; height:36px; overflow:hidden}
+.orgBox2 .listHeader.open{ text-align:right; padding-right:10px; border-bottom:1px solid #d9d9d9; background:#fafafa; line-height:32px; border-top:2px solid #000}
+.orgBox2 .listBox{display:block; height:210px; overflow-y:scroll}
+</style>
+</head>
+<body>
+    <div class="popup-wrap">
+        <div class="popup-layer">
+            <div class="popup-header">
+                <h1>조직도</h1>
+            </div>
+            <div class="ar mgt10" style="width:800px;">
+                <table width="250px" border="0" cellspacing="0" cellpadding="0" class="brd_list_a" style="border-bottom: none; table-layout: fixed">
+                <tr>
+                    <th>이름</th><td><input type="text" id="kbizNm" name="kbizNm" value="" onkeypress="fn_search2()"/></td>
+                    <th>아이디</th><td><input type="text" id="kbizId" name="kbizId" value="" onkeypress="fn_search2()"/>
+                    </td>
+                    <th><a href="#" class="btn small g_orange" onclick="fn_search()">조회</a></th>
+                </tr>
+                </table>
+            </div>
+            <div class="popup-container">
+                <div class="popup-conts">
+                    <!--content //-->
+                    <div class="pdb10 clfix" style="width: 800px;">
+                        <div class="orgBox fl" style="width: 250px">
+                            <div id="sidetreecontrol" class="listHeader open">
+                                <a href="#">전체닫기</a> <span style="color: #CCC; padding: 0 5px">|</span>
+                                <a href="#">전체열기</a>
+                            </div>
+                            <div class="listBox" style="padding-left: 10px">
+                            <ul id="tree" class="filetree">
+                                <li><a href="#"><strong><span class="folder">중소기업중앙회</span></strong></a>
+                                <c:set var="lcount" value="0" />
+                                <c:forEach items="${orng}" var="o">
+                                    <c:if test="${o.level ne 1}">
+                                        <c:if test="${lcount eq o.level}">
+                                            </li><li><a href="#"><strong><span class="folder ${o.deptCd}">${o.deptNm}</span></strong></a>
+                                        </c:if>
+                                        <c:if test="${lcount < o.level}">
+                                            <ul>
+                                                <li><a href="#"><strong><span class="folder ${o.deptCd}">${o.deptNm}</span></strong></a>
+                                        </c:if>
+                                        <c:if test="${lcount > o.level}">
+                                            <c:forEach begin="1" end="${lcount-o.level}" step="1">
+                                                </ul>
+                                            </c:forEach>
+                                            </li><li><a href="#"><strong><span class="folder ${o.deptCd}">${o.deptNm}</span></strong></a>
+                                        </c:if>
+                                    </c:if>
+                                    <c:set var="lcount" value="${o.level}" />
+                                </c:forEach>
+                                </li>
+                                </ul>
+                            </div>
+                        </div>
+                        <div class="orgBox2 fr" style="width: 540px">
+                            <div class="listHeader">
+                                <table width="475px" border="0" cellspacing="0" cellpadding="0" class="brd_list_a hover_action" style="border-bottom: none; table-layout: fixed">
+                                    <colgroup>
+                                        <col style="width: 100px">
+                                        <col style="width: 100px">
+                                        <col style="width: 120px">
+                                        <col style="width: 150px">
+                                    </colgroup>
+                                    <thead>
+                                        <tr>
+                                            <th style="border-bottom: none;">성명</th>
+                                            <th style="border-bottom: none;">아이디</th>
+                                            <th style="border-bottom: none;">전화번호</th>
+                                            <th style="border-bottom: none;">이메일</th>
+                                        </tr>
+                                    </thead>
+                                </table>
+                            </div>
+                            <div class="listBox">
+                                <table width="475px" border="0" cellspacing="0" cellpadding="0" class="brd_list_a hover_action" style="border-top: none; table-layout: fixed">
+                                    <colgroup>
+                                        <col style="width: 100px">
+                                        <col style="width: 100px">
+                                        <col style="width: 120px">
+                                        <col style="width: 150px">
+                                    </colgroup>
+                                    <tbody id="deptResult">
+                                    </tbody>
+                                </table>
+                            </div>
+	                        <div>
+	                          <form id="mesgDetailForm" name="mesgDetailForm" method="post" action="/inbound/messenger/mesgSend.json" >
+	                            <input type="hidden" id="userId" name="userId" value="${LoginUserId}">
+	                            <input type="hidden" id="tranId" name="tranId" value="">
+	                                <table width="100%" border="0"  cellspacing="0" cellpadding="0" class="brd_sch mgb05">
+	                                    <colgroup>
+	                                        <col style="width:80px;">
+	                                        <col style="width:150px;">
+	                                        <col style="width:80px;">
+	                                        <col style="width:150px;">
+	                                    </colgroup>
+	                                    <tr>
+	                                        <th>상담사명</th>
+	                                        <td><input type="text" id="userNm" name="userNm" value="${LoginUserNm}" readonly="readonly"/></td>
+	                                        <th>받는사람</th>
+	                                        <td><input type="text" id="tranNm" name="tranNm" value="" readonly="readonly"/></td>
+	                                    </tr>
+	                                    <tr>
+	                                        <th>제목</th>
+	                                        <td colspan="9"><input type="text" id="mesgTitle" name="mesgTitle" value="" title="제목" maxlength="150"/></td>
+	                                    </tr>
+	                                    <tr>
+	                                        <th>상담내역</th>
+	                                        <td colspan="9"><textarea rows="5" id="mesgContent" name="mesgContent" title="상담내역"></textarea></td>
+	                                    </tr>
+	                                    <tr>
+	                                        <th>링크</th>
+	                                        <td colspan="9"><input type="text" id="mesgUrl" name="mesgUrl" value="" /></td>
+	                                    </tr>
+	                                </table>
+	                            </form>
+	                        </div>
+                        </div>
+                    </div>
+                    <div class="popup-footer">
+                        <button id="btn_save" type="button" class="btn small g_blue" onclick="fn_mesgSend();">전송</button>
+                        <button id="btn_save" type="button" class="btn small g_lightgray" onclick="javascript:window.close();">닫기</button>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</body>
+</html>

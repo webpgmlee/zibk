@@ -1,0 +1,138 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper
+  PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+  "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="userStat">
+
+    <!-- [상담원별통계] 목록 조회 -->
+	<select id="select" parameterType="UserStatDomain" resultType="UserStatDomain">
+     select b.user_id
+            , b.user_nm
+            , nvl(c.a_cnt,0) as a_cnt
+            , nvl(d.b_cnt,0) as b_cnt
+            , nvl(e.c_cnt,0) as c_cnt
+            , nvl(f.d_cnt,0) as d_cnt
+            , nvl(g.e_cnt,0) as e_cnt
+            , nvl(h.f_cnt,0) as f_cnt
+            , nvl(i.g_cnt,0) as g_cnt
+            , nvl(j.sum_cnt,0) as sum_cnt
+      from if_co_user_hi a, if_co_user_ma b,
+             (select user_id,sum(1) as a_cnt
+               from th_consult_detail
+             where cnlt_proc_cd = '01'
+              <if test="selFromDt != null and selFromDt != '' and selDate ==  'date'">
+              and cnlt_date  between to_date(#{selFromDt},'YYYY-MM-DD') and (to_date(#{selToDt}|| '235959','YYYYMMDDHH24MISS'))
+              </if>
+              <if test="selFromDt != null and selFromDt != '' and selDate ==  'month'">
+              and cnlt_date  between to_date(#{selFromDt},'YYYY-MM') and add_months(to_date(#{selToDt} || '01235959','YYYYMMDDHH24MISS'), 1) - 1
+              </if>
+              <if test="selUserNm != null and selUserNm != ''">
+              and user_id in (select user_id from if_co_user_ma where user_nm like '%'|| #{selUserNm} ||'%')
+              </if>
+             group by user_id)c,
+             (select user_id,sum(1) as b_cnt
+               from th_consult_detail
+             where cnlt_proc_cd = '02'
+              <if test="selFromDt != null and selFromDt != '' and selDate ==  'date'">
+              and cnlt_date  between to_date(#{selFromDt},'YYYY-MM-DD') and (to_date(#{selToDt}|| '235959','YYYYMMDDHH24MISS'))
+              </if>
+              <if test="selFromDt != null and selFromDt != '' and selDate ==  'month'">
+              and cnlt_date  between to_date(#{selFromDt},'YYYY-MM') and add_months(to_date(#{selToDt} || '01235959','YYYYMMDDHH24MISS'), 1) - 1
+              </if>
+              <if test="selUserNm != null and selUserNm != ''">
+              and user_id in (select user_id from if_co_user_ma where user_nm like '%'|| #{selUserNm} ||'%')
+              </if>
+             group by user_id)d,
+             (select user_id,sum(1) as c_cnt
+               from th_consult_detail
+             where cnlt_proc_cd = '03'
+              <if test="selFromDt != null and selFromDt != '' and selDate ==  'date'">
+              and cnlt_date  between to_date(#{selFromDt},'YYYY-MM-DD') and (to_date(#{selToDt}|| '235959','YYYYMMDDHH24MISS'))
+              </if>
+              <if test="selFromDt != null and selFromDt != '' and selDate ==  'month'">
+              and cnlt_date  between to_date(#{selFromDt},'YYYY-MM') and add_months(to_date(#{selToDt} || '01235959','YYYYMMDDHH24MISS'), 1) - 1
+              </if>
+              <if test="selUserNm != null and selUserNm != ''">
+              and user_id in (select user_id from if_co_user_ma where user_nm like '%'|| #{selUserNm} ||'%')
+              </if>
+             group by user_id)e,
+             (select user_id,sum(1) as d_cnt
+                from th_consult_detail
+              where cnlt_proc_cd = '04'
+              <if test="selFromDt != null and selFromDt != '' and selDate ==  'date'">
+              and cnlt_date  between to_date(#{selFromDt},'YYYY-MM-DD') and (to_date(#{selToDt}|| '235959','YYYYMMDDHH24MISS'))
+              </if>
+              <if test="selFromDt != null and selFromDt != '' and selDate ==  'month'">
+              and cnlt_date  between to_date(#{selFromDt},'YYYY-MM') and add_months(to_date(#{selToDt} || '01235959','YYYYMMDDHH24MISS'), 1) - 1
+              </if>
+              <if test="selUserNm != null and selUserNm != ''">
+              and user_id in (select user_id from if_co_user_ma where user_nm like '%'|| #{selUserNm} ||'%')
+              </if>
+             group by user_id)f,
+             (select user_id,sum(1) as e_cnt
+                from th_consult_detail
+              where cnlt_proc_cd = '05'
+              <if test="selFromDt != null and selFromDt != '' and selDate ==  'date'">
+              and cnlt_date  between to_date(#{selFromDt},'YYYY-MM-DD') and (to_date(#{selToDt}|| '235959','YYYYMMDDHH24MISS'))
+              </if>
+              <if test="selFromDt != null and selFromDt != '' and selDate ==  'month'">
+              and cnlt_date  between to_date(#{selFromDt},'YYYY-MM') and add_months(to_date(#{selToDt} || '01235959','YYYYMMDDHH24MISS'), 1) - 1
+              </if>
+              <if test="selUserNm != null and selUserNm != ''">
+              and user_id in (select user_id from if_co_user_ma where user_nm like '%'|| #{selUserNm} ||'%')
+              </if>
+             group by user_id)g,
+             (select user_id,sum(1) as f_cnt
+                from th_consult_detail
+              where cnlt_proc_cd = '06'
+              <if test="selFromDt != null and selFromDt != '' and selDate ==  'date'">
+              and cnlt_date  between to_date(#{selFromDt},'YYYY-MM-DD') and (to_date(#{selToDt}|| '235959','YYYYMMDDHH24MISS'))
+              </if>
+              <if test="selFromDt != null and selFromDt != '' and selDate ==  'month'">
+              and cnlt_date  between to_date(#{selFromDt},'YYYY-MM') and add_months(to_date(#{selToDt} || '01235959','YYYYMMDDHH24MISS'), 1) - 1
+              </if>
+              <if test="selUserNm != null and selUserNm != ''">
+              and user_id in (select user_id from if_co_user_ma where user_nm like '%'|| #{selUserNm} ||'%')
+              </if>
+             group by user_id)h,
+             (select user_id,sum(1) as g_cnt
+                from th_consult_detail
+              where cnlt_proc_cd = '07'
+              <if test="selFromDt != null and selFromDt != '' and selDate ==  'date'">
+              and cnlt_date  between to_date(#{selFromDt},'YYYY-MM-DD') and (to_date(#{selToDt}|| '235959','YYYYMMDDHH24MISS'))
+              </if>
+              <if test="selFromDt != null and selFromDt != '' and selDate ==  'month'">
+              and cnlt_date  between to_date(#{selFromDt},'YYYY-MM') and add_months(to_date(#{selToDt} || '01235959','YYYYMMDDHH24MISS'), 1) - 1
+              </if>
+              <if test="selUserNm != null and selUserNm != ''">
+              and user_id in (select user_id from if_co_user_ma where user_nm like '%'|| #{selUserNm} ||'%')
+              </if>
+             group by user_id)i,
+             (select user_id,sum(1) as sum_cnt
+                from th_consult_detail
+              where cnlt_proc_cd in ('01','02','03','04','05','06','07')
+              <if test="selFromDt != null and selFromDt != '' and selDate ==  'date'">
+              and cnlt_date  between to_date(#{selFromDt},'YYYY-MM-DD') and (to_date(#{selToDt}|| '235959','YYYYMMDDHH24MISS'))
+              </if>
+              <if test="selFromDt != null and selFromDt != '' and selDate ==  'month'">
+              and cnlt_date  between to_date(#{selFromDt},'YYYY-MM') and add_months(to_date(#{selToDt} || '01235959','YYYYMMDDHH24MISS'), 1) - 1
+              </if>
+              <if test="selUserNm != null and selUserNm != ''">
+              and user_id in (select user_id from if_co_user_ma where user_nm like '%'|| #{selUserNm} ||'%')
+              </if>
+              group by user_id)j
+     where a.user_id = b.user_id
+        and a.user_id=c.user_id(+)
+        and a.user_id=d.user_id(+)
+        and a.user_id=e.user_id(+)
+        and a.user_id=f.user_id(+)
+        and a.user_id=g.user_id(+)
+        and a.user_id=h.user_id(+)
+        and a.user_id=i.user_id(+)
+        and a.user_id=j.user_id(+)
+	    and a.dept_cd ='B00604'
+	    and a.call_ap_grade in ('02','03')
+	    and b.user_nm like '%'|| #{selUserNm} || '%'
+    order by b.user_nm
+	</select>
+</mapper>

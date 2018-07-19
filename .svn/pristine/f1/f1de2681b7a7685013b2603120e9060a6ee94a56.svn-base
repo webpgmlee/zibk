@@ -1,0 +1,88 @@
+package or.kr.kbiz.bo.inbound.domain;
+
+public class InboundSpecialDomain {
+	private String cnltSeq;
+	private Integer cnltDetailNo;
+	private String untyCsno;
+	private String spclCont;
+	private String spclAppvYn;
+	private String spclAppvUserId;
+	private String regId;
+	private String regDate;
+	private String modId;
+	private String modDate;
+	private String csKrnNm;
+	private String userNm;
+	public String getCnltSeq() {
+		return cnltSeq;
+	}
+	public void setCnltSeq(String cnltSeq) {
+		this.cnltSeq = cnltSeq;
+	}
+	public Integer getCnltDetailNo() {
+		return cnltDetailNo;
+	}
+	public void setCnltDetailNo(Integer cnltDetailNo) {
+		this.cnltDetailNo = cnltDetailNo;
+	}
+	public String getUntyCsno() {
+		return untyCsno;
+	}
+	public void setUntyCsno(String untyCsno) {
+		this.untyCsno = untyCsno;
+	}
+	public String getSpclCont() {
+		return spclCont;
+	}
+	public void setSpclCont(String spclCont) {
+		this.spclCont = spclCont;
+	}
+	public String getSpclAppvYn() {
+		return spclAppvYn;
+	}
+	public void setSpclAppvYn(String spclAppvYn) {
+		this.spclAppvYn = spclAppvYn;
+	}
+	public String getSpclAppvUserId() {
+		return spclAppvUserId;
+	}
+	public void setSpclAppvUserId(String spclAppvUserId) {
+		this.spclAppvUserId = spclAppvUserId;
+	}
+	public String getRegId() {
+		return regId;
+	}
+	public void setRegId(String regId) {
+		this.regId = regId;
+	}
+	public String getRegDate() {
+		return regDate;
+	}
+	public void setRegDate(String regDate) {
+		this.regDate = regDate;
+	}
+	public String getModId() {
+		return modId;
+	}
+	public void setModId(String modId) {
+		this.modId = modId;
+	}
+	public String getModDate() {
+		return modDate;
+	}
+	public void setModDate(String modDate) {
+		this.modDate = modDate;
+	}
+	public String getCsKrnNm() {
+		return csKrnNm;
+	}
+	public void setCsKrnNm(String csKrnNm) {
+		this.csKrnNm = csKrnNm;
+	}
+	public String getUserNm() {
+		return userNm;
+	}
+	public void setUserNm(String userNm) {
+		this.userNm = userNm;
+	}
+}

@@ -1,0 +1,166 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<web-app xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns="http://java.sun.com/xml/ns/javaee" xsi:schemaLocation="http://java.sun.com/xml/ns/javaee http://java.sun.com/xml/ns/javaee/web-app_2_5.xsd" version="2.5">
+
+    <display-name>KBIZ-CS</display-name>
+    <description>KBIZ backoffice</description>
+
+    <!-- [S] CONTEXT -->
+    <listener>
+        <listener-class>org.springframework.web.context.ContextLoaderListener</listener-class>
+    </listener>
+
+    <servlet>
+	    <servlet-name>appServlet</servlet-name>
+	    <servlet-class>org.springframework.web.servlet.DispatcherServlet</servlet-class>
+	    <init-param>
+		    <param-name>contextConfigLocation</param-name>
+		    <param-value>classpath:config/spring/servlet-context.xml</param-value>
+	    </init-param>
+	    <load-on-startup>0</load-on-startup>
+    </servlet>
+    <servlet-mapping>
+        <servlet-name>appServlet</servlet-name>
+        <url-pattern>/</url-pattern>
+    </servlet-mapping>
+
+    <context-param>
+        <param-name>contextConfigLocation</param-name>
+        <param-value>
+            classpath:config/spring/root-context.xml
+        </param-value>
+    </context-param>
+    <!-- [E] CONTEXT -->
+
+
+    <!-- [S] LOG4J -->
+    <listener>
+        <listener-class>org.springframework.web.util.Log4jConfigListener</listener-class>
+    </listener>
+    <context-param>
+	    <param-name>log4jConfigLocation</param-name>
+	    <param-value>classpath:log4j.xml</param-value>
+    </context-param>
+    <!-- [E] LOG4J -->
+
+    <!-- [S] HTTP Method Filter -->
+    <filter>
+	    <filter-name>httpMethodFilter</filter-name>
+	    <filter-class>org.springframework.web.filter.HiddenHttpMethodFilter</filter-class>
+    </filter>
+    <filter-mapping>
+        <filter-name>httpMethodFilter</filter-name>
+        <servlet-name>appServlet</servlet-name>
+    </filter-mapping>
+    <!-- [E] HTTP Method Filter -->
+
+    <!-- [S] Request Wrapper Configuration -->
+    <filter>
+        <filter-name>Request Wrapper Filter</filter-name>
+        <filter-class>or.kr.kbiz.serv.web.filter.RequestWrapperFilter</filter-class>
+    </filter>
+    <filter-mapping>
+        <filter-name>Request Wrapper Filter</filter-name>
+        <url-pattern>*.json</url-pattern>
+    </filter-mapping>
+    <!-- [E] Request Wrapper Configuration -->
+
+    <!-- [S] Request Method Configuration -->
+    <filter>
+        <filter-name>Request Method Filter</filter-name>
+        <filter-class>or.kr.kbiz.serv.web.filter.RequestMethodFilter</filter-class>
+        <init-param>
+            <param-name>allowPOST</param-name>
+            <param-value>true</param-value>
+        </init-param>
+        <init-param>
+            <param-name>allowGET</param-name>
+            <param-value>true</param-value>
+        </init-param>
+    </filter>
+
+    <filter-mapping>
+        <filter-name>Request Method Filter</filter-name>
+        <url-pattern>*.json</url-pattern>
+    </filter-mapping>
+
+    <filter-mapping>
+        <filter-name>Request Method Filter</filter-name>
+        <url-pattern>*.view</url-pattern>
+    </filter-mapping>
+
+    <filter-mapping>
+        <filter-name>Request Method Filter</filter-name>
+        <url-pattern>*.do</url-pattern>
+    </filter-mapping>
+    <!-- [E] Request Method Configuration -->
+
+    <!-- [S] ENCODING -->
+    <filter>
+        <filter-name>encodingFilter</filter-name>
+        <filter-class>org.springframework.web.filter.CharacterEncodingFilter</filter-class>
+        <init-param>
+            <param-name>encoding</param-name>
+            <param-value>UTF-8</param-value>
+        </init-param>
+        <init-param>
+            <param-name>forceEncoding</param-name>
+            <param-value>true</param-value>
+        </init-param>
+    </filter>
+    <filter-mapping>
+        <filter-name>encodingFilter</filter-name>
+        <url-pattern>/*</url-pattern>
+    </filter-mapping>
+    <!-- [E] ENCODING -->
+
+    <!-- [S] MULTIPART -->
+    <filter>
+        <filter-name>multipartFilter</filter-name>
+        <filter-class>org.springframework.web.multipart.support.MultipartFilter</filter-class>
+    </filter>
+    <filter-mapping>
+        <filter-name>multipartFilter</filter-name>
+        <url-pattern>*.upload</url-pattern>
+    </filter-mapping>
+    <!-- [E] MULTIPART -->
+
+    <!-- [S] SSO filter -->
+    <!-- <filter>
+        <filter-name>SSOFilter</filter-name>
+        <filter-class>com.ksign.access.filter.KASSOServiceFilter</filter-class>
+
+        <init-param>
+            <param-name>sso_home</param-name>
+            <param-value>D:/ksign/sso/agent/</param-value>
+        </init-param>
+
+        <init-param>
+            <param-name>KSign_KCMV</param-name>
+            <param-value>false</param-value>
+        </init-param>
+
+        <init-param>
+            <param-name>TEST_MODE</param-name>
+            <param-value>true</param-value>
+        </init-param>
+    </filter>
+
+    <filter-mapping>
+        <filter-name>SSOFilter</filter-name>
+        <url-pattern>/*</url-pattern>
+    </filter-mapping> -->
+    <!-- [E] SSO filter -->
+
+    <!-- taglib -->
+    <!-- <jsp-config>
+        <taglib>
+            <taglib-uri>http://java.sun.com/jstl/core</taglib-uri>
+            <taglib-location>/WEB-INF/tld/c.tld</taglib-location>
+        </taglib>
+    </jsp-config> -->
+
+    <welcome-file-list>
+        <welcome-file>index.do</welcome-file>
+    </welcome-file-list>
+
+</web-app>
